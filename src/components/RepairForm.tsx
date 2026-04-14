@@ -56,6 +56,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setEstado(editRepair.estado);
       setImagenes(editRepair.imagenes || []);
       setCostoDiagnostico(editRepair.costoDiagnostico != null ? String(editRepair.costoDiagnostico) : "");
+      setCostoReparacion(editRepair.costoReparacion != null ? String(editRepair.costoReparacion) : "");
     } else {
       setCliente(""); setTelefono(""); setEmail("");
       setMarca(marcas[0] || ""); setConsola(modelosPorMarca[marcas[0]]?.[0] || "");
@@ -63,6 +64,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setProblemas([]); setDetalles(""); setEstado("PENDIENTE");
       setImagenes([]);
       setCostoDiagnostico("");
+      setCostoReparacion("");
     }
     setErrors({});
   }, [editRepair, open]);
@@ -106,6 +108,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       fecha: editRepair?.fecha || new Date().toISOString().slice(0, 10),
       imagenes,
       costoDiagnostico: costoDiagnostico ? parseFloat(costoDiagnostico) : undefined,
+      costoReparacion: costoReparacion ? parseFloat(costoReparacion) : undefined,
     });
     onClose();
   };
@@ -210,22 +213,42 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
             />
           </section>
 
-          {/* SECCIÓN 6 - Costo de Diagnóstico */}
+          {/* SECCIÓN 6 - Costos */}
           <section>
-            <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">💰 Costo de Diagnóstico</h3>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                value={costoDiagnostico}
-                onChange={(e) => setCostoDiagnostico(e.target.value)}
-                className={`${inputClass} pl-8`}
-              />
+            <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">💰 Costos</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Costo de Diagnóstico</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={costoDiagnostico}
+                    onChange={(e) => setCostoDiagnostico(e.target.value)}
+                    className={`${inputClass} pl-8`}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Costo de Reparación</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={costoReparacion}
+                    onChange={(e) => setCostoReparacion(e.target.value)}
+                    className={`${inputClass} pl-8`}
+                  />
+                </div>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Monto que se cobrará por el diagnóstico del equipo.</p>
+            <p className="text-xs text-muted-foreground mt-1">Montos por diagnóstico y reparación del equipo.</p>
           </section>
 
           {/* SECCIÓN 5 - Estado y QR */}
