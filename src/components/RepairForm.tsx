@@ -57,7 +57,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setCostoDiagnostico(editRepair.costoDiagnostico != null ? String(editRepair.costoDiagnostico) : "");
     } else {
       setCliente(""); setTelefono(""); setEmail("");
-      setMarca(marcas[0]); setConsola(modelosPorMarca[marcas[0]][0]);
+      setMarca(marcas[0] || ""); setConsola(modelosPorMarca[marcas[0]]?.[0] || "");
       setNumeroSerie(""); setColor(""); setAccesorios("");
       setProblemas([]); setDetalles(""); setEstado("PENDIENTE");
       setImagenes([]);
