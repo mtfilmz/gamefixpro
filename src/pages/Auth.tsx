@@ -74,6 +74,16 @@ const Auth = () => {
             />
           </div>
 
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="accent-primary w-4 h-4"
+            />
+            <span className="text-sm text-muted-foreground">Recordar sesión</span>
+          </label>
+
           <button
             type="submit"
             disabled={loading}
