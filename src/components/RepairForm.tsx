@@ -81,8 +81,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
     const e: Record<string, string> = {};
     if (!cliente.trim()) e.cliente = "Nombre requerido";
     if (!telefono.trim()) e.telefono = "Teléfono requerido";
-    if (!email.trim()) e.email = "Email requerido";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email inválido";
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email inválido";
     if (!consola) e.consola = "Modelo requerido";
     if (problemas.length === 0) e.problemas = "Selecciona al menos un problema";
     setErrors(e);
@@ -140,7 +139,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
                 {errors.telefono && <p className="text-destructive text-xs mt-1">{errors.telefono}</p>}
               </div>
               <div>
-                <input required type="email" placeholder="Email *" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} maxLength={255} />
+                <input type="email" placeholder="Email (opcional)" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} maxLength={255} />
                 {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
               </div>
             </div>
