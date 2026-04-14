@@ -76,7 +76,7 @@ const Index = () => {
         +
       </button>
 
-      <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); }} onSave={handleSave} editRepair={editRepair} />
+      <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); }} onSave={handleSave} editRepair={editRepair} repairs={repairs} />
     </div>
   );
 };

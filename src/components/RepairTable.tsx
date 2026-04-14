@@ -56,7 +56,7 @@ const RepairTable = ({ repairs, onEdit, filterEstado, onFilterChange }: RepairTa
                 <td className="py-3 px-4 text-foreground">{r.id}</td>
                 <td className="py-3 px-4 text-foreground">{r.cliente}</td>
                 <td className="py-3 px-4 text-foreground">{r.consola}</td>
-                <td className="py-3 px-4 text-foreground">{r.problema}</td>
+                <td className="py-3 px-4 text-foreground">{r.problemas.join(", ")}</td>
                 <td className="py-3 px-4 text-center">
                   <span className={`${estadoColor[r.estado]} text-xs font-bold px-3 py-1 rounded-full text-primary-foreground`}>
                     {r.estado}

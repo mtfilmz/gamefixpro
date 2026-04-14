@@ -3,8 +3,15 @@ export type EstadoReparacion = "PENDIENTE" | "DIAGNÓSTICO" | "EN REPARACIÓN" |
 export interface Repair {
   id: string;
   cliente: string;
+  telefono: string;
+  email: string;
+  marca: string;
   consola: string;
-  problema: string;
+  numeroSerie: string;
+  color: string;
+  accesorios: string;
+  problemas: string[];
+  detalles: string;
   estado: EstadoReparacion;
   fecha: string;
 }
