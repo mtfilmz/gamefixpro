@@ -1,7 +1,8 @@
 import { useRef, useCallback } from "react";
 import { Repair } from "@/types/repair";
 import { QRCodeSVG } from "qrcode.react";
-import { X, Download, Share2, Printer } from "lucide-react";
+import { X, Download, Share2, Printer, Phone } from "lucide-react";
+import { toast } from "sonner";
 
 interface QRTicketModalProps {
   repair: Repair | null;
@@ -40,6 +41,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
       link.download = `QR-${repair.id}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
+      toast.success("QR descargado");
     };
     img.src = url;
   }, [repair]);
@@ -56,7 +58,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
       }
     } else {
       await navigator.clipboard.writeText(text);
-      alert("Información copiada al portapapeles");
+      toast.success("Información copiada al portapapeles");
     }
   }, [repair]);
 
@@ -67,67 +69,70 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
   if (!open || !repair) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/70 backdrop-blur-sm overflow-y-auto py-6 px-4 print:bg-white print:p-0">
-      {/* Action buttons - hidden on print */}
-      <div className="fixed top-4 right-4 z-[60] flex gap-2 print:hidden">
+    <div className="fixed inset-0 z-50 flex items-start md:items-start justify-center bg-background/70 backdrop-blur-sm overflow-y-auto py-0 md:py-6 px-0 md:px-4 print:bg-white print:p-0">
+      {/* Action buttons - fixed bar on mobile, floating on desktop */}
+      <div className="fixed bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:top-4 md:right-4 z-[60] flex gap-2 p-3 md:p-0 bg-card md:bg-transparent border-t border-border md:border-0 safe-bottom print:hidden">
         <button
           onClick={handleDownloadQR}
-          className="bg-status-repaired text-primary-foreground p-2.5 rounded-lg hover:opacity-80 transition-opacity"
-          title="Descargar QR"
+          className="flex-1 md:flex-none bg-status-repaired text-primary-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
         >
           <Download className="w-5 h-5" />
+          <span className="text-xs font-bold md:hidden">Descargar</span>
         </button>
         <button
           onClick={handleShare}
-          className="bg-stat-completed text-primary-foreground p-2.5 rounded-lg hover:opacity-80 transition-opacity"
-          title="Compartir"
+          className="flex-1 md:flex-none bg-stat-completed text-primary-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
         >
           <Share2 className="w-5 h-5" />
+          <span className="text-xs font-bold md:hidden">Compartir</span>
         </button>
         <button
           onClick={handlePrint}
-          className="bg-accent text-accent-foreground p-2.5 rounded-lg hover:opacity-80 transition-opacity"
-          title="Imprimir ticket"
+          className="flex-1 md:flex-none bg-accent text-accent-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
         >
           <Printer className="w-5 h-5" />
+          <span className="text-xs font-bold md:hidden">Imprimir</span>
         </button>
         <button
           onClick={onClose}
-          className="bg-destructive text-destructive-foreground p-2.5 rounded-lg hover:opacity-80 transition-opacity"
-          title="Cerrar"
+          className="flex-1 md:flex-none bg-destructive text-destructive-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
         >
           <X className="w-5 h-5" />
+          <span className="text-xs font-bold md:hidden">Cerrar</span>
         </button>
       </div>
 
       {/* Ticket */}
       <div
         ref={ticketRef}
-        className="bg-white text-gray-900 w-full max-w-sm rounded-xl shadow-2xl overflow-hidden print:shadow-none print:rounded-none print:max-w-full"
+        className="bg-white text-gray-900 w-full md:max-w-sm md:rounded-xl shadow-2xl overflow-hidden mb-20 md:mb-0 print:shadow-none print:rounded-none print:max-w-full"
         id="print-ticket"
       >
         {/* Header */}
         <div className="bg-[hsl(var(--primary))] px-6 py-5 text-center">
-          <div className="text-3xl font-black text-white tracking-wider">[&gt;] GAME FIX PRO</div>
+          <div className="text-2xl md:text-3xl font-black text-white tracking-wider">[&gt;] GAME FIX PRO</div>
           <div className="text-white/80 text-sm mt-1 font-medium tracking-wide">Comprobante de Recepción</div>
         </div>
 
-        {/* ID grande */}
+        {/* ID */}
         <div className="text-center py-4 border-b-2 border-dashed border-gray-300">
           <div className="text-xs text-gray-500 uppercase tracking-widest">Orden de Servicio</div>
           <div className="text-5xl font-black text-gray-900 mt-1">{repair.id}</div>
           <div className="text-sm text-gray-500 mt-1">{repair.fecha}</div>
         </div>
 
-        {/* Datos del cliente */}
+        {/* Cliente */}
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Cliente</div>
           <div className="text-base font-bold text-gray-900">{repair.cliente}</div>
-          <div className="text-sm text-gray-600">{repair.telefono}</div>
+          <a href={`tel:${repair.telefono}`} className="flex items-center gap-1.5 text-sm text-blue-600 font-medium mt-1 min-h-[44px]">
+            <Phone className="w-4 h-4" />
+            {repair.telefono}
+          </a>
           {repair.email && <div className="text-sm text-gray-600">{repair.email}</div>}
         </div>
 
-        {/* Datos de la consola */}
+        {/* Equipo */}
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Equipo</div>
           <div className="grid grid-cols-2 gap-y-1 text-sm">
