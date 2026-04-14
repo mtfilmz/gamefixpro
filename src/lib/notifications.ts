@@ -14,10 +14,9 @@ export async function requestNotificationPermission(): Promise<boolean> {
 export function sendLocalNotification(title: string, options?: NotificationOptions) {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
 
-  const defaultOptions: NotificationOptions = {
+  const defaultOptions: NotificationOptions & { vibrate?: number[] } = {
     icon: "/pwa-icon-192.png",
     badge: "/pwa-icon-192.png",
-    vibrate: [200, 100, 200],
     tag: "gamefixpro",
     ...options,
   };
