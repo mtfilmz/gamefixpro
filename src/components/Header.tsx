@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Download, LogOut } from "lucide-react";
+import { Download, LogOut, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { canInstall, promptInstall } from "@/lib/pwa-utils";
 import { useAuth } from "@/hooks/use-auth";
+import { toast } from "@/hooks/use-toast";
 
 const Header = () => {
   const [installable, setInstallable] = useState(canInstall());
@@ -32,9 +33,16 @@ const Header = () => {
         <span className="hidden md:inline">GAME FIX PRO - Sistema de Reparación de Consolas</span>
       </h1>
       {user && (
-        <span className="text-primary-foreground/70 text-xs hidden sm:inline truncate max-w-[150px]">
-          {user.email}
-        </span>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(user.id);
+            toast({ title: "ID copiado", description: "Tu ID de usuario se copió al portapapeles." });
+          }}
+          className="text-primary-foreground/70 text-xs hidden sm:inline truncate max-w-[200px] hover:text-primary-foreground cursor-pointer"
+          title="Clic para copiar tu ID de usuario"
+        >
+          {user.email} 📋
+        </button>
       )}
       {installable && (
         <Button
