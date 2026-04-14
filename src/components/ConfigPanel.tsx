@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getConfig, saveConfig, resetConfig, AppConfig } from "@/lib/config";
-import { Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Repair } from "@/types/repair";
 
 const inputClass =
   "w-full bg-input border border-border rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm min-h-[40px]";
