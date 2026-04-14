@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Repair, EstadoReparacion } from "@/types/repair";
 import { getRepairs, saveRepairs, generateId } from "@/lib/repairs";
+import { notifyNewRepair } from "@/lib/notifications";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
@@ -34,6 +35,7 @@ const Index = () => {
     setRepairs(updated);
     setEditRepair(null);
     if (!data.id) {
+      notifyNewRepair(savedRepair.id, savedRepair.cliente);
       setQrRepair(savedRepair);
     }
   };
