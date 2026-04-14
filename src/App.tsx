@@ -37,7 +37,7 @@ const App = () => (
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<ProtectedRoute><NotFound /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
