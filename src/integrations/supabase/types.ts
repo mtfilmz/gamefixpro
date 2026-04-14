@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      repairs: {
+        Row: {
+          accesorios: string
+          cliente: string
+          color: string
+          consola: string
+          costo_diagnostico: number | null
+          costo_reparacion: number | null
+          created_at: string
+          detalles: string
+          email: string
+          estado: string
+          fecha: string
+          historial: Json
+          id: string
+          imagenes: Json
+          marca: string
+          numero_serie: string
+          problemas: string[]
+          telefono: string
+          updated_at: string
+        }
+        Insert: {
+          accesorios?: string
+          cliente?: string
+          color?: string
+          consola?: string
+          costo_diagnostico?: number | null
+          costo_reparacion?: number | null
+          created_at?: string
+          detalles?: string
+          email?: string
+          estado?: string
+          fecha?: string
+          historial?: Json
+          id: string
+          imagenes?: Json
+          marca?: string
+          numero_serie?: string
+          problemas?: string[]
+          telefono?: string
+          updated_at?: string
+        }
+        Update: {
+          accesorios?: string
+          cliente?: string
+          color?: string
+          consola?: string
+          costo_diagnostico?: number | null
+          costo_reparacion?: number | null
+          created_at?: string
+          detalles?: string
+          email?: string
+          estado?: string
+          fecha?: string
+          historial?: Json
+          id?: string
+          imagenes?: Json
+          marca?: string
+          numero_serie?: string
+          problemas?: string[]
+          telefono?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
