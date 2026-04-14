@@ -3,7 +3,6 @@ import { Repair, EstadoReparacion, StatusChange } from "@/types/repair";
 import { X, Check } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploader from "./ImageUploader";
-import { toast } from "sonner";
 
 interface UpdateStatusProps {
   repair: Repair | null;
