@@ -51,9 +51,10 @@ function repairToDb(r: Repair, userId: string) {
 export function useRepairs() {
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Initial fetch
   useEffect(() => {
+    if (!user) { setRepairs([]); setLoading(false); return; }
     const fetchRepairs = async () => {
       const { data, error } = await supabase
         .from("repairs")
@@ -67,9 +68,8 @@ export function useRepairs() {
     };
 
     fetchRepairs();
-  }, []);
+  }, [user]);
 
-  // Real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel("repairs-realtime")
@@ -100,7 +100,8 @@ export function useRepairs() {
   }, []);
 
   const saveRepair = async (repair: Repair) => {
-    const dbData = repairToDb(repair);
+    if (!user) return;
+    const dbData = repairToDb(repair, user.id);
     await supabase.from("repairs").upsert(dbData);
   };
 
