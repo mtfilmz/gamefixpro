@@ -4,6 +4,7 @@ interface RepairTableProps {
   repairs: Repair[];
   onEdit: (repair: Repair) => void;
   onShowQR: (repair: Repair) => void;
+  onUpdateStatus: (repair: Repair) => void;
   filterEstado: EstadoReparacion | "TODOS";
   onFilterChange: (f: EstadoReparacion | "TODOS") => void;
 }
@@ -23,7 +24,7 @@ function getProblemSummary(repair: Repair): string {
   return repair.detalles || "Sin detalle";
 }
 
-const RepairTable = ({ repairs, onEdit, onShowQR, filterEstado, onFilterChange }: RepairTableProps) => {
+const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, filterEstado, onFilterChange }: RepairTableProps) => {
   const filtered = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
   const estados: (EstadoReparacion | "TODOS")[] = ["TODOS", "PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
 
@@ -77,6 +78,12 @@ const RepairTable = ({ repairs, onEdit, onShowQR, filterEstado, onFilterChange }
                       className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-md hover:opacity-80 transition-opacity"
                     >
                       QR
+                    </button>
+                    <button
+                      onClick={() => onUpdateStatus(r)}
+                      className="bg-status-diagnostic text-primary-foreground text-xs font-bold px-3 py-1 rounded-md hover:opacity-80 transition-opacity"
+                    >
+                      ESTADO
                     </button>
                     <button
                       onClick={() => onEdit(r)}
