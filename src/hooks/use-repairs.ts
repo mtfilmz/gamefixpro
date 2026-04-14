@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Repair, EstadoReparacion, StatusChange, RepairImage } from "@/types/repair";
+import { useAuth } from "@/hooks/use-auth";
 
 function dbToRepair(row: any): Repair {
   return {
@@ -24,7 +25,7 @@ function dbToRepair(row: any): Repair {
   };
 }
 
-function repairToDb(r: Repair) {
+function repairToDb(r: Repair, userId: string) {
   return {
     id: r.id,
     cliente: r.cliente,
@@ -43,15 +44,17 @@ function repairToDb(r: Repair) {
     imagenes: JSON.parse(JSON.stringify(r.imagenes || [])),
     costo_diagnostico: r.costoDiagnostico ?? null,
     costo_reparacion: r.costoReparacion ?? null,
+    user_id: userId,
   };
 }
 
 export function useRepairs() {
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Initial fetch
   useEffect(() => {
+    if (!user) { setRepairs([]); setLoading(false); return; }
     const fetchRepairs = async () => {
       const { data, error } = await supabase
         .from("repairs")
@@ -65,9 +68,8 @@ export function useRepairs() {
     };
 
     fetchRepairs();
-  }, []);
+  }, [user]);
 
-  // Real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel("repairs-realtime")
@@ -98,7 +100,8 @@ export function useRepairs() {
   }, []);
 
   const saveRepair = async (repair: Repair) => {
-    const dbData = repairToDb(repair);
+    if (!user) return;
+    const dbData = repairToDb(repair, user.id);
     await supabase.from("repairs").upsert(dbData);
   };
 

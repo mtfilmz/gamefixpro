@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { Download } from "lucide-react";
+import { Download, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { canInstall, promptInstall } from "@/lib/pwa-utils";
+import { useAuth } from "@/hooks/use-auth";
 
 const Header = () => {
   const [installable, setInstallable] = useState(canInstall());
+  const { signOut, user } = useAuth();
 
   useEffect(() => {
     const onAvailable = () => setInstallable(true);
@@ -29,6 +31,11 @@ const Header = () => {
         <span className="md:hidden">Game Fix Pro</span>
         <span className="hidden md:inline">GAME FIX PRO - Sistema de Reparación de Consolas</span>
       </h1>
+      {user && (
+        <span className="text-primary-foreground/70 text-xs hidden sm:inline truncate max-w-[150px]">
+          {user.email}
+        </span>
+      )}
       {installable && (
         <Button
           size="sm"
@@ -38,6 +45,17 @@ const Header = () => {
         >
           <Download className="h-4 w-4" />
           <span className="hidden sm:inline">Instalar App</span>
+        </Button>
+      )}
+      {user && (
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={signOut}
+          className="shrink-0 gap-1.5"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="hidden sm:inline">Salir</span>
         </Button>
       )}
     </header>
