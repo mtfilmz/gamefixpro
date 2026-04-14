@@ -45,7 +45,7 @@ const UserRolesPanel = () => {
   const handleAssignByUserId = async (userId: string, role: string) => {
     setSaving(true);
     const { error } = await supabase.from("user_roles").upsert(
-      { user_id: userId, role },
+      [{ user_id: userId, role: role as "admin" | "tecnico" }],
       { onConflict: "user_id,role" }
     );
     if (error) {
@@ -68,7 +68,7 @@ const UserRolesPanel = () => {
   };
 
   const handleChangeRole = async (id: string, newRole: string) => {
-    const { error } = await supabase.from("user_roles").update({ role: newRole }).eq("id", id);
+    const { error } = await supabase.from("user_roles").update({ role: newRole as "admin" | "tecnico" }).eq("id", id);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
