@@ -17,7 +17,6 @@ import ConfigPanel from "@/components/ConfigPanel";
 
 const Index = () => {
   const { repairs, loading, saveRepair, deleteRepairs } = useRepairs();
-  const { repairs, loading, saveRepair, deleteRepairs } = useRepairs();
   const [activeView, setActiveView] = useState("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editRepair, setEditRepair] = useState<Repair | null>(null);
