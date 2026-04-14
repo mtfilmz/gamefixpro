@@ -17,11 +17,17 @@ const inputClass =
   "w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-base min-h-[44px]";
 
 const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormProps) => {
+  const config = getConfig();
+  const marcas = config.marcas;
+  const modelosPorMarca = config.modelosPorMarca;
+  const estados = config.estados as EstadoReparacion[];
+  const PROBLEMAS_OPTIONS = config.problemas;
+
   const [cliente, setCliente] = useState("");
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
-  const [marca, setMarca] = useState(marcas[0]);
-  const [consola, setConsola] = useState(modelosPorMarca[marcas[0]][0]);
+  const [marca, setMarca] = useState(marcas[0] || "");
+  const [consola, setConsola] = useState(modelosPorMarca[marcas[0]]?.[0] || "");
   const [numeroSerie, setNumeroSerie] = useState("");
   const [color, setColor] = useState("");
   const [accesorios, setAccesorios] = useState("");
