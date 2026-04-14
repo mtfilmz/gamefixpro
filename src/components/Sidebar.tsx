@@ -30,7 +30,6 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
   const menuItems = [
     { key: "dashboard", label: "Dashboard", icon: ">>" },
     { key: "historial", label: "Historial", icon: "||" },
-    { key: "roles", label: "Roles", icon: "⚙" },
     { key: "config", label: "Configuración", icon: "*" },
   ];
 
