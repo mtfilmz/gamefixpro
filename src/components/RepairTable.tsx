@@ -3,6 +3,7 @@ import { Repair, EstadoReparacion } from "@/types/repair";
 interface RepairTableProps {
   repairs: Repair[];
   onEdit: (repair: Repair) => void;
+  onShowQR: (repair: Repair) => void;
   filterEstado: EstadoReparacion | "TODOS";
   onFilterChange: (f: EstadoReparacion | "TODOS") => void;
 }
@@ -19,11 +20,10 @@ function getProblemSummary(repair: Repair): string {
   if (Array.isArray(repair.problemas) && repair.problemas.length > 0) {
     return repair.problemas.join(", ");
   }
-
   return repair.detalles || "Sin detalle";
 }
 
-const RepairTable = ({ repairs, onEdit, filterEstado, onFilterChange }: RepairTableProps) => {
+const RepairTable = ({ repairs, onEdit, onShowQR, filterEstado, onFilterChange }: RepairTableProps) => {
   const filtered = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
   const estados: (EstadoReparacion | "TODOS")[] = ["TODOS", "PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
 
@@ -72,7 +72,10 @@ const RepairTable = ({ repairs, onEdit, filterEstado, onFilterChange }: RepairTa
                 </td>
                 <td className="py-3 px-4 text-center">
                   <div className="flex gap-2 justify-center">
-                    <button className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-md hover:opacity-80 transition-opacity">
+                    <button
+                      onClick={() => onShowQR(r)}
+                      className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-md hover:opacity-80 transition-opacity"
+                    >
                       QR
                     </button>
                     <button
