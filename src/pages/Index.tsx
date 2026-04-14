@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Repair, EstadoReparacion } from "@/types/repair";
-import { getRepairs, saveRepairs, generateId } from "@/lib/repairs";
+import { generateId } from "@/lib/repairs";
 import { notifyNewRepair } from "@/lib/notifications";
+import { useRepairs } from "@/hooks/use-repairs";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
@@ -13,7 +14,7 @@ import UpdateStatus from "@/components/UpdateStatus";
 import ConfigPanel from "@/components/ConfigPanel";
 
 const Index = () => {
-  const [repairs, setRepairs] = useState<Repair[]>(getRepairs);
+  const { repairs, loading, saveRepair, deleteRepairs } = useRepairs();
   const [activeView, setActiveView] = useState("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editRepair, setEditRepair] = useState<Repair | null>(null);
@@ -22,18 +23,14 @@ const Index = () => {
   const [qrRepair, setQrRepair] = useState<Repair | null>(null);
   const [statusRepair, setStatusRepair] = useState<Repair | null>(null);
 
-  const handleSave = (data: Omit<Repair, "id"> & { id?: string }) => {
-    let updated: Repair[];
+  const handleSave = async (data: Omit<Repair, "id"> & { id?: string }) => {
     let savedRepair: Repair;
     if (data.id) {
       savedRepair = { ...data, id: data.id } as Repair;
-      updated = repairs.map((r) => (r.id === data.id ? savedRepair : r));
     } else {
       savedRepair = { ...data, id: generateId(repairs) } as Repair;
-      updated = [...repairs, savedRepair];
     }
-    saveRepairs(updated);
-    setRepairs(updated);
+    await saveRepair(savedRepair);
     setEditRepair(null);
     if (!data.id) {
       notifyNewRepair(savedRepair.id, savedRepair.cliente);
@@ -41,10 +38,8 @@ const Index = () => {
     }
   };
 
-  const handleStatusSave = (updatedRepair: Repair) => {
-    const updated = repairs.map((r) => (r.id === updatedRepair.id ? updatedRepair : r));
-    saveRepairs(updated);
-    setRepairs(updated);
+  const handleStatusSave = async (updatedRepair: Repair) => {
+    await saveRepair(updatedRepair);
     setStatusRepair(updatedRepair);
   };
 
@@ -57,6 +52,14 @@ const Index = () => {
     setEditRepair(null);
     setFormOpen(true);
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground text-lg">Cargando datos...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -81,10 +84,8 @@ const Index = () => {
           {activeView === "config" ? (
             <ConfigPanel
               repairs={repairs}
-              onDeleteRepairs={(ids) => {
-                const updated = repairs.filter((r) => !ids.includes(r.id));
-                saveRepairs(updated);
-                setRepairs(updated);
+              onDeleteRepairs={async (ids) => {
+                await deleteRepairs(ids);
               }}
             />
           ) : (
