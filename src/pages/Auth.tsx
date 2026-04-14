@@ -14,13 +14,17 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setMessage("");
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setError(error.message);
     } else {
+      if (rememberMe) {
+        localStorage.setItem("gfp_remembered_email", email);
+      } else {
+        localStorage.removeItem("gfp_remembered_email");
+      }
       navigate("/");
     }
     setLoading(false);
@@ -45,12 +49,6 @@ const Auth = () => {
               {error}
             </div>
           )}
-          {message && (
-            <div className="bg-primary/20 border border-primary/50 text-foreground rounded-lg px-4 py-2 text-sm">
-              {message}
-            </div>
-          )}
-
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Correo electrónico</label>
             <input
