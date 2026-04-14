@@ -201,7 +201,14 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
             </div>
           </section>
 
-          {/* SECCIÓN 4 - Detalles */}
+          {/* SECCIÓN 4 - Fotos del Equipo */}
+          <section>
+            <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📷 Fotos del Equipo</h3>
+            <p className="text-xs text-muted-foreground mb-2">Toma o sube fotos del estado actual del equipo como evidencia.</p>
+            <ImageUploader images={imagenes} onChange={setImagenes} />
+          </section>
+
+          {/* SECCIÓN 5 - Detalles */}
           <section>
             <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📝 Detalles Adicionales</h3>
             <textarea

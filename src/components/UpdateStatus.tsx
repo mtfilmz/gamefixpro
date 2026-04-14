@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Repair, EstadoReparacion, StatusChange } from "@/types/repair";
 import { X, Check } from "lucide-react";
 import { toast } from "sonner";
+import ImageUploader from "./ImageUploader";
+import { toast } from "sonner";
 
 interface UpdateStatusProps {
   repair: Repair | null;
@@ -126,6 +128,14 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
                 <p className="text-sm text-muted-foreground mt-2 border-t border-border pt-2">{repair.detalles}</p>
               )}
             </section>
+
+            {/* Photos */}
+            {(repair.imagenes && repair.imagenes.length > 0) && (
+              <section className="bg-muted/30 border border-border rounded-lg p-4">
+                <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📷 Fotos del Equipo</h3>
+                <ImageUploader images={repair.imagenes} onChange={() => {}} readOnly />
+              </section>
+            )}
 
             {/* Timeline */}
             <section className="bg-muted/30 border border-border rounded-lg p-4">
