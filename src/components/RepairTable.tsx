@@ -15,6 +15,14 @@ const estadoColor: Record<EstadoReparacion, string> = {
   ENTREGADO: "bg-status-delivered",
 };
 
+function getProblemSummary(repair: Repair): string {
+  if (Array.isArray(repair.problemas) && repair.problemas.length > 0) {
+    return repair.problemas.join(", ");
+  }
+
+  return repair.detalles || "Sin detalle";
+}
+
 const RepairTable = ({ repairs, onEdit, filterEstado, onFilterChange }: RepairTableProps) => {
   const filtered = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
   const estados: (EstadoReparacion | "TODOS")[] = ["TODOS", "PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
@@ -56,7 +64,7 @@ const RepairTable = ({ repairs, onEdit, filterEstado, onFilterChange }: RepairTa
                 <td className="py-3 px-4 text-foreground">{r.id}</td>
                 <td className="py-3 px-4 text-foreground">{r.cliente}</td>
                 <td className="py-3 px-4 text-foreground">{r.consola}</td>
-                <td className="py-3 px-4 text-foreground">{r.problemas.join(", ")}</td>
+                <td className="py-3 px-4 text-foreground">{getProblemSummary(r)}</td>
                 <td className="py-3 px-4 text-center">
                   <span className={`${estadoColor[r.estado]} text-xs font-bold px-3 py-1 rounded-full text-primary-foreground`}>
                     {r.estado}
