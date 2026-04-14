@@ -25,7 +25,7 @@ function dbToRepair(row: any): Repair {
   };
 }
 
-function repairToDb(r: Repair) {
+function repairToDb(r: Repair, userId: string) {
   return {
     id: r.id,
     cliente: r.cliente,
@@ -44,6 +44,7 @@ function repairToDb(r: Repair) {
     imagenes: JSON.parse(JSON.stringify(r.imagenes || [])),
     costo_diagnostico: r.costoDiagnostico ?? null,
     costo_reparacion: r.costoReparacion ?? null,
+    user_id: userId,
   };
 }
 
