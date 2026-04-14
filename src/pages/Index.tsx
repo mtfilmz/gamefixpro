@@ -10,6 +10,7 @@ import RepairTable from "@/components/RepairTable";
 import RepairForm from "@/components/RepairForm";
 import QRTicketModal from "@/components/QRTicketModal";
 import UpdateStatus from "@/components/UpdateStatus";
+import ConfigPanel from "@/components/ConfigPanel";
 
 const Index = () => {
   const [repairs, setRepairs] = useState<Repair[]>(getRepairs);
@@ -77,15 +78,21 @@ const Index = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
         <main className="flex-1 p-3 md:p-6 overflow-auto pb-20 lg:pb-6">
-          <StatsCards repairs={repairs} />
-          <RepairTable
-            repairs={repairs}
-            onEdit={openEdit}
-            onShowQR={setQrRepair}
-            onUpdateStatus={setStatusRepair}
-            filterEstado={filterEstado}
-            onFilterChange={setFilterEstado}
-          />
+          {activeView === "config" ? (
+            <ConfigPanel />
+          ) : (
+            <>
+              <StatsCards repairs={repairs} />
+              <RepairTable
+                repairs={repairs}
+                onEdit={openEdit}
+                onShowQR={setQrRepair}
+                onUpdateStatus={setStatusRepair}
+                filterEstado={filterEstado}
+                onFilterChange={setFilterEstado}
+              />
+            </>
+          )}
         </main>
         <footer className="text-center text-muted-foreground text-xs py-3 hidden lg:block">
           Sistema de Gestión v1.0 | Game Fix Pro

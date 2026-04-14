@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Repair, EstadoReparacion, RepairImage } from "@/types/repair";
 import { generateId } from "@/lib/repairs";
+import { getConfig } from "@/lib/config";
 import { QRCodeSVG } from "qrcode.react";
 import ImageUploader from "./ImageUploader";
 
@@ -12,38 +13,21 @@ interface RepairFormProps {
   repairs: Repair[];
 }
 
-const marcas = ["Sony", "Microsoft", "Nintendo"];
-const modelosPorMarca: Record<string, string[]> = {
-  Sony: ["PS5", "PS5 Digital", "PS4 Pro", "PS4 Slim", "PS4", "PS3"],
-  Microsoft: ["Xbox Series X", "Xbox Series S", "Xbox One X", "Xbox One S", "Xbox One"],
-  Nintendo: ["Nintendo Switch", "Nintendo Switch OLED", "Nintendo Switch Lite", "Wii U", "3DS"],
-};
-const estados: EstadoReparacion[] = ["PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
-
-const PROBLEMAS_OPTIONS = [
-  "Solo Diagnóstico",
-  "Mantenimiento",
-  "No enciende",
-  "Daño por líquido",
-  "Sufrió caída",
-  "Sobrecalentamiento",
-  "Subida de luz",
-  "Se apaga jugando",
-  "Se apaga con juegos pesados",
-  "Se congela/Freezes",
-  "No lee discos",
-  "Problemas de conexión",
-];
-
 const inputClass =
   "w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-base min-h-[44px]";
 
 const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormProps) => {
+  const config = getConfig();
+  const marcas = config.marcas;
+  const modelosPorMarca = config.modelosPorMarca;
+  const estados = config.estados as EstadoReparacion[];
+  const PROBLEMAS_OPTIONS = config.problemas;
+
   const [cliente, setCliente] = useState("");
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
-  const [marca, setMarca] = useState(marcas[0]);
-  const [consola, setConsola] = useState(modelosPorMarca[marcas[0]][0]);
+  const [marca, setMarca] = useState(marcas[0] || "");
+  const [consola, setConsola] = useState(modelosPorMarca[marcas[0]]?.[0] || "");
   const [numeroSerie, setNumeroSerie] = useState("");
   const [color, setColor] = useState("");
   const [accesorios, setAccesorios] = useState("");
@@ -73,7 +57,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setCostoDiagnostico(editRepair.costoDiagnostico != null ? String(editRepair.costoDiagnostico) : "");
     } else {
       setCliente(""); setTelefono(""); setEmail("");
-      setMarca(marcas[0]); setConsola(modelosPorMarca[marcas[0]][0]);
+      setMarca(marcas[0] || ""); setConsola(modelosPorMarca[marcas[0]]?.[0] || "");
       setNumeroSerie(""); setColor(""); setAccesorios("");
       setProblemas([]); setDetalles(""); setEstado("PENDIENTE");
       setImagenes([]);
