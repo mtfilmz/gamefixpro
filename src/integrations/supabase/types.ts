@@ -35,6 +35,7 @@ export type Database = {
           problemas: string[]
           telefono: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           accesorios?: string
@@ -56,6 +57,7 @@ export type Database = {
           problemas?: string[]
           telefono?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           accesorios?: string
@@ -77,6 +79,7 @@ export type Database = {
           problemas?: string[]
           telefono?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
