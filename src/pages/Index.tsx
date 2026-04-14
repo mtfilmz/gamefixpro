@@ -7,6 +7,7 @@ import StatsCards from "@/components/StatsCards";
 import RepairTable from "@/components/RepairTable";
 import RepairForm from "@/components/RepairForm";
 import QRTicketModal from "@/components/QRTicketModal";
+import UpdateStatus from "@/components/UpdateStatus";
 
 const Index = () => {
   const [repairs, setRepairs] = useState<Repair[]>(getRepairs);
@@ -16,6 +17,7 @@ const Index = () => {
   const [filterEstado, setFilterEstado] = useState<EstadoReparacion | "TODOS">("TODOS");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [qrRepair, setQrRepair] = useState<Repair | null>(null);
+  const [statusRepair, setStatusRepair] = useState<Repair | null>(null);
 
   const handleSave = (data: Omit<Repair, "id"> & { id?: string }) => {
     let updated: Repair[];
@@ -30,10 +32,16 @@ const Index = () => {
     saveRepairs(updated);
     setRepairs(updated);
     setEditRepair(null);
-    // Show QR/ticket after saving a new record
     if (!data.id) {
       setQrRepair(savedRepair);
     }
+  };
+
+  const handleStatusSave = (updatedRepair: Repair) => {
+    const updated = repairs.map((r) => (r.id === updatedRepair.id ? updatedRepair : r));
+    saveRepairs(updated);
+    setRepairs(updated);
+    setStatusRepair(updatedRepair); // keep modal open with fresh data
   };
 
   const openEdit = (r: Repair) => {
@@ -67,7 +75,14 @@ const Index = () => {
         <Header />
         <main className="flex-1 p-4 md:p-6 overflow-auto">
           <StatsCards repairs={repairs} />
-          <RepairTable repairs={repairs} onEdit={openEdit} onShowQR={setQrRepair} filterEstado={filterEstado} onFilterChange={setFilterEstado} />
+          <RepairTable
+            repairs={repairs}
+            onEdit={openEdit}
+            onShowQR={setQrRepair}
+            onUpdateStatus={setStatusRepair}
+            filterEstado={filterEstado}
+            onFilterChange={setFilterEstado}
+          />
         </main>
         <footer className="text-center text-muted-foreground text-xs py-3">
           Sistema de Gestión v1.0 | Game Fix Pro
@@ -83,6 +98,13 @@ const Index = () => {
 
       <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); }} onSave={handleSave} editRepair={editRepair} repairs={repairs} />
       <QRTicketModal repair={qrRepair} open={!!qrRepair} onClose={() => setQrRepair(null)} />
+      <UpdateStatus
+        repair={statusRepair}
+        open={!!statusRepair}
+        onClose={() => setStatusRepair(null)}
+        onSave={handleStatusSave}
+        onShowQR={setQrRepair}
+      />
     </div>
   );
 };

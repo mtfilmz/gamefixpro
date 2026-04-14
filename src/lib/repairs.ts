@@ -1,4 +1,4 @@
-import { Repair, EstadoReparacion } from "@/types/repair";
+import { Repair, EstadoReparacion, StatusChange } from "@/types/repair";
 
 const STORAGE_KEY = "gamefixpro_repairs";
 
@@ -63,6 +63,7 @@ function normalizeRepair(repair: StoredRepair): Repair {
     detalles: typeof repair.detalles === "string" ? repair.detalles.trim() : "",
     estado,
     fecha: typeof repair.fecha === "string" && repair.fecha.trim() ? repair.fecha : new Date().toISOString().slice(0, 10),
+    historial: Array.isArray((repair as any).historial) ? (repair as any).historial : [],
   };
 }
 
