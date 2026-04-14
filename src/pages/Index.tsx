@@ -79,7 +79,14 @@ const Index = () => {
         <Header />
         <main className="flex-1 p-3 md:p-6 overflow-auto pb-20 lg:pb-6">
           {activeView === "config" ? (
-            <ConfigPanel />
+            <ConfigPanel
+              repairs={repairs}
+              onDeleteRepairs={(ids) => {
+                const updated = repairs.filter((r) => !ids.includes(r.id));
+                saveRepairs(updated);
+                setRepairs(updated);
+              }}
+            />
           ) : (
             <>
               <StatsCards repairs={repairs} />
