@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const isLogin = true;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,20 +17,11 @@ const Auth = () => {
     setMessage("");
     setLoading(true);
 
-    if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        navigate("/");
-      }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        setMessage("Revisa tu correo para confirmar tu cuenta.");
-      }
+      navigate("/");
     }
     setLoading(false);
   };
@@ -44,7 +35,7 @@ const Auth = () => {
         <div className="bg-primary px-6 py-5 text-center">
           <h1 className="text-2xl font-bold text-primary-foreground">🎮 Game Fix Pro</h1>
           <p className="text-primary-foreground/80 text-sm mt-1">
-            {isLogin ? "Inicia sesión para continuar" : "Crea tu cuenta"}
+            Inicia sesión para continuar
           </p>
         </div>
 
@@ -90,18 +81,11 @@ const Auth = () => {
             disabled={loading}
             className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {loading ? "Cargando..." : isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+            {loading ? "Cargando..." : "Iniciar Sesión"}
           </button>
 
-          <p className="text-center text-sm text-muted-foreground">
-            {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
-            <button
-              type="button"
-              onClick={() => { setIsLogin(!isLogin); setError(""); setMessage(""); }}
-              className="text-primary hover:underline font-medium"
-            >
-              {isLogin ? "Regístrate" : "Inicia sesión"}
-            </button>
+          <p className="text-center text-xs text-muted-foreground">
+            Solo un administrador puede crear cuentas nuevas.
           </p>
         </form>
       </div>
