@@ -91,14 +91,6 @@ const Index = () => {
                 await deleteRepairs(ids);
               }}
             />
-          ) : activeView === "roles" ? (
-            isAdmin ? (
-              <UserRolesPanel />
-            ) : (
-              <div className="text-center text-muted-foreground py-12">
-                No tienes permisos para gestionar roles.
-              </div>
-            )
           ) : (
             <>
               <StatsCards repairs={repairs} />
@@ -127,7 +119,7 @@ const Index = () => {
       </button>
 
       {/* Mobile bottom nav */}
-      <BottomNav activeView={activeView} onViewChange={setActiveView} onNewRecord={openNew} showRoles={isAdmin} />
+      <BottomNav activeView={activeView} onViewChange={setActiveView} onNewRecord={openNew} />
 
       <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); }} onSave={handleSave} editRepair={editRepair} repairs={repairs} />
       <QRTicketModal repair={qrRepair} open={!!qrRepair} onClose={() => setQrRepair(null)} />
