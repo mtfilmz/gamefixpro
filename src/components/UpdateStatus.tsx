@@ -3,6 +3,7 @@ import { Repair, EstadoReparacion, StatusChange } from "@/types/repair";
 import { X, Check } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploader from "./ImageUploader";
+import { notifyStatusChange } from "@/lib/notifications";
 
 interface UpdateStatusProps {
   repair: Repair | null;
@@ -71,6 +72,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
     };
 
     onSave(updated);
+    notifyStatusChange(updated.id, updated.cliente, selectedEstado);
     toast.success(`Estado actualizado a ${selectedEstado}`);
     setSelectedEstado(null);
     setNota("");
