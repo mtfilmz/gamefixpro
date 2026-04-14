@@ -1,5 +1,11 @@
 export type EstadoReparacion = "PENDIENTE" | "DIAGNÓSTICO" | "EN REPARACIÓN" | "REPARADO" | "ENTREGADO";
 
+export interface StatusChange {
+  estado: EstadoReparacion;
+  fecha: string; // ISO timestamp
+  nota?: string;
+}
+
 export interface Repair {
   id: string;
   cliente: string;
@@ -14,4 +20,5 @@ export interface Repair {
   detalles: string;
   estado: EstadoReparacion;
   fecha: string;
+  historial?: StatusChange[];
 }
