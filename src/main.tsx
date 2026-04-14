@@ -1,6 +1,9 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+
+// Limpiar datos viejos de localStorage (migrados a la nube)
+localStorage.removeItem("gamefixpro_repairs");
 import { initInstallPrompt } from "./lib/pwa-utils";
 import { requestNotificationPermission } from "./lib/notifications";
 
