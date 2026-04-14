@@ -1,4 +1,5 @@
 import { Repair, EstadoReparacion } from "@/types/repair";
+import MobileRepairCard from "./MobileRepairCard";
 
 interface RepairTableProps {
   repairs: Repair[];
@@ -31,14 +32,18 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, filterEstado, 
   return (
     <div className="mt-6">
       <div className="bg-secondary rounded-t-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-primary font-bold text-lg">HISTORIAL DE EQUIPOS</h2>
-        <div className="flex gap-1 flex-wrap">
+        <h2 className="text-primary font-bold text-base md:text-lg">HISTORIAL DE EQUIPOS</h2>
+      </div>
+
+      {/* Filter pills - scrollable on mobile */}
+      <div className="bg-secondary/50 px-4 py-2 overflow-x-auto">
+        <div className="flex gap-1.5 min-w-max">
           {estados.map((e) => (
             <button
               key={e}
               onClick={() => onFilterChange(e)}
-              className={`text-xs px-3 py-1 rounded-full font-bold transition-colors ${
-                filterEstado === e ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+              className={`text-xs px-3 py-2 rounded-full font-bold transition-colors whitespace-nowrap min-h-[36px] ${
+                filterEstado === e ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground active:bg-muted/80"
               }`}
             >
               {e}
@@ -47,7 +52,24 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, filterEstado, 
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Mobile: Card layout */}
+      <div className="md:hidden space-y-3 p-3">
+        {filtered.map((r) => (
+          <MobileRepairCard
+            key={r.id}
+            repair={r}
+            onEdit={onEdit}
+            onShowQR={onShowQR}
+            onUpdateStatus={onUpdateStatus}
+          />
+        ))}
+        {filtered.length === 0 && (
+          <div className="py-8 text-center text-muted-foreground">No hay registros</div>
+        )}
+      </div>
+
+      {/* Desktop: Table layout */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-accent">
