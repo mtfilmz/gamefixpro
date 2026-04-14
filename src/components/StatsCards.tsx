@@ -9,11 +9,18 @@ const StatsCards = ({ repairs }: StatsCardsProps) => {
   const enReparacion = repairs.filter((r) => r.estado === "EN REPARACIÓN" || r.estado === "DIAGNÓSTICO").length;
   const completados = repairs.filter((r) => r.estado === "REPARADO" || r.estado === "ENTREGADO").length;
 
+  const ingresos = repairs.reduce((sum, r) => {
+    return sum + (r.costoDiagnostico || 0) + (r.costoReparacion || 0);
+  }, 0);
+
+  const formatMoney = (n: number) =>
+    "$" + n.toLocaleString("es-MX", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
   const stats = [
     { value: pendientes, label: "PENDIENTES", colorClass: "bg-stat-pending" },
     { value: enReparacion, label: "EN REPARACIÓN", colorClass: "bg-stat-repairing" },
     { value: completados, label: "COMPLETADOS", colorClass: "bg-stat-completed" },
-    { value: "$2,350", label: "INGRESOS", colorClass: "bg-stat-revenue" },
+    { value: formatMoney(ingresos), label: "INGRESOS", colorClass: "bg-stat-revenue" },
   ];
 
   return (
