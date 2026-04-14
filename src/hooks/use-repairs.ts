@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Repair, EstadoReparacion, StatusChange, RepairImage } from "@/types/repair";
+import { useAuth } from "@/hooks/use-auth";
 
 function dbToRepair(row: any): Repair {
   return {
