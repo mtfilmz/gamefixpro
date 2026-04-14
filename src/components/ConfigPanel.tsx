@@ -176,8 +176,14 @@ const ModelosEditor = ({ marcas, modelosPorMarca, onChange }: ModelosEditorProps
   );
 };
 
-const ConfigPanel = () => {
+interface ConfigPanelProps {
+  repairs?: Repair[];
+  onDeleteRepairs?: (ids: string[]) => void;
+}
+
+const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
   const [config, setConfig] = useState<AppConfig>(getConfig);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const update = (partial: Partial<AppConfig>) => {
     const updated = { ...config, ...partial };
