@@ -35,6 +35,7 @@ function formatTimestamp(iso: string): string {
 const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusProps) => {
   const [selectedEstado, setSelectedEstado] = useState<EstadoReparacion | null>(null);
   const [nota, setNota] = useState("");
+  const [costoReparacion, setCostoReparacion] = useState<string>("");
 
   // Reset when repair changes
   const [lastRepairId, setLastRepairId] = useState<string | null>(null);
@@ -42,6 +43,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
     setLastRepairId(repair.id);
     setSelectedEstado(null);
     setNota("");
+    setCostoReparacion(repair.costoReparacion != null ? String(repair.costoReparacion) : "");
   }
 
   if (!open || !repair) return null;
@@ -65,6 +67,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
       ...repair,
       estado: selectedEstado,
       historial: [...historial, newEntry],
+      costoReparacion: costoReparacion ? parseFloat(costoReparacion) : repair.costoReparacion,
     };
 
     onSave(updated);
@@ -200,6 +203,40 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
                   );
                 })}
               </div>
+            </section>
+
+            {/* Costs */}
+            <section className="bg-muted/30 border border-border rounded-lg p-4">
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">💰 Costos</h3>
+              {repair.costoDiagnostico != null && (
+                <div className="flex justify-between items-center text-sm mb-2">
+                  <span className="text-muted-foreground">Diagnóstico:</span>
+                  <span className="text-foreground font-bold">${repair.costoDiagnostico.toFixed(2)}</span>
+                </div>
+              )}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Costo de Reparación</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={costoReparacion}
+                    onChange={(e) => setCostoReparacion(e.target.value)}
+                    className="w-full bg-input border border-border rounded-lg pl-8 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm min-h-[44px]"
+                  />
+                </div>
+              </div>
+              {(repair.costoDiagnostico != null || costoReparacion) && (
+                <div className="flex justify-between items-center text-sm mt-3 pt-2 border-t border-border">
+                  <span className="text-foreground font-bold">Total:</span>
+                  <span className="text-primary font-black text-lg">
+                    ${((repair.costoDiagnostico || 0) + (costoReparacion ? parseFloat(costoReparacion) : 0)).toFixed(2)}
+                  </span>
+                </div>
+              )}
             </section>
 
             {/* Notes */}

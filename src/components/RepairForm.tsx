@@ -51,6 +51,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
   const [detalles, setDetalles] = useState("");
   const [estado, setEstado] = useState<EstadoReparacion>("PENDIENTE");
   const [imagenes, setImagenes] = useState<RepairImage[]>([]);
+  const [costoDiagnostico, setCostoDiagnostico] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const nextId = editRepair?.id || generateId(repairs);
@@ -69,12 +70,14 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setDetalles(editRepair.detalles);
       setEstado(editRepair.estado);
       setImagenes(editRepair.imagenes || []);
+      setCostoDiagnostico(editRepair.costoDiagnostico != null ? String(editRepair.costoDiagnostico) : "");
     } else {
       setCliente(""); setTelefono(""); setEmail("");
       setMarca(marcas[0]); setConsola(modelosPorMarca[marcas[0]][0]);
       setNumeroSerie(""); setColor(""); setAccesorios("");
       setProblemas([]); setDetalles(""); setEstado("PENDIENTE");
       setImagenes([]);
+      setCostoDiagnostico("");
     }
     setErrors({});
   }, [editRepair, open]);
@@ -117,6 +120,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       estado,
       fecha: editRepair?.fecha || new Date().toISOString().slice(0, 10),
       imagenes,
+      costoDiagnostico: costoDiagnostico ? parseFloat(costoDiagnostico) : undefined,
     });
     onClose();
   };
@@ -219,6 +223,24 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
               maxLength={1000}
               className={`${inputClass} resize-none`}
             />
+          </section>
+
+          {/* SECCIÓN 6 - Costo de Diagnóstico */}
+          <section>
+            <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">💰 Costo de Diagnóstico</h3>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={costoDiagnostico}
+                onChange={(e) => setCostoDiagnostico(e.target.value)}
+                className={`${inputClass} pl-8`}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Monto que se cobrará por el diagnóstico del equipo.</p>
           </section>
 
           {/* SECCIÓN 5 - Estado y QR */}
