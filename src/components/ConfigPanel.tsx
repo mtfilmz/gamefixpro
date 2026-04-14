@@ -267,6 +267,90 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
           items={config.accesoriosPreset}
           onChange={(accesoriosPreset) => update({ accesoriosPreset })}
         />
+
+        {/* Data Management Section */}
+        <div className="border border-border rounded-xl overflow-hidden">
+          <div className="w-full flex items-center gap-2 px-4 py-3 bg-muted/30">
+            <span className="text-sm">🗑️</span>
+            <span className="font-bold text-sm text-foreground flex-1">Gestión de Equipos Registrados</span>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{repairs.length}</span>
+          </div>
+          <div className="p-3 space-y-3">
+            {repairs.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-4">No hay equipos registrados.</p>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.size === repairs.length && repairs.length > 0}
+                      onChange={(e) => {
+                        setSelectedIds(e.target.checked ? new Set(repairs.map(r => r.id)) : new Set());
+                      }}
+                      className="rounded"
+                    />
+                    Seleccionar todos
+                  </label>
+                  {selectedIds.size > 0 && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="ml-auto gap-1.5"
+                      onClick={() => {
+                        if (confirm(`¿Eliminar ${selectedIds.size} equipo(s)? Esta acción no se puede deshacer.`)) {
+                          onDeleteRepairs?.(Array.from(selectedIds));
+                          setSelectedIds(new Set());
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Eliminar ({selectedIds.size})
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-1 max-h-72 overflow-y-auto">
+                  {repairs.map((r) => (
+                    <label
+                      key={r.id}
+                      className="flex items-center gap-3 bg-muted/20 rounded-lg px-3 py-2 cursor-pointer hover:bg-muted/40 transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(r.id)}
+                        onChange={(e) => {
+                          const next = new Set(selectedIds);
+                          e.target.checked ? next.add(r.id) : next.delete(r.id);
+                          setSelectedIds(next);
+                        }}
+                        className="rounded"
+                      />
+                      <span className="font-mono text-xs font-bold text-foreground">{r.id}</span>
+                      <span className="text-sm text-foreground truncate flex-1">{r.cliente}</span>
+                      <span className="text-xs text-muted-foreground">{r.consola}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="pt-2 border-t border-border">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="w-full gap-1.5"
+                    onClick={() => {
+                      if (confirm("¿Eliminar TODOS los equipos registrados? Esta acción no se puede deshacer.")) {
+                        onDeleteRepairs?.(repairs.map(r => r.id));
+                        setSelectedIds(new Set());
+                      }
+                    }}
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    Eliminar todos los equipos
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
