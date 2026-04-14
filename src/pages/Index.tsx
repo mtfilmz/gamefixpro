@@ -3,7 +3,7 @@ import { Repair, EstadoReparacion } from "@/types/repair";
 import { generateId } from "@/lib/repairs";
 import { notifyNewRepair } from "@/lib/notifications";
 import { useRepairs } from "@/hooks/use-repairs";
-import { useRole } from "@/hooks/use-role";
+
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
@@ -13,10 +13,9 @@ import RepairForm from "@/components/RepairForm";
 import QRTicketModal from "@/components/QRTicketModal";
 import UpdateStatus from "@/components/UpdateStatus";
 import ConfigPanel from "@/components/ConfigPanel";
-import UserRolesPanel from "@/components/UserRolesPanel";
+
 
 const Index = () => {
-  const { isAdmin } = useRole();
   const { repairs, loading, saveRepair, deleteRepairs } = useRepairs();
   const [activeView, setActiveView] = useState("dashboard");
   const [formOpen, setFormOpen] = useState(false);
@@ -91,14 +90,6 @@ const Index = () => {
                 await deleteRepairs(ids);
               }}
             />
-          ) : activeView === "roles" ? (
-            isAdmin ? (
-              <UserRolesPanel />
-            ) : (
-              <div className="text-center text-muted-foreground py-12">
-                No tienes permisos para gestionar roles.
-              </div>
-            )
           ) : (
             <>
               <StatsCards repairs={repairs} />
@@ -127,7 +118,7 @@ const Index = () => {
       </button>
 
       {/* Mobile bottom nav */}
-      <BottomNav activeView={activeView} onViewChange={setActiveView} onNewRecord={openNew} showRoles={isAdmin} />
+      <BottomNav activeView={activeView} onViewChange={setActiveView} onNewRecord={openNew} />
 
       <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); }} onSave={handleSave} editRepair={editRepair} repairs={repairs} />
       <QRTicketModal repair={qrRepair} open={!!qrRepair} onClose={() => setQrRepair(null)} />
