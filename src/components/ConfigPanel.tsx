@@ -3,6 +3,8 @@ import { getConfig, saveConfig, resetConfig, AppConfig } from "@/lib/config";
 import { Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Repair } from "@/types/repair";
+import { useRole } from "@/hooks/use-role";
+import UserRolesPanel from "@/components/UserRolesPanel";
 
 const inputClass =
   "w-full bg-input border border-border rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm min-h-[40px]";
@@ -184,6 +186,7 @@ interface ConfigPanelProps {
 const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
   const [config, setConfig] = useState<AppConfig>(getConfig);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const { isAdmin } = useRole();
 
   const update = (partial: Partial<AppConfig>) => {
     const updated = { ...config, ...partial };
@@ -351,6 +354,12 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
             )}
           </div>
         </div>
+        {/* Roles section - only for admins */}
+        {isAdmin && (
+          <div className="pt-2">
+            <UserRolesPanel />
+          </div>
+        )}
       </div>
     </div>
   );
