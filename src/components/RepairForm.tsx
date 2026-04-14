@@ -35,7 +35,7 @@ const PROBLEMAS_OPTIONS = [
 ];
 
 const inputClass =
-  "w-full bg-input border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm";
+  "w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-base min-h-[44px]";
 
 const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormProps) => {
   const [cliente, setCliente] = useState("");
@@ -119,10 +119,10 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/70 backdrop-blur-sm overflow-y-auto py-6 px-4">
-      <div className="bg-card border border-border rounded-xl w-full max-w-2xl shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/70 backdrop-blur-sm overflow-y-auto py-0 md:py-6 px-0 md:px-4">
+      <div className="bg-card border border-border md:rounded-xl w-full max-w-2xl shadow-2xl">
         {/* Header */}
-        <div className="bg-primary rounded-t-xl px-6 py-4 flex items-center justify-between">
+        <div className="bg-primary md:rounded-t-xl px-6 py-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-primary-foreground">
             {editRepair ? "Editar Registro" : "Nuevo Registro"}
           </h2>
@@ -139,7 +139,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
                 {errors.cliente && <p className="text-destructive text-xs mt-1">{errors.cliente}</p>}
               </div>
               <div>
-                <input required placeholder="Teléfono *" value={telefono} onChange={(e) => setTelefono(e.target.value)} className={inputClass} maxLength={20} />
+                <input required type="tel" placeholder="Teléfono *" value={telefono} onChange={(e) => setTelefono(e.target.value)} className={inputClass} maxLength={20} />
                 {errors.telefono && <p className="text-destructive text-xs mt-1">{errors.telefono}</p>}
               </div>
               <div>
