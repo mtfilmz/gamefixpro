@@ -64,6 +64,7 @@ function normalizeRepair(repair: StoredRepair): Repair {
     estado,
     fecha: typeof repair.fecha === "string" && repair.fecha.trim() ? repair.fecha : new Date().toISOString().slice(0, 10),
     historial: Array.isArray((repair as any).historial) ? (repair as any).historial : [],
+    imagenes: Array.isArray((repair as any).imagenes) ? (repair as any).imagenes : [],
   };
 }
 

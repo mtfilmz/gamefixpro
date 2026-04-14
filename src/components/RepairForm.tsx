@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Repair, EstadoReparacion } from "@/types/repair";
+import { Repair, EstadoReparacion, RepairImage } from "@/types/repair";
 import { generateId } from "@/lib/repairs";
 import { QRCodeSVG } from "qrcode.react";
+import ImageUploader from "./ImageUploader";
 
 interface RepairFormProps {
   open: boolean;
@@ -49,6 +50,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
   const [problemas, setProblemas] = useState<string[]>([]);
   const [detalles, setDetalles] = useState("");
   const [estado, setEstado] = useState<EstadoReparacion>("PENDIENTE");
+  const [imagenes, setImagenes] = useState<RepairImage[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const nextId = editRepair?.id || generateId(repairs);
@@ -66,11 +68,13 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setProblemas(editRepair.problemas);
       setDetalles(editRepair.detalles);
       setEstado(editRepair.estado);
+      setImagenes(editRepair.imagenes || []);
     } else {
       setCliente(""); setTelefono(""); setEmail("");
       setMarca(marcas[0]); setConsola(modelosPorMarca[marcas[0]][0]);
       setNumeroSerie(""); setColor(""); setAccesorios("");
       setProblemas([]); setDetalles(""); setEstado("PENDIENTE");
+      setImagenes([]);
     }
     setErrors({});
   }, [editRepair, open]);
@@ -112,6 +116,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       detalles: detalles.trim(),
       estado,
       fecha: editRepair?.fecha || new Date().toISOString().slice(0, 10),
+      imagenes,
     });
     onClose();
   };
@@ -196,7 +201,14 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
             </div>
           </section>
 
-          {/* SECCIÓN 4 - Detalles */}
+          {/* SECCIÓN 4 - Fotos del Equipo */}
+          <section>
+            <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📷 Fotos del Equipo</h3>
+            <p className="text-xs text-muted-foreground mb-2">Toma o sube fotos del estado actual del equipo como evidencia.</p>
+            <ImageUploader images={imagenes} onChange={setImagenes} />
+          </section>
+
+          {/* SECCIÓN 5 - Detalles */}
           <section>
             <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📝 Detalles Adicionales</h3>
             <textarea

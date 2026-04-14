@@ -6,6 +6,13 @@ export interface StatusChange {
   nota?: string;
 }
 
+export interface RepairImage {
+  id: string;
+  dataUrl: string;
+  fecha: string;
+  nota?: string;
+}
+
 export interface Repair {
   id: string;
   cliente: string;
@@ -21,4 +28,5 @@ export interface Repair {
   estado: EstadoReparacion;
   fecha: string;
   historial?: StatusChange[];
+  imagenes?: RepairImage[];
 }
