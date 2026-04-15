@@ -53,20 +53,20 @@ export function useRepairs() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
+  const fetchRepairs = async () => {
     if (!user) { setRepairs([]); setLoading(false); return; }
-    const fetchRepairs = async () => {
-      const { data, error } = await supabase
-        .from("repairs")
-        .select("*")
-        .order("created_at", { ascending: true });
+    const { data, error } = await supabase
+      .from("repairs")
+      .select("*")
+      .order("created_at", { ascending: true });
 
-      if (!error && data) {
-        setRepairs(data.map(dbToRepair));
-      }
-      setLoading(false);
-    };
+    if (!error && data) {
+      setRepairs(data.map(dbToRepair));
+    }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     fetchRepairs();
   }, [user]);
 
@@ -109,5 +109,5 @@ export function useRepairs() {
     await supabase.from("repairs").delete().in("id", ids);
   };
 
-  return { repairs, loading, saveRepair, deleteRepairs };
+  return { repairs, loading, saveRepair, deleteRepairs, refreshRepairs: fetchRepairs };
 }
