@@ -69,13 +69,19 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
           continue;
         }
 
-        const { data: urlData } = supabase.storage
+        // Use signed URL (valid 1 year) since bucket is private
+        const { data: signedData, error: signError } = await supabase.storage
           .from("repair-images")
-          .getPublicUrl(fileName);
+          .createSignedUrl(fileName, 60 * 60 * 24 * 365);
+
+        if (signError || !signedData?.signedUrl) {
+          console.error("Signed URL error:", signError);
+          continue;
+        }
 
         newImages.push({
           id: `img-${Date.now()}-${i}`,
-          dataUrl: urlData.publicUrl,
+          dataUrl: signedData.signedUrl,
           fecha: new Date().toISOString(),
         });
       } catch (err) {
