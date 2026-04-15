@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Repair, EstadoReparacion } from "@/types/repair";
 import { generateId } from "@/lib/repairs";
 import { notifyNewRepair } from "@/lib/notifications";
@@ -16,7 +16,7 @@ import ConfigPanel from "@/components/ConfigPanel";
 
 
 const Index = () => {
-  const { repairs, loading, saveRepair, deleteRepairs, refreshRepairs } = useRepairs();
+  const { repairs, loading, saveRepair, deleteRepairs, refreshRepairs, setBusy } = useRepairs();
   const [activeView, setActiveView] = useState("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editRepair, setEditRepair] = useState<Repair | null>(null);
@@ -24,6 +24,12 @@ const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [qrRepair, setQrRepair] = useState<Repair | null>(null);
   const [statusRepair, setStatusRepair] = useState<Repair | null>(null);
+
+  // Pause auto-refresh while any modal is open
+  const anyModalOpen = formOpen || !!qrRepair || !!statusRepair;
+  useEffect(() => {
+    setBusy(anyModalOpen);
+  }, [anyModalOpen, setBusy]);
 
   const handleSave = async (data: Omit<Repair, "id"> & { id?: string }) => {
     let savedRepair: Repair;
