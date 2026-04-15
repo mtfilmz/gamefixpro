@@ -37,6 +37,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
   const [selectedEstado, setSelectedEstado] = useState<EstadoReparacion | null>(null);
   const [nota, setNota] = useState("");
   const [costoReparacion, setCostoReparacion] = useState<string>("");
+  const [costoComponente, setCostoComponente] = useState<string>("");
 
   // Reset when repair changes
   const [lastRepairId, setLastRepairId] = useState<string | null>(null);
