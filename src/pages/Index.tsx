@@ -25,6 +25,12 @@ const Index = () => {
   const [qrRepair, setQrRepair] = useState<Repair | null>(null);
   const [statusRepair, setStatusRepair] = useState<Repair | null>(null);
 
+  // Pause auto-refresh while any modal is open
+  const anyModalOpen = formOpen || !!qrRepair || !!statusRepair;
+  useEffect(() => {
+    setBusy(anyModalOpen);
+  }, [anyModalOpen, setBusy]);
+
   const handleSave = async (data: Omit<Repair, "id"> & { id?: string }) => {
     let savedRepair: Repair;
     if (data.id) {
