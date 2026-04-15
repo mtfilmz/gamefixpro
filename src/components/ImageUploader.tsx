@@ -27,10 +27,13 @@ function resizeImage(file: File): Promise<Blob> {
         canvas.width = w;
         canvas.height = h;
         canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+        // Try WebP first (much lighter), fallback to JPEG
+        const useWebP = typeof canvas.toBlob === "function";
+        const mime = useWebP ? "image/webp" : "image/jpeg";
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
           else reject(new Error("Failed to create blob"));
-        }, "image/jpeg", 0.7);
+        }, mime, 0.6);
       };
       img.onerror = reject;
       img.src = reader.result as string;
