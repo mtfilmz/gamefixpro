@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, LogOut, RefreshCw, RotateCcw } from "lucide-react";
+import { Download, LogOut, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { canInstall, promptInstall } from "@/lib/pwa-utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -7,26 +7,6 @@ import { toast } from "@/hooks/use-toast";
 
 interface HeaderProps {
   onRefresh?: () => void;
-}
-
-async function forceFullUpdate() {
-  try {
-    // Unregister all service workers
-    const registrations = await navigator.serviceWorker?.getRegistrations();
-    if (registrations) {
-      await Promise.all(registrations.map((r) => r.unregister()));
-    }
-
-    // Clear all caches
-    const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map((name) => caches.delete(name)));
-
-    // Clear storage
-    localStorage.clear();
-    sessionStorage.clear();
-  } catch (e) {
-    console.warn("Error limpiando caches:", e);
-  }
 }
 
 const Header = ({ onRefresh }: HeaderProps) => {
@@ -47,13 +27,6 @@ const Header = ({ onRefresh }: HeaderProps) => {
   const handleInstall = async () => {
     const accepted = await promptInstall();
     if (accepted) setInstallable(false);
-  };
-
-  const handleForceUpdate = async () => {
-    toast({ title: "Actualizando...", description: "Limpiando caché y cerrando sesión." });
-    await forceFullUpdate();
-    await signOut();
-    window.location.href = "/auth";
   };
 
   return (
@@ -87,18 +60,6 @@ const Header = ({ onRefresh }: HeaderProps) => {
         >
           <RefreshCw className="h-4 w-4" />
           <span className="hidden sm:inline">Actualizar</span>
-        </Button>
-      )}
-      {user && (
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={handleForceUpdate}
-          className="shrink-0 gap-1.5"
-          title="Forzar actualización: limpia caché y cierra sesión"
-        >
-          <RotateCcw className="h-4 w-4" />
-          <span className="hidden sm:inline">Forzar Update</span>
         </Button>
       )}
       {installable && (
