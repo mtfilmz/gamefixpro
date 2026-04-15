@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { getConfig, saveConfig, resetConfig, AppConfig } from "@/lib/config";
-import { Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight, AlertTriangle, RefreshCw } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Repair } from "@/types/repair";
 import { useRole } from "@/hooks/use-role";
