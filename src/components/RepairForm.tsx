@@ -37,6 +37,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
   const [imagenes, setImagenes] = useState<RepairImage[]>([]);
   const [costoDiagnostico, setCostoDiagnostico] = useState<string>("");
   const [costoReparacion, setCostoReparacion] = useState<string>("");
+  const [costoComponente, setCostoComponente] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const nextId = editRepair?.id || generateId(repairs);
@@ -57,6 +58,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setImagenes(editRepair.imagenes || []);
       setCostoDiagnostico(editRepair.costoDiagnostico != null ? String(editRepair.costoDiagnostico) : "");
       setCostoReparacion(editRepair.costoReparacion != null ? String(editRepair.costoReparacion) : "");
+      setCostoComponente(editRepair.costoComponente != null ? String(editRepair.costoComponente) : "");
     } else {
       setCliente(""); setTelefono(""); setEmail("");
       setMarca(marcas[0] || ""); setConsola(modelosPorMarca[marcas[0]]?.[0] || "");
@@ -65,6 +67,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setImagenes([]);
       setCostoDiagnostico("");
       setCostoReparacion("");
+      setCostoComponente("");
     }
     setErrors({});
   }, [editRepair, open]);
@@ -108,6 +111,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       imagenes,
       costoDiagnostico: costoDiagnostico ? parseFloat(costoDiagnostico) : undefined,
       costoReparacion: costoReparacion ? parseFloat(costoReparacion) : undefined,
+      costoComponente: costoComponente ? parseFloat(costoComponente) : undefined,
     });
     onClose();
   };
@@ -246,24 +250,49 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
                   />
                 </div>
               </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Componente Adicional</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={costoComponente}
+                    onChange={(e) => setCostoComponente(e.target.value)}
+                    className={`${inputClass} pl-8`}
+                  />
+                </div>
+              </div>
             </div>
-            {costoDiagnostico && costoReparacion && parseFloat(costoReparacion) > 0 && (
+            {(costoDiagnostico || costoReparacion || costoComponente) && (
               <div className="mt-3 p-3 bg-muted/40 border border-border rounded-lg space-y-1">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Costo de reparación</span>
-                  <span>${parseFloat(costoReparacion).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-green-500">
-                  <span>Diagnóstico acreditado</span>
-                  <span>- ${parseFloat(costoDiagnostico).toFixed(2)}</span>
-                </div>
+                {costoReparacion && parseFloat(costoReparacion) > 0 && (
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Costo de reparación</span>
+                    <span>${parseFloat(costoReparacion).toFixed(2)}</span>
+                  </div>
+                )}
+                {costoComponente && parseFloat(costoComponente) > 0 && (
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Componente adicional</span>
+                    <span>${parseFloat(costoComponente).toFixed(2)}</span>
+                  </div>
+                )}
+                {costoDiagnostico && parseFloat(costoDiagnostico) > 0 && (
+                  <div className="flex justify-between text-sm text-emerald-500">
+                    <span>Diagnóstico acreditado</span>
+                    <span>- ${parseFloat(costoDiagnostico).toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="border-t border-border pt-1 flex justify-between text-sm font-bold text-foreground">
                   <span>Saldo a cobrar</span>
-                  <span>${Math.max(0, parseFloat(costoReparacion) - parseFloat(costoDiagnostico)).toFixed(2)}</span>
+                  <span>${Math.max(0, (parseFloat(costoReparacion || "0") + parseFloat(costoComponente || "0")) - parseFloat(costoDiagnostico || "0")).toFixed(2)}</span>
                 </div>
               </div>
             )}
-            <p className="text-xs text-muted-foreground mt-1">El diagnóstico se acredita automáticamente al costo de reparación.</p>
+            <p className="text-xs text-muted-foreground mt-1">El diagnóstico se acredita automáticamente al costo total.</p>
           </section>
 
           {/* SECCIÓN 5 - Estado y QR */}

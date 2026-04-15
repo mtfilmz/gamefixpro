@@ -20,6 +20,7 @@ export type Database = {
           cliente: string
           color: string
           consola: string
+          costo_componente: number | null
           costo_diagnostico: number | null
           costo_reparacion: number | null
           created_at: string
@@ -42,6 +43,7 @@ export type Database = {
           cliente?: string
           color?: string
           consola?: string
+          costo_componente?: number | null
           costo_diagnostico?: number | null
           costo_reparacion?: number | null
           created_at?: string
@@ -64,6 +66,7 @@ export type Database = {
           cliente?: string
           color?: string
           consola?: string
+          costo_componente?: number | null
           costo_diagnostico?: number | null
           costo_reparacion?: number | null
           created_at?: string
