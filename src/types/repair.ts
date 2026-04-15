@@ -31,4 +31,5 @@ export interface Repair {
   imagenes?: RepairImage[];
   costoDiagnostico?: number;
   costoReparacion?: number;
+  costoComponente?: number;
 }

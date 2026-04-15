@@ -1,0 +1,1 @@
+ALTER TABLE public.repairs ADD COLUMN costo_componente numeric DEFAULT NULL;
