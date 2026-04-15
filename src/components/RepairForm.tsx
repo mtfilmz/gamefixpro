@@ -58,6 +58,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setImagenes(editRepair.imagenes || []);
       setCostoDiagnostico(editRepair.costoDiagnostico != null ? String(editRepair.costoDiagnostico) : "");
       setCostoReparacion(editRepair.costoReparacion != null ? String(editRepair.costoReparacion) : "");
+      setCostoComponente(editRepair.costoComponente != null ? String(editRepair.costoComponente) : "");
     } else {
       setCliente(""); setTelefono(""); setEmail("");
       setMarca(marcas[0] || ""); setConsola(modelosPorMarca[marcas[0]]?.[0] || "");
@@ -66,6 +67,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setImagenes([]);
       setCostoDiagnostico("");
       setCostoReparacion("");
+      setCostoComponente("");
     }
     setErrors({});
   }, [editRepair, open]);
@@ -109,6 +111,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       imagenes,
       costoDiagnostico: costoDiagnostico ? parseFloat(costoDiagnostico) : undefined,
       costoReparacion: costoReparacion ? parseFloat(costoReparacion) : undefined,
+      costoComponente: costoComponente ? parseFloat(costoComponente) : undefined,
     });
     onClose();
   };
