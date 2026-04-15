@@ -5,35 +5,19 @@ interface StatsCardsProps {
 }
 
 const StatsCards = ({ repairs }: StatsCardsProps) => {
-  const pendientes = repairs.filter((r) => r.estado === "PENDIENTE").length;
-  const enReparacion = repairs.filter((r) => r.estado === "EN REPARACIÓN" || r.estado === "DIAGNÓSTICO").length;
-  const completados = repairs.filter((r) => r.estado === "REPARADO" || r.estado === "ENTREGADO").length;
-
-  const ingresos = repairs.reduce((sum, r) => {
-    return sum + (r.costoDiagnostico || 0) + (r.costoReparacion || 0);
-  }, 0);
+  const saldo = repairs
+    .filter((r) => r.estado !== "ENTREGADO")
+    .reduce((sum, r) => sum + (r.costoDiagnostico || 0) + (r.costoReparacion || 0), 0);
 
   const formatMoney = (n: number) =>
     "$" + n.toLocaleString("es-MX", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
-  const stats = [
-    { value: pendientes, label: "PENDIENTES", colorClass: "bg-stat-pending" },
-    { value: enReparacion, label: "EN REPARACIÓN", colorClass: "bg-stat-repairing" },
-    { value: completados, label: "COMPLETADOS", colorClass: "bg-stat-completed" },
-    { value: formatMoney(ingresos), label: "INGRESOS", colorClass: "bg-stat-revenue" },
-  ];
-
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((s) => (
-        <div
-          key={s.label}
-          className={`${s.colorClass} rounded-xl p-5 border-2 border-foreground/20 shadow-lg flex flex-col items-center justify-center`}
-        >
-          <span className="text-3xl font-bold text-primary-foreground">{s.value}</span>
-          <span className="text-xs font-bold text-primary-foreground/90 mt-1">{s.label}</span>
-        </div>
-      ))}
+    <div className="mb-4">
+      <div className="bg-stat-revenue rounded-xl p-5 border-2 border-foreground/20 shadow-lg flex flex-col items-center justify-center max-w-xs">
+        <span className="text-3xl font-bold text-primary-foreground">{formatMoney(saldo)}</span>
+        <span className="text-xs font-bold text-primary-foreground/90 mt-1">SALDO A COBRAR</span>
+      </div>
     </div>
   );
 };
