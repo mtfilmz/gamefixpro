@@ -83,7 +83,15 @@ export function useRepairs() {
       .order("created_at", { ascending: true });
 
     if (!error && data) {
-      setRepairs(data.map(dbToRepair));
+      const parsed = data.map(dbToRepair);
+      // Refresh signed URLs for images in parallel
+      const withUrls = await Promise.all(
+        parsed.map(async (r) => ({
+          ...r,
+          imagenes: await refreshImageUrls(r.imagenes || []),
+        }))
+      );
+      setRepairs(withUrls);
     }
     setLoading(false);
   };
