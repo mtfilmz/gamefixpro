@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import { Download, LogOut, Copy } from "lucide-react";
+import { Download, LogOut, Copy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { canInstall, promptInstall } from "@/lib/pwa-utils";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "@/hooks/use-toast";
 
-const Header = () => {
+interface HeaderProps {
+  onRefresh?: () => void;
+}
+
+const Header = ({ onRefresh }: HeaderProps) => {
   const [installable, setInstallable] = useState(canInstall());
   const { signOut, user } = useAuth();
 
@@ -43,6 +47,20 @@ const Header = () => {
         >
           {user.email} 📋
         </button>
+      )}
+      {onRefresh && (
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            onRefresh();
+            toast({ title: "Actualizado", description: "Lista de reparaciones actualizada." });
+          }}
+          className="shrink-0 gap-1.5"
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span className="hidden sm:inline">Actualizar</span>
+        </Button>
       )}
       {installable && (
         <Button
