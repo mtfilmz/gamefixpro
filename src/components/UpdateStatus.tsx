@@ -253,7 +253,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
                 <div className="flex justify-between items-center text-sm mt-3 pt-2 border-t border-border">
                   <span className="text-foreground font-bold">Total:</span>
                   <span className="text-primary font-black text-lg">
-                    ${((repair.costoDiagnostico || 0) + (costoReparacion ? parseFloat(costoReparacion) : 0) + (costoComponente ? parseFloat(costoComponente) : 0)).toFixed(2)}
+                    ${((costoReparacion ? parseFloat(costoReparacion) : 0) + (costoComponente ? parseFloat(costoComponente) : 0) - (repair.costoDiagnostico || 0)).toFixed(2)}
                   </span>
                 </div>
               )}
