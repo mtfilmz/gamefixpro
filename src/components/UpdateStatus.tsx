@@ -46,6 +46,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
     setSelectedEstado(null);
     setNota("");
     setCostoReparacion(repair.costoReparacion != null ? String(repair.costoReparacion) : "");
+    setCostoComponente(repair.costoComponente != null ? String(repair.costoComponente) : "");
   }
 
   if (!open || !repair) return null;
