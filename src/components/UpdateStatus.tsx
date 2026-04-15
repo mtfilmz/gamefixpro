@@ -71,6 +71,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
       estado: selectedEstado,
       historial: [...historial, newEntry],
       costoReparacion: costoReparacion ? parseFloat(costoReparacion) : repair.costoReparacion,
+      costoComponente: costoComponente ? parseFloat(costoComponente) : repair.costoComponente,
     };
 
     onSave(updated);
