@@ -257,16 +257,22 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
             {/* Action buttons */}
             <div className="flex gap-3">
               <button
-                onClick={handleSave}
-                className="flex-1 bg-status-repaired text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                onClick={onClose}
+                className="flex-1 bg-destructive text-destructive-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
               >
-                Guardar Cambios
+                Cerrar
               </button>
               <button
                 onClick={() => onShowQR(repair)}
                 className="flex-1 bg-status-delivered text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
               >
                 Ver QR / Compartir
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex-1 bg-status-repaired text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
+              >
+                Guardar Cambios
               </button>
             </div>
           </div>
