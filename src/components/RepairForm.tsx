@@ -247,7 +247,23 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
                 </div>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Montos por diagnóstico y reparación del equipo.</p>
+            {costoDiagnostico && costoReparacion && parseFloat(costoReparacion) > 0 && (
+              <div className="mt-3 p-3 bg-muted/40 border border-border rounded-lg space-y-1">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Costo de reparación</span>
+                  <span>${parseFloat(costoReparacion).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-green-500">
+                  <span>Diagnóstico acreditado</span>
+                  <span>- ${parseFloat(costoDiagnostico).toFixed(2)}</span>
+                </div>
+                <div className="border-t border-border pt-1 flex justify-between text-sm font-bold text-foreground">
+                  <span>Saldo a cobrar</span>
+                  <span>${Math.max(0, parseFloat(costoReparacion) - parseFloat(costoDiagnostico)).toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">El diagnóstico se acredita automáticamente al costo de reparación.</p>
           </section>
 
           {/* SECCIÓN 5 - Estado y QR */}
