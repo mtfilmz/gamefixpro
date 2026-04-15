@@ -62,10 +62,11 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
       if (!file.type.startsWith("image/")) continue;
       try {
         const blob = await resizeImage(file);
-        const fileName = `${user.id}/${Date.now()}-${i}.jpg`;
+        const ext = blob.type === "image/webp" ? "webp" : "jpg";
+        const fileName = `${user.id}/${Date.now()}-${i}.${ext}`;
         const { error } = await supabase.storage
           .from("repair-images")
-          .upload(fileName, blob, { contentType: "image/jpeg", upsert: false });
+          .upload(fileName, blob, { contentType: blob.type, upsert: false });
 
         if (error) {
           console.error("Upload error:", error);
