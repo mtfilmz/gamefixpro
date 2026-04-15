@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Repair, EstadoReparacion } from "@/types/repair";
 import { generateId } from "@/lib/repairs";
 import { notifyNewRepair } from "@/lib/notifications";
@@ -16,7 +16,7 @@ import ConfigPanel from "@/components/ConfigPanel";
 
 
 const Index = () => {
-  const { repairs, loading, saveRepair, deleteRepairs, refreshRepairs } = useRepairs();
+  const { repairs, loading, saveRepair, deleteRepairs, refreshRepairs, setBusy } = useRepairs();
   const [activeView, setActiveView] = useState("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editRepair, setEditRepair] = useState<Repair | null>(null);
