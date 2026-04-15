@@ -7,7 +7,7 @@ interface StatsCardsProps {
 const StatsCards = ({ repairs }: StatsCardsProps) => {
   const saldo = repairs
     .filter((r) => r.estado !== "ENTREGADO")
-    .reduce((sum, r) => sum + (r.costoDiagnostico || 0) + (r.costoReparacion || 0), 0);
+    .reduce((sum, r) => sum + (r.costoDiagnostico || 0) + (r.costoReparacion || 0) + (r.costoComponente || 0), 0);
 
   const formatMoney = (n: number) =>
     "$" + n.toLocaleString("es-MX", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
