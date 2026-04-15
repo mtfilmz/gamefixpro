@@ -356,6 +356,10 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
             )}
           </div>
         </div>
+
+        {/* Force Update Section */}
+        <ForceUpdateSection />
+
         {/* Roles section - only for admins */}
         {isAdmin && (
           <div className="pt-2">
