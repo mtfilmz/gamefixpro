@@ -234,11 +234,26 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
                   />
                 </div>
               </div>
-              {(repair.costoDiagnostico != null || costoReparacion) && (
+              <div className="mt-3">
+                <label className="text-xs text-muted-foreground mb-1 block">Componente Adicional</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={costoComponente}
+                    onChange={(e) => setCostoComponente(e.target.value)}
+                    className="w-full bg-input border border-border rounded-lg pl-8 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm min-h-[44px]"
+                  />
+                </div>
+              </div>
+              {(repair.costoDiagnostico != null || costoReparacion || costoComponente) && (
                 <div className="flex justify-between items-center text-sm mt-3 pt-2 border-t border-border">
                   <span className="text-foreground font-bold">Total:</span>
                   <span className="text-primary font-black text-lg">
-                    ${((repair.costoDiagnostico || 0) + (costoReparacion ? parseFloat(costoReparacion) : 0)).toFixed(2)}
+                    ${((repair.costoDiagnostico || 0) + (costoReparacion ? parseFloat(costoReparacion) : 0) + (costoComponente ? parseFloat(costoComponente) : 0)).toFixed(2)}
                   </span>
                 </div>
               )}
