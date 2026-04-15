@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import { Download, LogOut, Copy } from "lucide-react";
+import { Download, LogOut, Copy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { canInstall, promptInstall } from "@/lib/pwa-utils";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "@/hooks/use-toast";
 
-const Header = () => {
+interface HeaderProps {
+  onRefresh?: () => void;
+}
+
+const Header = ({ onRefresh }: HeaderProps) => {
   const [installable, setInstallable] = useState(canInstall());
   const { signOut, user } = useAuth();
 
