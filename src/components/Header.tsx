@@ -48,6 +48,20 @@ const Header = ({ onRefresh }: HeaderProps) => {
           {user.email} 📋
         </button>
       )}
+      {onRefresh && (
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            onRefresh();
+            toast({ title: "Actualizado", description: "Lista de reparaciones actualizada." });
+          }}
+          className="shrink-0 gap-1.5"
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span className="hidden sm:inline">Actualizar</span>
+        </Button>
+      )}
       {installable && (
         <Button
           size="sm"
