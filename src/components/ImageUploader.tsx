@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { RepairImage } from "@/types/repair";
-import { Camera, X, Plus, ZoomIn } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Camera, X, Plus, ZoomIn, Loader2 } from "lucide-react";
 
 interface ImageUploaderProps {
   images: RepairImage[];
@@ -10,7 +11,7 @@ interface ImageUploaderProps {
 
 const MAX_SIZE = 800;
 
-function resizeImage(file: File): Promise<string> {
+function resizeImage(file: File): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -26,7 +27,10 @@ function resizeImage(file: File): Promise<string> {
         canvas.width = w;
         canvas.height = h;
         canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", 0.7));
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error("Failed to create blob"));
+        }, "image/jpeg", 0.7);
       };
       img.onerror = reject;
       img.src = reader.result as string;
@@ -39,24 +43,49 @@ function resizeImage(file: File): Promise<string> {
 const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setUploading(true);
     const newImages: RepairImage[] = [];
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (!file.type.startsWith("image/")) continue;
       try {
-        const dataUrl = await resizeImage(file);
+        const blob = await resizeImage(file);
+        const fileName = `${user.id}/${Date.now()}-${i}.jpg`;
+        const { error } = await supabase.storage
+          .from("repair-images")
+          .upload(fileName, blob, { contentType: "image/jpeg", upsert: false });
+
+        if (error) {
+          console.error("Upload error:", error);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from("repair-images")
+          .getPublicUrl(fileName);
+
         newImages.push({
           id: `img-${Date.now()}-${i}`,
-          dataUrl,
+          dataUrl: urlData.publicUrl,
           fecha: new Date().toISOString(),
         });
-      } catch { /* skip invalid */ }
+      } catch (err) {
+        console.error("Image processing error:", err);
+      }
     }
+
     if (newImages.length > 0) onChange([...images, ...newImages]);
     if (inputRef.current) inputRef.current.value = "";
+    setUploading(false);
   };
 
   const removeImage = (id: string) => {
@@ -99,10 +128,11 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="aspect-square rounded-lg border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors min-h-[80px]"
+            disabled={uploading}
+            className="aspect-square rounded-lg border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors min-h-[80px] disabled:opacity-50"
           >
-            <Camera className="w-6 h-6" />
-            <span className="text-[10px] font-medium">Agregar</span>
+            {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Camera className="w-6 h-6" />}
+            <span className="text-[10px] font-medium">{uploading ? "Subiendo..." : "Agregar"}</span>
           </button>
         )}
       </div>
@@ -121,7 +151,7 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
       )}
 
       {/* Add more button for mobile */}
-      {!readOnly && images.length > 0 && (
+      {!readOnly && images.length > 0 && !uploading && (
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
