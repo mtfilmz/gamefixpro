@@ -8,6 +8,51 @@ import { Repair } from "@/types/repair";
 import { useRole } from "@/hooks/use-role";
 import UserRolesPanel from "@/components/UserRolesPanel";
 
+const ForceUpdateSection = () => {
+  const { signOut } = useAuth();
+
+  const handleForceUpdate = async () => {
+    toast({ title: "Actualizando...", description: "Limpiando caché y cerrando sesión." });
+    try {
+      const registrations = await navigator.serviceWorker?.getRegistrations();
+      if (registrations) {
+        await Promise.all(registrations.map((r) => r.unregister()));
+      }
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {
+      console.warn("Error limpiando caches:", e);
+    }
+    await signOut();
+    window.location.href = "/auth";
+  };
+
+  return (
+    <div className="border border-border rounded-xl overflow-hidden">
+      <div className="w-full flex items-center gap-2 px-4 py-3 bg-muted/30">
+        <span className="text-sm">🔄</span>
+        <span className="font-bold text-sm text-foreground flex-1">Forzar Actualización</span>
+      </div>
+      <div className="p-3 space-y-2">
+        <p className="text-xs text-muted-foreground">
+          Si la app no refleja los últimos cambios, presiona este botón para limpiar toda la caché, cerrar sesión y recargar desde cero.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-1.5"
+          onClick={handleForceUpdate}
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          Forzar Actualización Completa
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const inputClass =
   "w-full bg-input border border-border rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm min-h-[40px]";
 
