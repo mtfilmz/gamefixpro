@@ -68,6 +68,8 @@ export function useRepairs() {
 
   useEffect(() => {
     fetchRepairs();
+    const interval = setInterval(fetchRepairs, 30000);
+    return () => clearInterval(interval);
   }, [user]);
 
   useEffect(() => {
