@@ -3,6 +3,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { Repair, EstadoReparacion, StatusChange, RepairImage } from "@/types/repair";
 import { useAuth } from "@/hooks/use-auth";
 
+async function refreshImageUrls(images: RepairImage[]): Promise<RepairImage[]> {
+  if (!images || images.length === 0) return [];
+  const refreshed: RepairImage[] = [];
+  for (const img of images) {
+    // Extract storage path from any supabase URL (public or signed)
+    const match = img.dataUrl?.match(/repair-images\/(.+?)(?:\?|$)/);
+    if (match) {
+      const path = decodeURIComponent(match[1]);
+      const { data } = await supabase.storage
+        .from("repair-images")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      refreshed.push({ ...img, dataUrl: data?.signedUrl || img.dataUrl });
+    } else {
+      refreshed.push(img);
+    }
+  }
+  return refreshed;
+}
+
 function dbToRepair(row: any): Repair {
   return {
     id: row.id,
