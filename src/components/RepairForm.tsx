@@ -37,6 +37,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
   const [imagenes, setImagenes] = useState<RepairImage[]>([]);
   const [costoDiagnostico, setCostoDiagnostico] = useState<string>("");
   const [costoReparacion, setCostoReparacion] = useState<string>("");
+  const [costoComponente, setCostoComponente] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const nextId = editRepair?.id || generateId(repairs);

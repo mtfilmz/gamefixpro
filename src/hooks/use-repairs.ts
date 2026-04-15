@@ -22,6 +22,7 @@ function dbToRepair(row: any): Repair {
     imagenes: (row.imagenes as RepairImage[]) || [],
     costoDiagnostico: row.costo_diagnostico != null ? Number(row.costo_diagnostico) : undefined,
     costoReparacion: row.costo_reparacion != null ? Number(row.costo_reparacion) : undefined,
+    costoComponente: row.costo_componente != null ? Number(row.costo_componente) : undefined,
   };
 }
 
@@ -44,6 +45,7 @@ function repairToDb(r: Repair, userId: string) {
     imagenes: JSON.parse(JSON.stringify(r.imagenes || [])),
     costo_diagnostico: r.costoDiagnostico ?? null,
     costo_reparacion: r.costoReparacion ?? null,
+    costo_componente: r.costoComponente ?? null,
     user_id: userId,
   };
 }
