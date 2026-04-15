@@ -11,7 +11,7 @@ const StatsCards = ({ repairs }: StatsCardsProps) => {
       const reparacion = r.costoReparacion || 0;
       const componente = r.costoComponente || 0;
       const diagnostico = r.costoDiagnostico || 0;
-      return sum + Math.max(0, (reparacion + componente) - diagnostico);
+      return sum + reparacion + componente + diagnostico;
     }, 0);
 
   const formatMoney = (n: number) =>
