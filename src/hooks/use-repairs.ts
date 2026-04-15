@@ -53,6 +53,7 @@ function repairToDb(r: Repair, userId: string) {
 export function useRepairs() {
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
   const { user } = useAuth();
 
   const fetchRepairs = async () => {
@@ -70,9 +71,11 @@ export function useRepairs() {
 
   useEffect(() => {
     fetchRepairs();
-    const interval = setInterval(fetchRepairs, 30000);
+    const interval = setInterval(() => {
+      if (!busy) fetchRepairs();
+    }, 30000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, busy]);
 
   useEffect(() => {
     const channel = supabase
@@ -81,6 +84,7 @@ export function useRepairs() {
         "postgres_changes",
         { event: "*", schema: "public", table: "repairs" },
         (payload) => {
+          if (busy) return;
           if (payload.eventType === "INSERT") {
             const newRepair = dbToRepair(payload.new);
             setRepairs((prev) => {
@@ -101,7 +105,7 @@ export function useRepairs() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [busy]);
 
   const saveRepair = async (repair: Repair) => {
     if (!user) return;
@@ -113,5 +117,5 @@ export function useRepairs() {
     await supabase.from("repairs").delete().in("id", ids);
   };
 
-  return { repairs, loading, saveRepair, deleteRepairs, refreshRepairs: fetchRepairs };
+  return { repairs, loading, saveRepair, deleteRepairs, refreshRepairs: fetchRepairs, setBusy };
 }
