@@ -16,7 +16,7 @@ const StatsCards = ({ repairs }: StatsCardsProps) => {
   const totalDiagnostico = noEntregadas.reduce((s, r) => s + (r.costoDiagnostico || 0), 0);
   const totalReparacion = noEntregadas.reduce((s, r) => s + (r.costoReparacion || 0), 0);
   const totalComponente = noEntregadas.reduce((s, r) => s + (r.costoComponente || 0), 0);
-  const saldo = totalDiagnostico + totalReparacion + totalComponente;
+  const saldo = totalReparacion + totalComponente - totalDiagnostico;
 
   const formatMoney = (n: number) =>
     "$" + n.toLocaleString("es-MX", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
