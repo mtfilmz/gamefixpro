@@ -3,6 +3,7 @@ import { Repair } from "@/types/repair";
 import { QRCodeSVG } from "qrcode.react";
 import { X, Download, Share2, Printer, Phone, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
+import { getTrackUrl } from "@/lib/public-url";
 
 interface QRTicketModalProps {
   repair: Repair | null;
@@ -13,7 +14,7 @@ interface QRTicketModalProps {
 const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
   const ticketRef = useRef<HTMLDivElement>(null);
 
-  const trackUrl = repair ? `${window.location.origin}/track/${repair.id}` : "";
+  const trackUrl = repair ? getTrackUrl(repair.id) : "";
   const qrValue = trackUrl;
 
   const handleDownloadQR = useCallback(() => {
