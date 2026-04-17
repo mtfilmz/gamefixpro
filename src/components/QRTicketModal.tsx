@@ -1,7 +1,7 @@
 import { useRef, useCallback } from "react";
 import { Repair } from "@/types/repair";
 import { QRCodeSVG } from "qrcode.react";
-import { X, Download, Share2, Printer, Phone } from "lucide-react";
+import { X, Download, Share2, Printer, Phone, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 
 interface QRTicketModalProps {
@@ -13,7 +13,8 @@ interface QRTicketModalProps {
 const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
   const ticketRef = useRef<HTMLDivElement>(null);
 
-  const qrValue = repair ? `GAMEFIX-${repair.id}-${repair.consola}-${repair.cliente}` : "";
+  const trackUrl = repair ? `${window.location.origin}/track/${repair.id}` : "";
+  const qrValue = trackUrl;
 
   const handleDownloadQR = useCallback(() => {
     if (!repair) return;
@@ -48,11 +49,11 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
 
   const handleShare = useCallback(async () => {
     if (!repair) return;
-    const text = `Game Fix Pro - ${repair.id}\nCliente: ${repair.cliente}\nConsola: ${repair.consola}\nEstado: ${repair.estado}`;
+    const text = `Game Fix Pro - ${repair.id}\nCliente: ${repair.cliente}\nConsola: ${repair.consola}\nEstado: ${repair.estado}\nVer estado: ${trackUrl}`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: `Game Fix Pro ${repair.id}`, text });
+        await navigator.share({ title: `Game Fix Pro ${repair.id}`, text, url: trackUrl });
       } catch {
         // user cancelled
       }
@@ -60,7 +61,13 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
       await navigator.clipboard.writeText(text);
       toast.success("Información copiada al portapapeles");
     }
-  }, [repair]);
+  }, [repair, trackUrl]);
+
+  const handleCopyLink = useCallback(async () => {
+    if (!repair) return;
+    await navigator.clipboard.writeText(trackUrl);
+    toast.success("Enlace copiado al portapapeles");
+  }, [repair, trackUrl]);
 
   const handlePrint = useCallback(() => {
     window.print();
