@@ -4,6 +4,7 @@ import { X, Check, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploader from "./ImageUploader";
 import { notifyStatusChange } from "@/lib/notifications";
+import { getTrackUrl } from "@/lib/public-url";
 
 interface UpdateStatusProps {
   repair: Repair | null;
@@ -276,7 +277,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
             <div className="space-y-2">
               <button
                 onClick={async () => {
-                  const url = `${window.location.origin}/track/${repair.id}`;
+                  const url = getTrackUrl(repair.id);
                   const text = `Hola ${repair.cliente}, puedes ver el estado de tu reparación aquí: ${url}`;
                   if (navigator.share) {
                     try {
