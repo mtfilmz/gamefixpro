@@ -19,5 +19,6 @@ export function getPublicBaseUrl(): string {
 }
 
 export function getTrackUrl(repairId: string): string {
-  return `${getPublicBaseUrl()}/track/${repairId}`;
+  // IMPORTANT: encode the ID — repair IDs include "#" which is a URL fragment delimiter
+  return `${getPublicBaseUrl()}/track/${encodeURIComponent(repairId)}`;
 }
