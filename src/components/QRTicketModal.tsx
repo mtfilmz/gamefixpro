@@ -198,7 +198,17 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
         {/* QR */}
         <div className="px-6 py-6 flex flex-col items-center">
           <QRCodeSVG id="qr-ticket-svg" value={qrValue} size={180} bgColor="#ffffff" fgColor="#1a1a3e" level="H" />
-          <div className="text-xs text-gray-400 mt-3 tracking-wide">Escanear para ver estado</div>
+          <div className="text-xs text-gray-400 mt-3 tracking-wide">Escanear para ver estado en línea</div>
+          <button
+            onClick={handleCopyLink}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 print:hidden"
+          >
+            <LinkIcon className="w-3.5 h-3.5" />
+            Copiar enlace
+          </button>
+          <div className="hidden print:block text-[10px] text-gray-500 mt-2 break-all px-4 text-center">
+            {trackUrl}
+          </div>
         </div>
 
         {/* Footer */}
