@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Repair, EstadoReparacion, StatusChange } from "@/types/repair";
-import { X, Check } from "lucide-react";
+import { X, Check, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploader from "./ImageUploader";
 import { notifyStatusChange } from "@/lib/notifications";
@@ -273,25 +273,45 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
             </section>
 
             {/* Action buttons */}
-            <div className="flex gap-3">
+            <div className="space-y-2">
               <button
-                onClick={onClose}
-                className="flex-1 bg-destructive text-destructive-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                onClick={async () => {
+                  const url = `${window.location.origin}/track/${repair.id}`;
+                  const text = `Hola ${repair.cliente}, puedes ver el estado de tu reparación aquí: ${url}`;
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({ title: `Reparación ${repair.id}`, text, url });
+                    } catch { /* cancelled */ }
+                  } else {
+                    await navigator.clipboard.writeText(url);
+                    toast.success("Enlace copiado al portapapeles");
+                  }
+                }}
+                className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm flex items-center justify-center gap-2"
               >
-                Cerrar
+                <LinkIcon className="w-4 h-4" />
+                Compartir enlace con el cliente
               </button>
-              <button
-                onClick={() => onShowQR(repair)}
-                className="flex-1 bg-status-delivered text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
-              >
-                Ver QR / Compartir
-              </button>
-              <button
-                onClick={handleSave}
-                className="flex-1 bg-status-repaired text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
-              >
-                Guardar Cambios
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={onClose}
+                  className="flex-1 bg-destructive text-destructive-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                >
+                  Cerrar
+                </button>
+                <button
+                  onClick={() => onShowQR(repair)}
+                  className="flex-1 bg-status-delivered text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                >
+                  Ver QR
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="flex-1 bg-status-repaired text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                >
+                  Guardar
+                </button>
+              </div>
             </div>
           </div>
         </div>
