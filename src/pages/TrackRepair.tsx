@@ -273,11 +273,11 @@ const TrackRepair = () => {
         {/* Footer */}
         <footer className="text-center text-xs text-muted-foreground pt-4">
           <a
-            href="tel:5551234567"
+            href="tel:7875001324"
             className="inline-flex items-center gap-1.5 text-primary font-medium"
           >
             <Phone className="w-3.5 h-3.5" />
-            (555) 123-4567
+            787-500-1324
           </a>
           <div className="mt-1">Game Fix Pro · www.gamefixpro.com</div>
         </footer>
