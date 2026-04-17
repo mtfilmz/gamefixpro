@@ -1,1 +1,4 @@
 project_id = "tbkptuvpzwvdjqmsbmeh"
+
+[functions.public-repair-status]
+verify_jwt = false
