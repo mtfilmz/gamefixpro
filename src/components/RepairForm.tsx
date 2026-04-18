@@ -10,13 +10,14 @@ interface RepairFormProps {
   onClose: () => void;
   onSave: (repair: Omit<Repair, "id"> & { id?: string }) => void;
   editRepair?: Repair | null;
+  prefillRepair?: Repair | null;
   repairs: Repair[];
 }
 
 const inputClass =
   "w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-base min-h-[44px]";
 
-const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormProps) => {
+const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs }: RepairFormProps) => {
   const config = getConfig();
   const marcas = config.marcas;
   const modelosPorMarca = config.modelosPorMarca;
@@ -59,6 +60,23 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setCostoDiagnostico(editRepair.costoDiagnostico != null ? String(editRepair.costoDiagnostico) : "");
       setCostoReparacion(editRepair.costoReparacion != null ? String(editRepair.costoReparacion) : "");
       setCostoComponente(editRepair.costoComponente != null ? String(editRepair.costoComponente) : "");
+    } else if (prefillRepair) {
+      // Reapertura de caso: copiar datos del cliente/equipo, limpiar problemas/costos/imagenes
+      setCliente(prefillRepair.cliente);
+      setTelefono(prefillRepair.telefono);
+      setEmail(prefillRepair.email);
+      setMarca(prefillRepair.marca);
+      setConsola(prefillRepair.consola);
+      setNumeroSerie(prefillRepair.numeroSerie);
+      setColor(prefillRepair.color);
+      setAccesorios(prefillRepair.accesorios);
+      setProblemas([]);
+      setDetalles(`Reapertura del caso ${prefillRepair.id} (entregado el ${prefillRepair.fecha}). El equipo volvió a fallar.`);
+      setEstado("PENDIENTE");
+      setImagenes([]);
+      setCostoDiagnostico("");
+      setCostoReparacion("");
+      setCostoComponente("");
     } else {
       setCliente(""); setTelefono(""); setEmail("");
       setMarca(marcas[0] || ""); setConsola(modelosPorMarca[marcas[0]]?.[0] || "");
@@ -70,7 +88,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, repairs }: RepairFormPr
       setCostoComponente("");
     }
     setErrors({});
-  }, [editRepair, open]);
+  }, [editRepair, prefillRepair, open]);
 
   useEffect(() => {
     setConsola(modelosPorMarca[marca]?.[0] || "");

@@ -20,6 +20,7 @@ const Index = () => {
   const [activeView, setActiveView] = useState("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editRepair, setEditRepair] = useState<Repair | null>(null);
+  const [prefillRepair, setPrefillRepair] = useState<Repair | null>(null);
   const [filterEstado, setFilterEstado] = useState<EstadoReparacion | "TODOS">("TODOS");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [qrRepair, setQrRepair] = useState<Repair | null>(null);
@@ -53,11 +54,19 @@ const Index = () => {
 
   const openEdit = (r: Repair) => {
     setEditRepair(r);
+    setPrefillRepair(null);
+    setFormOpen(true);
+  };
+
+  const openReopen = (r: Repair) => {
+    setEditRepair(null);
+    setPrefillRepair(r);
     setFormOpen(true);
   };
 
   const openNew = () => {
     setEditRepair(null);
+    setPrefillRepair(null);
     setFormOpen(true);
   };
 
@@ -104,6 +113,7 @@ const Index = () => {
                 onEdit={openEdit}
                 onShowQR={setQrRepair}
                 onUpdateStatus={setStatusRepair}
+                onReopen={openReopen}
                 filterEstado={filterEstado}
                 onFilterChange={setFilterEstado}
               />
@@ -126,7 +136,7 @@ const Index = () => {
       {/* Mobile bottom nav */}
       <BottomNav activeView={activeView} onViewChange={setActiveView} onNewRecord={openNew} />
 
-      <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); }} onSave={handleSave} editRepair={editRepair} repairs={repairs} />
+      <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); setPrefillRepair(null); }} onSave={handleSave} editRepair={editRepair} prefillRepair={prefillRepair} repairs={repairs} />
       <QRTicketModal repair={qrRepair} open={!!qrRepair} onClose={() => setQrRepair(null)} />
       <UpdateStatus
         repair={statusRepair}
