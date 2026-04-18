@@ -114,7 +114,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
     e.preventDefault();
     if (!validate()) return;
     onSave({
-      id: editRepair?.id,
+      id: editRepair?.id || (prefillRepair ? nextId : undefined),
       cliente: cliente.trim(),
       telefono: telefono.trim(),
       email: email.trim(),
