@@ -147,7 +147,13 @@ const Index = () => {
             </div>
           ) : (
             <>
-              <StatsCards repairs={repairs} />
+              <StatsCards
+                repairs={repairs}
+                onSelectEstado={(estado) => {
+                  setFilterEstado(estado);
+                  setActiveView("historial");
+                }}
+              />
               <RepairTable
                 repairs={repairs}
                 onEdit={openEdit}
