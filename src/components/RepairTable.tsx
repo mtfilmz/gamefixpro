@@ -9,6 +9,8 @@ interface RepairTableProps {
   onReopen: (repair: Repair) => void;
   filterEstado: EstadoReparacion | "TODOS";
   onFilterChange: (f: EstadoReparacion | "TODOS") => void;
+  searchQuery?: string;
+  title?: string;
 }
 
 const estadoColor: Record<EstadoReparacion, string> = {
@@ -26,14 +28,22 @@ function getProblemSummary(repair: Repair): string {
   return repair.detalles || "Sin detalle";
 }
 
-const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, filterEstado, onFilterChange }: RepairTableProps) => {
-  const filtered = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
+const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, filterEstado, onFilterChange, searchQuery = "", title = "HISTORIAL DE EQUIPOS" }: RepairTableProps) => {
+  const byEstado = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = q
+    ? byEstado.filter((r) =>
+        [r.id, r.cliente, r.telefono, r.consola, r.marca, r.numeroSerie, ...(r.problemas || [])]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q))
+      )
+    : byEstado;
   const estados: (EstadoReparacion | "TODOS")[] = ["TODOS", "PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
 
   return (
     <div className="mt-6">
       <div className="bg-secondary rounded-t-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-primary font-bold text-base md:text-lg">HISTORIAL DE EQUIPOS</h2>
+        <h2 className="text-primary font-bold text-base md:text-lg">{title}</h2>
       </div>
 
       {/* Filter pills - scrollable on mobile */}
