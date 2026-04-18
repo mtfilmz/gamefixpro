@@ -6,6 +6,7 @@ interface MobileRepairCardProps {
   onEdit: (repair: Repair) => void;
   onShowQR: (repair: Repair) => void;
   onUpdateStatus: (repair: Repair) => void;
+  onReopen: (repair: Repair) => void;
 }
 
 const estadoColor: Record<string, string> = {
@@ -16,7 +17,7 @@ const estadoColor: Record<string, string> = {
   ENTREGADO: "bg-status-delivered",
 };
 
-const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus }: MobileRepairCardProps) => {
+const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen }: MobileRepairCardProps) => {
   return (
     <div className="bg-card border border-border rounded-xl p-4 space-y-3">
       {/* Top row: ID + Status */}
@@ -53,25 +54,33 @@ const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus }: MobileRe
       <div className="text-xs text-muted-foreground">{repair.fecha}</div>
 
       {/* Action buttons - large touch targets */}
-      <div className="flex gap-2 pt-1">
+      <div className="flex flex-wrap gap-2 pt-1">
         <button
           onClick={() => onShowQR(repair)}
-          className="flex-1 bg-primary text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
+          className="flex-1 min-w-[60px] bg-primary text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
         >
           QR
         </button>
         <button
           onClick={() => onUpdateStatus(repair)}
-          className="flex-1 bg-status-diagnostic text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
+          className="flex-1 min-w-[60px] bg-status-diagnostic text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
         >
           ESTADO
         </button>
         <button
           onClick={() => onEdit(repair)}
-          className="flex-1 bg-stat-completed text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
+          className="flex-1 min-w-[60px] bg-stat-completed text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
         >
           EDITAR
         </button>
+        {repair.estado === "ENTREGADO" && (
+          <button
+            onClick={() => onReopen(repair)}
+            className="basis-full bg-status-pending text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
+          >
+            🔄 REABRIR CASO
+          </button>
+        )}
       </div>
     </div>
   );
