@@ -10,6 +10,7 @@ interface RepairFormProps {
   onClose: () => void;
   onSave: (repair: Omit<Repair, "id"> & { id?: string }) => void;
   editRepair?: Repair | null;
+  prefillRepair?: Repair | null;
   repairs: Repair[];
 }
 
