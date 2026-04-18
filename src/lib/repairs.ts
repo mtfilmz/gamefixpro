@@ -101,9 +101,30 @@ export function saveRepairs(repairs: Repair[]) {
 
 export function generateId(repairs: Repair[]): string {
   const max = repairs.reduce((currentMax, repair) => {
-    const numericId = Number.parseInt(String(repair.id).replace("#", ""), 10);
+    // Solo considerar el número base (ignorar sufijos -R2, -R3...)
+    const baseId = String(repair.id).replace("#", "").split("-")[0];
+    const numericId = Number.parseInt(baseId, 10);
     return Number.isNaN(numericId) ? currentMax : Math.max(currentMax, numericId);
   }, 0);
 
   return `#${String(max + 1).padStart(3, "0")}`;
+}
+
+/**
+ * Genera el siguiente ID de revisión para un caso reabierto.
+ * #001 → #001-R2, #001-R2 → #001-R3, etc.
+ */
+export function generateRevisionId(baseId: string, repairs: Repair[]): string {
+  const base = baseId.split("-")[0]; // "#001" desde "#001-R2"
+  const escaped = base.replace(/[#]/g, "\\$&");
+  const regex = new RegExp(`^${escaped}(?:-R(\\d+))?$`);
+
+  const maxRev = repairs.reduce((currentMax, repair) => {
+    const match = String(repair.id).match(regex);
+    if (!match) return currentMax;
+    const rev = match[1] ? Number.parseInt(match[1], 10) : 1;
+    return Number.isNaN(rev) ? currentMax : Math.max(currentMax, rev);
+  }, 1);
+
+  return `${base}-R${maxRev + 1}`;
 }
