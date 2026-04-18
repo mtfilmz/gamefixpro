@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Repair, EstadoReparacion, RepairImage } from "@/types/repair";
-import { generateId } from "@/lib/repairs";
+import { generateId, generateRevisionId } from "@/lib/repairs";
 import { getConfig } from "@/lib/config";
 import { QRCodeSVG } from "qrcode.react";
 import ImageUploader from "./ImageUploader";
@@ -41,7 +41,8 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
   const [costoComponente, setCostoComponente] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const nextId = editRepair?.id || generateId(repairs);
+  const nextId = editRepair?.id
+    || (prefillRepair ? generateRevisionId(prefillRepair.id, repairs) : generateId(repairs));
 
   useEffect(() => {
     if (editRepair) {
@@ -113,7 +114,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
     e.preventDefault();
     if (!validate()) return;
     onSave({
-      id: editRepair?.id,
+      id: editRepair?.id || (prefillRepair ? nextId : undefined),
       cliente: cliente.trim(),
       telefono: telefono.trim(),
       email: email.trim(),
