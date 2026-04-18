@@ -25,6 +25,7 @@ const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [qrRepair, setQrRepair] = useState<Repair | null>(null);
   const [statusRepair, setStatusRepair] = useState<Repair | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Pause auto-refresh while any modal is open
   const anyModalOpen = formOpen || !!qrRepair || !!statusRepair;
@@ -105,6 +106,45 @@ const Index = () => {
                 await deleteRepairs(ids);
               }}
             />
+          ) : activeView === "historial" ? (
+            <RepairTable
+              repairs={repairs}
+              onEdit={openEdit}
+              onShowQR={setQrRepair}
+              onUpdateStatus={setStatusRepair}
+              onReopen={openReopen}
+              filterEstado={filterEstado}
+              onFilterChange={setFilterEstado}
+              title="HISTORIAL COMPLETO"
+            />
+          ) : activeView === "buscar" ? (
+            <div>
+              <div className="bg-card border border-border rounded-xl p-4 mb-4">
+                <label className="text-xs text-muted-foreground mb-1 block font-bold uppercase tracking-wide">Buscar reparación</label>
+                <input
+                  type="search"
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="ID, cliente, teléfono, consola, número de serie..."
+                  className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-base min-h-[44px]"
+                />
+                {searchQuery && (
+                  <p className="text-xs text-muted-foreground mt-2">Mostrando resultados para "{searchQuery}"</p>
+                )}
+              </div>
+              <RepairTable
+                repairs={repairs}
+                onEdit={openEdit}
+                onShowQR={setQrRepair}
+                onUpdateStatus={setStatusRepair}
+                onReopen={openReopen}
+                filterEstado={filterEstado}
+                onFilterChange={setFilterEstado}
+                searchQuery={searchQuery}
+                title="RESULTADOS"
+              />
+            </div>
           ) : (
             <>
               <StatsCards repairs={repairs} />
