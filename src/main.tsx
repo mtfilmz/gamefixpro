@@ -1,12 +1,17 @@
 import { createRoot } from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
 import App from "./App.tsx";
+import ErrorBoundary from "./components/ErrorBoundary";
 import "./index.css";
 import { initInstallPrompt } from "./lib/pwa-utils";
 import { requestNotificationPermission } from "./lib/notifications";
 
-// Limpiar datos viejos de localStorage (migrados a la nube)
-localStorage.removeItem("gamefixpro_repairs");
+// Limpiar datos viejos de localStorage (migrados a la nube) — protegido para Safari modo privado
+try {
+  localStorage.removeItem("gamefixpro_repairs");
+} catch {
+  // localStorage no disponible (Safari privado, cookies bloqueadas)
+}
 
 const isInIframe = (() => {
   try {
@@ -69,4 +74,8 @@ if (isPreviewHost || isInIframe) {
   setupProductionPwa();
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+);
