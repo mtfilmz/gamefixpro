@@ -14,6 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          config: Json
+          created_at: string
+          id: string
+          singleton_key: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          id?: string
+          singleton_key?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          id?: string
+          singleton_key?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      backup_runs: {
+        Row: {
+          backup_settings_id: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          file_names: string[]
+          id: string
+          started_at: string
+          status: string
+          summary: Json
+          updated_at: string
+        }
+        Insert: {
+          backup_settings_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          file_names?: string[]
+          id?: string
+          started_at?: string
+          status?: string
+          summary?: Json
+          updated_at?: string
+        }
+        Update: {
+          backup_settings_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          file_names?: string[]
+          id?: string
+          started_at?: string
+          status?: string
+          summary?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backup_runs_backup_settings_id_fkey"
+            columns: ["backup_settings_id"]
+            isOneToOne: false
+            referencedRelation: "backup_settings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backup_settings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data_scope: string
+          destination_details: Json
+          destination_type: string
+          enabled: boolean
+          formats: string[]
+          id: string
+          schedule_cron: string
+          singleton_key: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data_scope?: string
+          destination_details?: Json
+          destination_type?: string
+          enabled?: boolean
+          formats?: string[]
+          id?: string
+          schedule_cron?: string
+          singleton_key?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data_scope?: string
+          destination_details?: Json
+          destination_type?: string
+          enabled?: boolean
+          formats?: string[]
+          id?: string
+          schedule_cron?: string
+          singleton_key?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       repairs: {
         Row: {
           accesorios: string
