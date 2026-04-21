@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { Shield, UserPlus, Trash2 } from "lucide-react";
 
@@ -30,17 +29,6 @@ const UserRolesPanel = () => {
   useEffect(() => {
     fetchRoles();
   }, []);
-
-  const handleAssignRole = async () => {
-    if (!newEmail.trim()) {
-      toast({ title: "Error", description: "Ingresa un correo electrónico", variant: "destructive" });
-      return;
-    }
-    setSaving(true);
-
-    toast({ title: "Info", description: "Para asignar roles, necesitas el ID del usuario. Usa el botón de copiar ID.", variant: "default" });
-    setSaving(false);
-  };
 
   const handleAssignByUserId = async (userId: string, role: string) => {
     setSaving(true);
@@ -98,15 +86,14 @@ const UserRolesPanel = () => {
             onChange={(e) => setNewEmail(e.target.value)}
             className="flex-1 bg-input border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          <Select value={newRole} onValueChange={setNewRole}>
-            <SelectTrigger className="w-full sm:w-[140px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="tecnico">Técnico</SelectItem>
-            </SelectContent>
-          </Select>
+          <select
+            value={newRole}
+            onChange={(e) => setNewRole(e.target.value)}
+            className="w-full sm:w-[140px] bg-input border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="admin">Admin</option>
+            <option value="tecnico">Técnico</option>
+          </select>
           <Button
             onClick={() => {
               if (newEmail.trim()) {
@@ -150,18 +137,14 @@ const UserRolesPanel = () => {
                     {r.user_id}
                   </td>
                   <td className="px-4 py-2">
-                    <Select
+                    <select
                       value={r.role}
-                      onValueChange={(val) => handleChangeRole(r.id, val)}
+                      onChange={(e) => handleChangeRole(r.id, e.target.value)}
+                      className="w-[120px] h-8 bg-input border border-border rounded-lg px-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     >
-                      <SelectTrigger className="w-[120px] h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="tecnico">Técnico</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <option value="admin">Admin</option>
+                      <option value="tecnico">Técnico</option>
+                    </select>
                   </td>
                   <td className="px-4 py-2 text-right">
                     <Button
