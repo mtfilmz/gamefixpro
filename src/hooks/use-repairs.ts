@@ -80,7 +80,7 @@ export function useRepairs() {
     const { data, error } = await supabase
       .from("repairs")
       .select("*")
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false });
 
     if (!error && data) {
       const parsed = data.map(dbToRepair);
