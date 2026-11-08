@@ -37,6 +37,7 @@ function dbToRepair(row: any): Repair {
     detalles: row.detalles || "",
     estado: row.estado as EstadoReparacion,
     fecha: row.fecha || "",
+    createdAt: row.created_at || "",
     historial: (row.historial as StatusChange[]) || [],
     imagenes: (row.imagenes as RepairImage[]) || [],
     costoDiagnostico: row.costo_diagnostico != null ? Number(row.costo_diagnostico) : undefined,
@@ -116,7 +117,7 @@ export function useRepairs() {
             const newRepair = dbToRepair(payload.new);
             setRepairs((prev) => {
               if (prev.some((r) => r.id === newRepair.id)) return prev;
-              return [...prev, newRepair];
+              return [newRepair, ...prev];
             });
           } else if (payload.eventType === "UPDATE") {
             const updated = dbToRepair(payload.new);

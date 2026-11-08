@@ -28,16 +28,23 @@ function getProblemSummary(repair: Repair): string {
   return repair.detalles || "Sin detalle";
 }
 
+function newestFirst(a: Repair, b: Repair): number {
+  const ka = a.createdAt || a.fecha || "";
+  const kb = b.createdAt || b.fecha || "";
+  return kb.localeCompare(ka);
+}
+
 const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, filterEstado, onFilterChange, searchQuery = "", title = "HISTORIAL DE EQUIPOS" }: RepairTableProps) => {
   const byEstado = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
   const q = searchQuery.trim().toLowerCase();
-  const filtered = q
+  const filtered = (q
     ? byEstado.filter((r) =>
         [r.id, r.cliente, r.telefono, r.consola, r.marca, r.numeroSerie, ...(r.problemas || [])]
           .filter(Boolean)
           .some((v) => String(v).toLowerCase().includes(q))
       )
-    : byEstado;
+    : byEstado
+  ).slice().sort(newestFirst);
   const estados: (EstadoReparacion | "TODOS")[] = ["TODOS", "PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
 
   return (

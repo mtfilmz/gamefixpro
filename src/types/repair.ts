@@ -27,6 +27,7 @@ export interface Repair {
   detalles: string;
   estado: EstadoReparacion;
   fecha: string;
+  createdAt?: string;
   historial?: StatusChange[];
   imagenes?: RepairImage[];
   costoDiagnostico?: number;
