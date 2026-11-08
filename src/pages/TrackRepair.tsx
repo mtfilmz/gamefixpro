@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Check, Phone } from "lucide-react";
+import ImageLightbox from "@/components/ImageLightbox";
 
 interface PublicRepair {
   id: string;
@@ -43,6 +44,7 @@ const TrackRepair = () => {
   const [repair, setRepair] = useState<PublicRepair | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [previewIdx, setPreviewIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -181,13 +183,13 @@ const TrackRepair = () => {
               Fotos del equipo
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {repair.imagenes.map((img) => (
-                <a
+              {repair.imagenes.map((img, idx) => (
+                <button
                   key={img.id}
-                  href={img.dataUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block aspect-square rounded-lg overflow-hidden border border-border bg-muted"
+                  type="button"
+                  aria-label="Ampliar foto"
+                  onClick={() => setPreviewIdx(idx)}
+                  className="block aspect-square rounded-lg overflow-hidden border border-border bg-muted cursor-zoom-in"
                 >
                   <img
                     src={img.dataUrl}
@@ -195,7 +197,7 @@ const TrackRepair = () => {
                     loading="lazy"
                     className="w-full h-full object-cover"
                   />
-                </a>
+                </button>
               ))}
             </div>
           </section>
@@ -282,6 +284,30 @@ const TrackRepair = () => {
           <div className="mt-1">Game Fix Pro · www.gamefixpro.com</div>
         </footer>
       </main>
+
+      {/* Fullscreen viewer with zoom */}
+      {previewIdx !== null && repair.imagenes[previewIdx] && (
+        <ImageLightbox
+          src={repair.imagenes[previewIdx].dataUrl}
+          alt={repair.imagenes[previewIdx].nota || "Foto del equipo"}
+          index={previewIdx}
+          total={repair.imagenes.length}
+          onPrev={
+            repair.imagenes.length > 1
+              ? () =>
+                  setPreviewIdx(
+                    (c) => (c === null ? c : (c - 1 + repair.imagenes.length) % repair.imagenes.length),
+                  )
+              : undefined
+          }
+          onNext={
+            repair.imagenes.length > 1
+              ? () => setPreviewIdx((c) => (c === null ? c : (c + 1) % repair.imagenes.length))
+              : undefined
+          }
+          onClose={() => setPreviewIdx(null)}
+        />
+      )}
     </div>
   );
 };

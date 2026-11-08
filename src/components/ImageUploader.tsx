@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { RepairImage } from "@/types/repair";
 import { supabase } from "@/integrations/supabase/client";
 import { Camera, X, Plus, ZoomIn, Loader2 } from "lucide-react";
+import ImageLightbox from "./ImageLightbox";
 
 interface ImageUploaderProps {
   images: RepairImage[];
@@ -45,7 +46,7 @@ function resizeImage(file: File): Promise<Blob> {
 
 const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const handleFiles = async (files: FileList | null) => {
@@ -102,17 +103,24 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
     onChange(images.filter((img) => img.id !== id));
   };
 
+  const openAt = (idx: number) => setPreviewIdx(idx);
+  const step = (delta: number) =>
+    setPreviewIdx((cur) => {
+      if (cur === null || images.length === 0) return cur;
+      return (cur + delta + images.length) % images.length;
+    });
+
   return (
     <div>
       {/* Grid of thumbnails */}
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-        {images.map((img) => (
+        {images.map((img, idx) => (
           <div key={img.id} className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted/30">
             <img
               src={img.dataUrl}
               alt="Equipo"
-              className="w-full h-full object-cover cursor-pointer"
-              onClick={() => setPreview(img.dataUrl)}
+              className="w-full h-full object-cover cursor-zoom-in"
+              onClick={() => openAt(idx)}
             />
             {!readOnly && (
               <button
@@ -125,7 +133,8 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
             )}
             <button
               type="button"
-              onClick={() => setPreview(img.dataUrl)}
+              aria-label="Ampliar foto"
+              onClick={() => openAt(idx)}
               className="absolute bottom-1 right-1 bg-background/80 rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <ZoomIn className="w-3 h-3 text-foreground" />
@@ -172,25 +181,17 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
         </button>
       )}
 
-      {/* Fullscreen preview */}
-      {preview && (
-        <div
-          className="fixed inset-0 z-[60] bg-background/90 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setPreview(null)}
-        >
-          <button
-            className="absolute top-4 right-4 bg-destructive text-destructive-foreground rounded-full w-10 h-10 flex items-center justify-center z-10"
-            onClick={() => setPreview(null)}
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <img
-            src={preview}
-            alt="Vista previa"
-            className="max-w-full max-h-full rounded-lg object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
+      {/* Fullscreen viewer with zoom */}
+      {previewIdx !== null && images[previewIdx] && (
+        <ImageLightbox
+          src={images[previewIdx].dataUrl}
+          alt={images[previewIdx].nota || "Foto del equipo"}
+          index={previewIdx}
+          total={images.length}
+          onPrev={images.length > 1 ? () => step(-1) : undefined}
+          onNext={images.length > 1 ? () => step(1) : undefined}
+          onClose={() => setPreviewIdx(null)}
+        />
       )}
     </div>
   );
