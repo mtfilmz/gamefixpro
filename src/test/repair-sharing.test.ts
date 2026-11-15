@@ -21,6 +21,11 @@ describe("compartir registros", () => {
     const share = vi.fn().mockRejectedValue(new DOMException("Cancelado", "AbortError"));
     expect(await shareReceipt({ share }, file, "Orden", "Mensaje", "https://example.com")).toBe("cancelled");
   });
+  it("ofrece canales de envío si el navegador rechaza compartir", async () => {
+    const share = vi.fn().mockRejectedValue(new DOMException("No permitido", "NotAllowedError"));
+    expect(await shareReceipt({ share, canShare: () => true }, file, "Orden", "Mensaje", "https://example.com")).toBe("options");
+    expect(share).toHaveBeenCalledTimes(1);
+  });
   it("acredita diagnóstico al total de la factura", () => {
     expect(repairTotal({ costoReparacion: 1000, costoComponente: 150, costoDiagnostico: 100 } as Repair)).toBe(1050);
   });

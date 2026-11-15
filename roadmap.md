@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [x] Revisar Compartir en Dashboard, Historial, Buscar, móvil, estado y recepción nueva; seis entradas con sesión real y nueve pruebas correctas, sin alterar datos. Revisión en docs/share-flow-review.md.
 - [x] Corregir Compartir: envío nativo o selección de canales, sin descarga automática; ocho pruebas y flujo con sesión real verificados, sin enviar mensajes externos.
 - [x] Añadir SMS al teléfono del registro y factura PNG descargable/compartible; 15 pruebas correctas y comprobante aislado verificado en computadora/móvil, sin enviar mensajes.
 - [x] Verificar compartir desde un registro con sesión real: opciones visibles y solicitudes de compartir texto/imagen comprobadas sin descargas automáticas.
