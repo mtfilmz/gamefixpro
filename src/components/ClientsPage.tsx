@@ -49,7 +49,7 @@ export default function ClientsPage({ repairs }: { repairs: Repair[] }) {
     {error && <div role="alert" className="text-sm text-destructive">No se pudieron cargar los clientes guardados. <Button variant="link" onClick={() => refresh()}>Reintentar</Button></div>}
     {loading ? <p role="status" className="text-muted-foreground">Cargando clientes...</p> : visible.length ? <div className="divide-y divide-border border-y border-border">
       <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_2.5rem] gap-4 py-3 text-xs uppercase font-bold text-muted-foreground"><span>Cliente</span><span>Teléfono</span><span>Correo</span><span /></div>
-      {visible.map((client, index) => <div key={client.id || index} className="grid grid-cols-[1fr_2.5rem] md:grid-cols-[1fr_1fr_1fr_2.5rem] gap-2 md:gap-4 py-4 text-sm">
+      {visible.map((client, index) => <div key={client.id || index} className="record-highlight grid grid-cols-[1fr_2.5rem] md:grid-cols-[1fr_1fr_1fr_2.5rem] gap-2 md:gap-4 py-4 text-sm">
         <span className="font-semibold break-words">{client.cliente}</span>
         <span className="flex items-start gap-2 min-w-0 col-start-1 md:col-start-auto"><Phone className="h-4 w-4 shrink-0 text-muted-foreground" /><span className="break-words">{client.telefono || "Sin teléfono"}</span></span>
         <span className="flex items-start gap-2 min-w-0 col-start-1 md:col-start-auto"><Mail className="h-4 w-4 shrink-0 text-muted-foreground" /><span className="break-all">{client.email || "Sin correo"}</span></span>

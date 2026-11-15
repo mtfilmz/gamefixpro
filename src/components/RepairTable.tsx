@@ -108,7 +108,7 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDe
           </thead>
           <tbody>
             {filtered.map((r, i) => (
-              <tr key={r.id} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
+              <tr key={r.id} className={`record-highlight ${i % 2 === 0 ? "bg-card" : "bg-muted/30"}`}>
                 <td className="py-3 px-4 text-foreground">{r.id}</td>
                 <td className="py-3 px-4 text-foreground"><Button variant="ghost" className="h-auto p-0 whitespace-normal text-left justify-start" onClick={() => onDetails(r)}>{r.cliente}</Button></td>
                 <td className="py-3 px-4 text-foreground">{r.consola}</td>

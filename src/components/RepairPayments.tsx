@@ -20,7 +20,7 @@ export default function RepairPayments({ repairId }: { repairId: string }) {
   return <div className="space-y-3">
     {error && <p role="alert" className="text-destructive text-sm">{error}</p>}
     {!error && payments.length === 0 && <p className="text-muted-foreground text-sm">Sin pagos registrados por tu cuenta.</p>}
-    {payments.map(p => <div key={p.id} className="border-b border-border py-3 space-y-1">
+    {payments.map(p => <div key={p.id} className="record-highlight border-b border-border py-3 space-y-1">
       <div className="flex flex-wrap justify-between gap-2 text-sm font-semibold"><span>${p.amount.toFixed(2)} · {methods[p.method]}</span><span>{p.paid_on}</span></div>
       <p className="text-muted-foreground text-xs break-words">{p.client_name} — {p.equipment}</p>
       <p className="text-sm text-muted-foreground">{p.sync_status === "synced" ? "Sincronizado con Balans Board" : "Pendiente de Balans Board"}</p>

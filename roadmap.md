@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [x] Resaltar registros al pasar el mouse en listas de reparaciones, clientes, actividad, pagos y configuración; consulta real confirma cambio de color en Dashboard, Historial, Clientes, Actividad, Configuración y tarjetas móviles sin apertura automática de detalles.
 - [x] Autocompletar el monto desde costos conservando abonos manuales y confirmación explícita; 16 pruebas correctas y nuevo registro verificado con sesión real en computadora/teléfono sin guardar pagos de prueba. La edición utiliza el mismo cálculo sin alterar pagos guardados.
 - [x] Corregir rechazo de sesión al vincular: firmas verificadas, renovación y reintento limitado; 32 pruebas correctas y consulta/actualización con sesión real devuelven 200 en computadora y teléfono, sin crear ingresos ni canjear códigos.
 - [x] Añadir historial administrativo de cambios y operaciones desde su activación: creación/edición con sesión real visibles en escritorio/móvil, seis pruebas correctas, política solo-admin y permisos de escritura revocados comprobados. Operaciones del servidor sin sesión se identifican como no atribuidas.

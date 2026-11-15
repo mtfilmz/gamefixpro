@@ -31,6 +31,7 @@
     --border: 233 30% 30%;
     --input: 233 30% 25%;
     --ring: 343 100% 59%;
+    --record-highlight: 233 30% 32%;
 
     --receipt-paper: 0 0% 100%;
     --receipt-ink: 220 20% 15%;
@@ -86,6 +87,26 @@
 }
 
 /* Smooth scrolling */
+.record-highlight {
+  transition: background-color 150ms ease;
+}
+
+.record-highlight:focus-within {
+  background-color: hsl(var(--record-highlight));
+}
+
+@media (hover: hover) {
+  .record-highlight:hover {
+    background-color: hsl(var(--record-highlight));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .record-highlight {
+    transition: none;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;

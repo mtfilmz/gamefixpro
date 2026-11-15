@@ -36,7 +36,7 @@ export default function ActivityHistoryPage() {
       <span className="text-sm text-muted-foreground self-center">{query.data?.count ?? 0} operaciones</span>
     </div>
     {query.isLoading ? <p role="status">Cargando historial...</p> : query.error ? <p role="alert" className="text-destructive">No se pudo cargar el historial. Intenta actualizar.</p> : !query.data?.rows.length ? <p role="status" className="text-muted-foreground py-8">No hay operaciones registradas.</p> : <div className="divide-y divide-border border-y border-border">
-      {query.data.rows.map(entry => <article key={entry.id} className="py-4 space-y-2 text-sm">
+      {query.data.rows.map(entry => <article key={entry.id} className="record-highlight py-4 space-y-2 text-sm">
         <div className="flex flex-wrap items-center justify-between gap-2"><span className="font-semibold">{activityOperations[entry.operation]} · {activityEntities[entry.entity] || entry.entity}</span><time className="text-muted-foreground">{new Date(entry.occurred_at).toLocaleString("es-MX")}</time></div>
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-muted-foreground"><span className="break-all">Registro: {entry.record_id}</span><span className="break-all">Responsable: {entry.actor_id || "Proceso del servidor (sin usuario identificado)"}</span></div>
         <p className="break-words">Campos: {entry.changed_fields.join(", ") || "Sin cambios"}</p>

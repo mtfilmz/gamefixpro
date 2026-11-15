@@ -145,7 +145,7 @@ const EditableList = ({ title, icon, items, onChange }: EditableListProps) => {
             {items.map((item, idx) => (
               <div
                 key={`${item}-${idx}`}
-                className="flex items-center gap-1.5 bg-muted/20 rounded-lg px-3 py-2 group"
+                className="record-highlight flex items-center gap-1.5 bg-muted/20 rounded-lg px-3 py-2 group"
               >
                 {editIdx === idx ? (
                   <>
@@ -362,7 +362,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
                   {repairs.map((r) => (
                     <label
                       key={r.id}
-                      className="flex items-center gap-3 bg-muted/20 rounded-lg px-3 py-2 cursor-pointer hover:bg-muted/40 transition-colors"
+                      className="record-highlight flex items-center gap-3 bg-muted/20 rounded-lg px-3 py-2 cursor-pointer"
                     >
                       <input
                         type="checkbox"

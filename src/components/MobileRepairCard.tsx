@@ -22,7 +22,7 @@ const estadoColor: Record<string, string> = {
 
 const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen, onDetails, onDelete }: MobileRepairCardProps) => {
   return (
-    <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+    <div className="record-highlight bg-card border border-border rounded-xl p-4 space-y-3">
       {/* Top row: ID + Status */}
       <div className="flex items-center justify-between">
         <span className="text-foreground font-mono font-bold text-lg">{repair.id}</span>

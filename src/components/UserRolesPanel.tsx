@@ -132,7 +132,7 @@ const UserRolesPanel = () => {
               </tr>
             ) : (
               roles.map((r) => (
-                <tr key={r.id} className="border-t border-border">
+                <tr key={r.id} className="record-highlight border-t border-border">
                   <td className="px-4 py-2 text-foreground font-mono text-xs truncate max-w-[200px]">
                     {r.user_id}
                   </td>
