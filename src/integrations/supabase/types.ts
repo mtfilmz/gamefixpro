@@ -136,6 +136,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          source_key: string | null
           telefono: string
           user_id: string
         }
@@ -144,6 +145,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          source_key?: string | null
           telefono?: string
           user_id?: string
         }
@@ -152,6 +154,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          source_key?: string | null
           telefono?: string
           user_id?: string
         }

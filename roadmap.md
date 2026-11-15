@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [x] Permitir editar clientes guardados y del historial sin alterar reparaciones ni pagos anteriores; ocho pruebas correctas, edición y lectura tras recarga verificadas con sesión real, formulario móvil comprobado.
 - [x] Añadir Clientes debajo de Historial, listar clientes anteriores y guardar nuevos clientes; siete pruebas correctas y guardado/lectura tras recarga con sesión real en computadora/móvil. Cliente temporal eliminado.
 - [x] Buscar clientes anteriores por nombre, teléfono o correo al crear un registro; cuatro pruebas correctas y selección con sesión real en computadora/móvil sin guardar registros de prueba.
 - [x] Incluir nombre, dirección, teléfono y web del negocio de referencia en el comprobante compartido; verificar imagen descargada, impresión y móvil con comprobante aislado y nueve pruebas correctas.
