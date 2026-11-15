@@ -17,7 +17,7 @@ export function repairTotal(repair: Repair): number {
 }
 
 export function repairMessage(repair: Repair, url: string): string {
-  return `Game Fix Pro — ${repair.id}\nCliente: ${repair.cliente}\nEquipo: ${repair.marca} — ${repair.consola}\nEstado: ${repair.estado}\nTotal presupuestado: $${repairTotal(repair).toFixed(2)}\nSeguimiento: ${url}`;
+  return `Super Mobile Game Fix — ${repair.id}\nCliente: ${repair.cliente}\nEquipo: ${repair.marca} — ${repair.consola}\nEstado: ${repair.estado}\nTotal presupuestado: $${repairTotal(repair).toFixed(2)}\nSeguimiento: ${url}`;
 }
 
 export function smsLink(phone: string, message: string, userAgent: string): string | null {

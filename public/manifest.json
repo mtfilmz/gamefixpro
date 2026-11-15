@@ -1,6 +1,6 @@
 {
-  "name": "Game Fix Pro",
-  "short_name": "GameFix",
+  "name": "Super Mobile Game Fix",
+  "short_name": "Super Mobile Game Fix",
   "description": "Sistema de Gestión de Reparación de Consolas",
   "start_url": "/",
   "display": "standalone",

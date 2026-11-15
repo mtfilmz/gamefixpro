@@ -61,7 +61,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
 
   const share = async () => {
     if (!repair || !file) return;
-    const result = await shareReceipt(navigator, file, `Game Fix Pro ${repair.id}`, repairMessage(repair, trackUrl), trackUrl);
+    const result = await shareReceipt(navigator, file, `Super Mobile Game Fix ${repair.id}`, repairMessage(repair, trackUrl), trackUrl);
     if (result === "options") setShareOptions(true);
   };
 
@@ -79,7 +79,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
             <h3 className="font-semibold text-sm">Compartir registro</h3>
             <Button asChild variant="secondary" className="w-full"><a href={`https://wa.me/?text=${encodeURIComponent(repairMessage(repair, trackUrl))}`} target="_blank" rel="noopener noreferrer">WhatsApp</a></Button>
             {sms && <Button asChild variant="secondary" className="w-full"><a href={sms}><MessageSquare />Mensaje de texto</a></Button>}
-            <Button asChild variant="secondary" className="w-full"><a href={`mailto:${encodeURIComponent(repair.email || "")}?subject=${encodeURIComponent(`Game Fix Pro ${repair.id}`)}&body=${encodeURIComponent(repairMessage(repair, trackUrl))}`}>Correo electrónico</a></Button>
+            <Button asChild variant="secondary" className="w-full"><a href={`mailto:${encodeURIComponent(repair.email || "")}?subject=${encodeURIComponent(`Super Mobile Game Fix ${repair.id}`)}&body=${encodeURIComponent(repairMessage(repair, trackUrl))}`}>Correo electrónico</a></Button>
             <Button variant="outline" className="w-full" onClick={async () => {
               try { await navigator.clipboard.writeText(repairMessage(repair, trackUrl)); toast.success("Registro copiado"); setShareOptions(false); }
               catch { toast.error("No se pudo copiar el registro"); }
@@ -138,7 +138,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
             catch { toast.error("No se pudo copiar el enlace"); }
           }}><LinkIcon />Copiar enlace</Button>
         </div>
-        <footer className="px-6 py-3 border-t border-inherit text-center text-xs font-semibold">Game Fix Pro · {repair.id}</footer>
+        <footer className="px-6 py-3 border-t border-inherit text-center text-xs font-semibold">Super Mobile Game Fix · {repair.id}</footer>
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
         <div className="bg-primary px-6 py-5 text-center">
-          <h1 className="text-2xl font-bold text-primary-foreground">🎮 Game Fix Pro</h1>
+          <h1 className="text-2xl font-bold text-primary-foreground">🎮 Super Mobile Game Fix</h1>
           <p className="text-primary-foreground/80 text-sm mt-1">
             Inicia sesión para continuar
           </p>

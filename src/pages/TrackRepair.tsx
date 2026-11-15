@@ -48,7 +48,7 @@ const TrackRepair = () => {
 
   useEffect(() => {
     if (!id) return;
-    document.title = `Estado de Reparación ${id} | Game Fix Pro`;
+    document.title = `Estado de Reparación ${id} | Super Mobile Game Fix`;
 
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-repair-status?id=${encodeURIComponent(id)}`;
     fetch(url)
@@ -93,7 +93,7 @@ const TrackRepair = () => {
       {/* Header */}
       <header className="bg-primary px-6 py-6 text-center">
         <h1 className="text-2xl md:text-3xl font-black text-primary-foreground tracking-wider">
-          [&gt;] GAME FIX PRO
+          Super Mobile Game Fix
         </h1>
         <p className="text-primary-foreground/80 text-sm mt-1">Seguimiento de Reparación</p>
       </header>
@@ -281,7 +281,7 @@ const TrackRepair = () => {
             <Phone className="w-3.5 h-3.5" />
             787-500-1324
           </a>
-          <div className="mt-1">Game Fix Pro · www.gamefixpro.com</div>
+          <div className="mt-1">Super Mobile Game Fix · www.gamefixpro.com</div>
         </footer>
       </main>
 

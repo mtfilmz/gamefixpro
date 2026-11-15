@@ -193,7 +193,7 @@ const Index = () => {
           )}
         </main>
         <footer className="text-center text-muted-foreground text-xs py-3 hidden lg:block">
-          Sistema de Gestión v1.0 | Game Fix Pro
+          Sistema de Gestión v1.0 | Super Mobile Game Fix
         </footer>
       </div>
 
