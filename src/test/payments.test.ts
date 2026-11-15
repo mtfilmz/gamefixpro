@@ -25,6 +25,15 @@ describe("pagos reales", () => {
     const p = paymentPayload({ ...draft, repair_id: "#031", client_name: "Cliente prueba", equipment: "Sony — PS5" }, "binding");
     expect(p).toMatchObject({ type: "income", source: "business", category: "Reparaciones", description: "Pago de Cliente prueba — Sony — PS5", binding_id: "binding" });
   });
+  it("envía el teléfono congelado en el pago, no el teléfono actual de la reparación", () => {
+    const payment = { ...draft, repair_id: "#034", client_name: "Cliente prueba", equipment: "Sony — PS5", client_phone: "+1 809 555 0100", telefono: "+1 809 555 0199" };
+    expect(paymentPayload(payment, "binding").client_phone).toBe("+1 809 555 0100");
+    expect(paymentPayload(payment, "binding").amount).toBe(150);
+  });
+  it("mantiene el contrato anterior para pagos anteriores y pruebas sin teléfono", () => {
+    const payment = { ...draft, repair_id: "#034", client_name: "Cliente prueba", equipment: "Sony — PS5", client_phone: null };
+    expect(paymentPayload(payment, "binding")).not.toHaveProperty("client_phone");
+  });
   it("conserva el mismo identificador al reintentar guardar", async () => {
     mock.rpc.mockResolvedValue({ error: null });
     await recordPayment("#031", draft); await recordPayment("#031", draft);

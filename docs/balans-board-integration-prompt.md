@@ -4,8 +4,8 @@ Conecta esta app financiera (https://ingreso-impuesto-compass.lovable.app) con m
 
 ## Lo que ya está preparado en Game Fix Pro
 
-- Tabla public.repair_payments: id UUID del pago, user_id (cuenta que registró el pago), repair_id, client_name y equipment congelados al confirmar, amount positivo, paid_on DATE, method, sync_status pending/synced, sync_error, remote_movement_id y synced_at. No se crean pagos desde presupuestos ni se exportan órdenes antiguas. Cada abono tiene su propio UUID. RLS permite leer solamente los pagos propios; escritura mediante RPC validada record_repair_payment. Repetir un UUID con datos distintos se rechaza, no sobrescribe el pago.
-- Formulario de registro/edición permite confirmar pago recibido, fecha y método. Guardar nuevamente sin un nuevo abono no registra otro pago. Un UUID se conserva durante el reintento tras un error de guardado. Las fotos y teléfonos no forman parte del envío.
+- Tabla public.repair_payments: id UUID del pago, user_id (cuenta que registró el pago), repair_id, client_name, equipment y client_phone congelados al confirmar pagos nuevos, amount positivo, paid_on DATE, method, sync_status pending/synced, sync_error, remote_movement_id y synced_at. No se crean pagos desde presupuestos ni se exportan órdenes antiguas. Cada abono tiene su propio UUID. RLS permite leer solamente los pagos propios; escritura mediante RPC validada record_repair_payment. Repetir un UUID con datos distintos se rechaza, no sobrescribe el pago.
+- Formulario de registro/edición permite confirmar pago recibido, fecha y método. Guardar nuevamente sin un nuevo abono no registra otro pago. Un UUID se conserva durante el reintento tras un error de guardado. Las fotos no forman parte del envío. Los pagos nuevos incluyen client_phone; los anteriores y de prueba conservan el contrato sin teléfono. Consultar balans-board-phone-update.md para actualizar el receptor sin modificar recibos anteriores.
 - Función desplegada sync-repair-payment: valida sesión de Game Fix Pro y propiedad del pago. Busca un vínculo activo en public.finance_account_links: user_id único de Game Fix Pro, binding_id UUID único, destination_user_id UUID de Balans Board y enabled. Esta tabla es privada, sin acceso del navegador. Actualmente NO hay vínculo ni credenciales configuradas.
 - La función espera secretos exclusivamente del lado servidor: BALANS_PAYMENT_RECEIVER_URL (URL HTTPS completa del receptor) y BALANS_PAYMENT_SHARED_SECRET (secreto compartido). Solo permite POST a la URL configurada, sin redirecciones. Al faltar configuración conserva pending y permite reintentar. No hay cron ni envío masivo histórico.
 
@@ -23,6 +23,7 @@ Conecta esta app financiera (https://ingreso-impuesto-compass.lovable.app) con m
   "payment_id": "UUID estable del pago",
   "repair_id": "#031",
   "client_name": "Cliente de prueba",
+  "client_phone": "+1 809 555 0100",
   "equipment": "Sony — PS5",
   "amount": 150,
   "paid_on": "2026-11-15",
@@ -45,7 +46,7 @@ Cabeceras: Content-Type application/json, X-Integration-Secret (privado) e Idemp
 ```
 
 Un reintento legítimo devuelve exactamente ese mismo recibo; no crees otro movimiento. Game Fix Pro solo marca synced cuando status, payment_id y binding_id coinciden y movement_id es UUID. Errores deben devolver estado no 2xx y un mensaje seguro, sin secretos ni datos innecesarios.
-7. Nuevas tablas públicas requieren GRANT, RLS y políticas: recibos privados y bindings solo servidor; movimientos mantienen acceso por propietario. No expongas credenciales ni permitas destinos suministrados por el navegador. No envíes imágenes, teléfonos, emails ni historial técnico.
+7. Nuevas tablas públicas requieren GRANT, RLS y políticas: recibos privados y bindings solo servidor; movimientos mantienen acceso por propietario. No expongas credenciales ni permitas destinos suministrados por el navegador. Acepta client_phone opcional de pagos nuevos (string, máximo 20 caracteres), consérvalo en el recibo y muéstralo en detalles. No envíes imágenes, emails ni historial técnico.
 
 ## Qué falta después en Game Fix Pro
 

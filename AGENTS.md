@@ -1,5 +1,6 @@
 # Architecture rules
 - Keep actual payments in an immutable ledger separate from repair estimates; edits to a repair must not rewrite paid amounts or exported snapshots.
+- Snapshot the repair phone on new payment insertion and export it as optional client_phone; never backfill existing payments or derive export contact data from mutable repairs, so retries preserve the original receipt contract.
 - Route financial exports through an authenticated edge function using a server-only explicit account binding, a stable payment UUID and a verified receiver receipt; missing configuration leaves payments pending.
 - Expose payment insertion through a validated security-definer RPC and payment reads through owner-only RLS; synchronization metadata and account bindings are server-write-only.
 - Complete account linking only through a server-authenticated one-time code redemption; derive the source identity from the validated session and persist only a matching-currency verified remote receipt to prevent unverified destinations.

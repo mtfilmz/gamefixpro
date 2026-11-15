@@ -15,6 +15,13 @@
       "when": 1794716153293,
       "tag": "0001_finance_test_payment",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794717532295,
+      "tag": "0002_snapshot_new_payment_phone",
+      "breakpoints": true
     }
   ]
 }

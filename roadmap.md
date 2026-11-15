@@ -1,12 +1,15 @@
 # Pagos a Balans Board
+- [x] Guardar y enviar teléfono congelado en próximos pagos; 21 pruebas correctas y lectura autenticada confirma pago recibido sin cambios.
+- [ ] Actualizar receptor y detalles en Balans Board para admitir client_phone (bloqueado: otro proyecto, solo lectura aquí; instrucciones en docs/balans-board-phone-update.md).
+- [x] Revisar registro/edición, estado, historial/reintentos, prueba, envío y receptor; preservar pagos anteriores sin rellenarlos.
 - [x] Añadir pago de prueba de 150 con confirmación explícita, recibo visible y reintento sin duplicados; verificar 19 pruebas y el bloqueo sin vínculo con sesión real.
 - [x] Añadir finalización segura de vinculación en Configuración y conectar con el contrato existente de Balans Board.
 - [x] Configurar direcciones reales y guardar clave compartida en Game Fix Pro.
-- [ ] Finalizar vínculo (requiere código de un solo uso generado en Balans Board y misma clave guardada allí).
+- [x] Finalizar vínculo con código de un solo uso y verificar conexión en USD.
 - [x] Registrar pagos reales separados de presupuestos, con fecha, método e identificador por abono.
 - [x] Guardar pagos inmutables y pendientes; permitir reintentos autenticados con el mismo identificador.
 - [x] Preparar envío privado condicionado a vínculo explícito y confirmación del receptor.
 - [x] Entregar prompt preciso para recepción y vinculación en Balans Board.
 - [x] Probar nueve reglas de pagos y verificar acceso público sin errores en computadora y teléfono.
-- [ ] Verificar un pago y reintento en Balans Board (bloqueado: falta vínculo verificado, lectura desde la app financiera y autorización de un pago de prueba).
+- [ ] Verificar recepción de un nuevo pago con teléfono y reintento en Balans Board (bloqueado: receptor remoto debe admitir el campo y falta autorización para crear otro ingreso).
 - [x] Verificar con sesión real la consulta de estado y formulario de vinculación en esta app, sin errores de página.

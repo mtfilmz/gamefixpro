@@ -38,7 +38,9 @@ Deno.serve(async req => {
     try {
       response = await fetch(url, { method: "POST", redirect: "error", signal: AbortSignal.timeout(15000), headers: { "Content-Type": "application/json", "X-Integration-Secret": sharedSecret, "Idempotency-Key": payment.id }, body: JSON.stringify(payload) });
     } catch { return await pending("No se confirmó el envío; puedes reintentarlo sin duplicar el pago"); }
-    if (!response.ok) return await pending(`Balans Board rechazó el envío (${response.status}); el pago sigue guardado`);
+    if (!response.ok) return await pending(response.status === 400 && payment.client_phone != null
+      ? "Balans Board rechazó el pago con teléfono; actualiza su receptor para admitir client_phone. El pago sigue guardado y pendiente, sin duplicarlo."
+      : `Balans Board rechazó el envío (${response.status}); el pago sigue guardado`);
     const receipt = receiptSchema.safeParse(await response.json().catch(() => null));
     if (!receipt.success || receipt.data.payment_id !== payment.id || receipt.data.binding_id !== link.binding_id) return await pending("Balans Board no confirmó este pago; envío pendiente");
     const { error: savedError } = await db.from("repair_payments").update({ sync_status: "synced", remote_movement_id: receipt.data.movement_id, synced_at: new Date().toISOString(), sync_error: null }).eq("id", payment.id).eq("user_id", auth.user.id);

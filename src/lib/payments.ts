@@ -10,6 +10,7 @@ export type PaymentDraft = z.infer<typeof paymentSchema>;
 export interface SavedPayment extends PaymentDraft {
   repair_id: string;
   client_name: string;
+  client_phone?: string | null;
   equipment: string;
   sync_status: "pending" | "synced";
   sync_error: string | null;
