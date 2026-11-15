@@ -93,9 +93,15 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
       </div>
       {imageError && <p role="alert" className="text-destructive mb-3 print:hidden">No se pudo generar la imagen. Cierra y vuelve a abrir el comprobante.</p>}
       <div ref={ticketRef} className="repair-receipt w-full max-w-lg overflow-hidden shrink-0" id="print-ticket">
-        <header className="receipt-header px-6 py-5">
-          <h2 className="text-2xl font-black">GAME FIX PRO</h2>
-          <p className="text-sm mt-1">Factura de servicio · Comprobante de reparación</p>
+        <header className="px-6 py-5 border-b border-inherit break-words">
+          <h2 className="text-xl font-bold">Súper Mobile Tech Repair</h2>
+          <address className="not-italic text-sm mt-2 space-y-1">
+            <p>PR-185 Km 5.0, Campo Rico, Canóvanas</p>
+            <p>Tel: 9394848958</p>
+            <p>reparaciondecelularespr.com</p>
+          </address>
+          <p className="text-xl font-bold text-center mt-5">FACTURA DE SERVICIO</p>
+          <p className="text-xs text-center mt-1">Comprobante de reparación</p>
         </header>
         <div className="px-6 py-4 border-b border-inherit flex justify-between gap-3">
           <div><p className="text-xs uppercase">Orden de servicio</p><p className="text-3xl font-black break-all">{repair.id}</p></div>
