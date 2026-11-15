@@ -4,11 +4,14 @@ import { generateId, generateRevisionId } from "@/lib/repairs";
 import { getConfig } from "@/lib/config";
 import { QRCodeSVG } from "qrcode.react";
 import ImageUploader from "./ImageUploader";
+import { Button } from "@/components/ui/button";
+import RepairPayments from "./RepairPayments";
+import { PaymentDraft, paymentSchema, localPaymentDate } from "@/lib/payments";
 
 interface RepairFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (repair: Omit<Repair, "id"> & { id?: string }) => void;
+  onSave: (repair: Omit<Repair, "id"> & { id?: string }, payment?: PaymentDraft) => Promise<void>;
   editRepair?: Repair | null;
   prefillRepair?: Repair | null;
   repairs: Repair[];
@@ -40,6 +43,12 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
   const [costoReparacion, setCostoReparacion] = useState<string>("");
   const [costoComponente, setCostoComponente] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [paymentEnabled, setPaymentEnabled] = useState(false);
+  const [paymentId, setPaymentId] = useState("");
+  const [paidAmount, setPaidAmount] = useState("");
+  const [paidOn, setPaidOn] = useState(localPaymentDate);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentDraft["method"]>("cash");
+  const [saving, setSaving] = useState(false);
 
   const nextId = editRepair?.id
     || (prefillRepair ? generateRevisionId(prefillRepair.id, repairs) : generateId(repairs));
@@ -89,6 +98,11 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
       setCostoComponente("");
     }
     setErrors({});
+    setPaymentEnabled(false);
+    setPaymentId(crypto.randomUUID());
+    setPaidAmount("");
+    setPaidOn(localPaymentDate());
+    setPaymentMethod("cash");
   }, [editRepair, prefillRepair, open]);
 
   useEffect(() => {
@@ -110,11 +124,19 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
-    onSave({
-      id: editRepair?.id || (prefillRepair ? nextId : undefined),
+    if (saving || !validate()) return;
+    let payment: PaymentDraft | undefined;
+    if (paymentEnabled) {
+      const parsed = paymentSchema.safeParse({ id: paymentId, amount: paidAmount, paid_on: paidOn, method: paymentMethod });
+      if (!parsed.success) { setErrors({ payment: "Revisa el monto pagado (mayor que cero y máximo dos decimales), la fecha y el método" }); return; }
+      payment = parsed.data;
+    }
+    setSaving(true);
+    try {
+    await onSave({
+      id: nextId,
       cliente: cliente.trim(),
       telefono: telefono.trim(),
       email: email.trim(),
@@ -131,8 +153,11 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
       costoDiagnostico: costoDiagnostico ? parseFloat(costoDiagnostico) : undefined,
       costoReparacion: costoReparacion ? parseFloat(costoReparacion) : undefined,
       costoComponente: costoComponente ? parseFloat(costoComponente) : undefined,
-    });
+    }, payment);
     onClose();
+    } catch (error) {
+      setErrors({ save: error instanceof Error ? error.message : "No se pudo guardar; vuelve a intentarlo" });
+    } finally { setSaving(false); }
   };
 
   if (!open) return null;
@@ -149,6 +174,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-6 max-h-[80vh] overflow-y-auto">
+          <fieldset disabled={saving} className="space-y-6 min-w-0">
           {/* SECCIÓN 1 - Datos del Cliente */}
           <section>
             <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📋 Datos del Cliente</h3>
@@ -314,6 +340,21 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
             <p className="text-xs text-muted-foreground mt-1">El diagnóstico se acredita automáticamente al costo total.</p>
           </section>
 
+          <section className="space-y-3">
+            <h3 className="text-primary font-bold text-sm uppercase tracking-wide">Pagos cobrados</h3>
+            {editRepair && <RepairPayments repairId={editRepair.id} />}
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <input type="checkbox" checked={paymentEnabled} onChange={e => setPaymentEnabled(e.target.checked)} className="accent-primary w-4 h-4" />
+              {editRepair ? "Registrar un nuevo abono recibido" : "Registrar pago recibido"}
+            </label>
+            {paymentEnabled && <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label htmlFor="paid-amount" className="text-xs text-muted-foreground block mb-1">Monto pagado</label><input id="paid-amount" type="number" min="0.01" step="0.01" required value={paidAmount} onChange={e => setPaidAmount(e.target.value)} className={inputClass} /></div>
+              <div><label htmlFor="paid-on" className="text-xs text-muted-foreground block mb-1">Fecha del pago</label><input id="paid-on" type="date" required value={paidOn} onChange={e => setPaidOn(e.target.value)} className={inputClass} /></div>
+              <div><label htmlFor="payment-method" className="text-xs text-muted-foreground block mb-1">Método de pago</label><select id="payment-method" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value as PaymentDraft["method"])} className={inputClass}><option value="cash">Efectivo</option><option value="card">Tarjeta</option><option value="transfer">Transferencia</option><option value="other">Otro</option></select></div>
+            </div>}
+            {errors.payment && <p role="alert" className="text-destructive text-sm">{errors.payment}</p>}
+          </section>
+
           {/* SECCIÓN 5 - Estado y QR */}
           <section>
             <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">🔧 Estado e Identificación</h3>
@@ -342,21 +383,23 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
           </section>
 
           {/* Botones */}
+          {errors.save && <p role="alert" className="text-destructive text-sm">{errors.save}</p>}
           <div className="flex gap-3 pt-2">
-            <button
+            <Button
               type="submit"
               className="flex-1 bg-status-repaired text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
             >
-              {editRepair ? "Guardar Cambios" : "Guardar Registro"}
-            </button>
-            <button
+              {saving ? "Guardando..." : editRepair ? "Guardar Cambios" : "Guardar Registro"}
+            </Button>
+            <Button
               type="button"
               onClick={onClose}
               className="flex-1 bg-destructive text-destructive-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
+          </fieldset>
         </form>
       </div>
     </div>

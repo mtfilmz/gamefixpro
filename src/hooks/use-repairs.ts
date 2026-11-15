@@ -136,9 +136,10 @@ export function useRepairs() {
   }, [busy]);
 
   const saveRepair = async (repair: Repair) => {
-    if (!user) return;
+    if (!user) throw new Error("Debes iniciar sesión para guardar");
     const dbData = repairToDb(repair, user.id);
-    await supabase.from("repairs").upsert(dbData);
+    const { error } = await supabase.from("repairs").upsert(dbData);
+    if (error) throw new Error(error.message);
   };
 
   const deleteRepairs = async (ids: string[]) => {

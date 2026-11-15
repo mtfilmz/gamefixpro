@@ -13,6 +13,9 @@ import RepairForm from "@/components/RepairForm";
 import QRTicketModal from "@/components/QRTicketModal";
 import UpdateStatus from "@/components/UpdateStatus";
 import ConfigPanel from "@/components/ConfigPanel";
+import { PaymentDraft } from "@/lib/payments";
+import { recordPayment, syncPayment } from "@/lib/payment-service";
+import { toast } from "sonner";
 
 
 const Index = () => {
@@ -33,7 +36,8 @@ const Index = () => {
     setBusy(anyModalOpen);
   }, [anyModalOpen, setBusy]);
 
-  const handleSave = async (data: Omit<Repair, "id"> & { id?: string }) => {
+  const handleSave = async (data: Omit<Repair, "id"> & { id?: string }, payment?: PaymentDraft) => {
+    const isNew = !editRepair;
     let savedRepair: Repair;
     if (data.id) {
       savedRepair = { ...data, id: data.id } as Repair;
@@ -41,8 +45,15 @@ const Index = () => {
       savedRepair = { ...data, id: generateId(repairs) } as Repair;
     }
     await saveRepair(savedRepair);
+    if (payment) {
+      try { await recordPayment(savedRepair.id, payment); }
+      catch (e) { throw new Error(`Equipo guardado; no se confirmó el pago. Reintenta sin cerrar: ${e instanceof Error ? e.message : "Error al guardar"}`); }
+      try { await syncPayment(payment.id); toast.success("Pago confirmado por Balans Board"); }
+      catch (e) { toast.warning(e instanceof Error ? e.message : "Pago guardado; envío pendiente"); }
+    }
     setEditRepair(null);
-    if (!data.id) {
+    await refreshRepairs();
+    if (isNew) {
       notifyNewRepair(savedRepair.id, savedRepair.cliente);
       setQrRepair(savedRepair);
     }

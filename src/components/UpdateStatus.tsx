@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import ImageUploader from "./ImageUploader";
 import { notifyStatusChange } from "@/lib/notifications";
 import { getTrackUrl } from "@/lib/public-url";
+import RepairPayments from "./RepairPayments";
 
 interface UpdateStatusProps {
   repair: Repair | null;
@@ -258,6 +259,11 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
                   </span>
                 </div>
               )}
+            </section>
+
+            <section className="space-y-3">
+              <h3 className="text-primary font-bold text-sm uppercase tracking-wide">Pagos cobrados</h3>
+              <RepairPayments repairId={repair.id} />
             </section>
 
             {/* Notes */}

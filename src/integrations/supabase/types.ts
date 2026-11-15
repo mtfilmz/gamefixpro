@@ -130,6 +130,81 @@ export type Database = {
         }
         Relationships: []
       }
+      finance_account_links: {
+        Row: {
+          binding_id: string
+          created_at: string
+          destination_user_id: string
+          enabled: boolean
+          id: string
+          user_id: string
+        }
+        Insert: {
+          binding_id: string
+          created_at?: string
+          destination_user_id: string
+          enabled?: boolean
+          id?: string
+          user_id: string
+        }
+        Update: {
+          binding_id?: string
+          created_at?: string
+          destination_user_id?: string
+          enabled?: boolean
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      repair_payments: {
+        Row: {
+          amount: number
+          client_name: string
+          created_at: string
+          equipment: string
+          id: string
+          method: string
+          paid_on: string
+          remote_movement_id: string | null
+          repair_id: string
+          sync_error: string | null
+          sync_status: string
+          synced_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          client_name: string
+          created_at?: string
+          equipment: string
+          id: string
+          method: string
+          paid_on: string
+          remote_movement_id?: string | null
+          repair_id: string
+          sync_error?: string | null
+          sync_status?: string
+          synced_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          client_name?: string
+          created_at?: string
+          equipment?: string
+          id?: string
+          method?: string
+          paid_on?: string
+          remote_movement_id?: string | null
+          repair_id?: string
+          sync_error?: string | null
+          sync_status?: string
+          synced_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       repairs: {
         Row: {
           accesorios: string
@@ -234,6 +309,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      record_repair_payment: {
+        Args: {
+          p_amount: number
+          p_id: string
+          p_method: string
+          p_paid_on: string
+          p_repair_id: string
+        }
+        Returns: Json
       }
     }
     Enums: {
