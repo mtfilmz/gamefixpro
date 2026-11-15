@@ -1,4 +1,7 @@
 # Pagos a Balans Board
+- [x] Abrir detalles completos al pasar el mouse por registros; acceso por toque en móvil.
+- [x] Añadir eliminación por registro y proteger también eliminación múltiple con contraseña validada en servidor y permisos existentes.
+- [x] Verificar detalles en computadora/móvil y rechazo real de contraseña incorrecta; 13 pruebas correctas. No ejecutar eliminación válida de registros reales durante pruebas.
 - [x] Guardar y enviar teléfono congelado en próximos pagos; 21 pruebas correctas y lectura autenticada confirma pago recibido sin cambios.
 - [ ] Actualizar receptor y detalles en Balans Board para admitir client_phone (bloqueado: otro proyecto, solo lectura aquí; instrucciones en docs/balans-board-phone-update.md).
 - [x] Revisar registro/edición, estado, historial/reintentos, prueba, envío y receptor; preservar pagos anteriores sin rellenarlos.

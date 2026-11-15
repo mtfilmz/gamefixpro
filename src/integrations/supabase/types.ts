@@ -157,6 +157,24 @@ export type Database = {
         }
         Relationships: []
       }
+      repair_delete_attempts: {
+        Row: {
+          attempts: number
+          user_id: string
+          window_started_at: string
+        }
+        Insert: {
+          attempts?: number
+          user_id: string
+          window_started_at?: string
+        }
+        Update: {
+          attempts?: number
+          user_id?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       repair_payments: {
         Row: {
           amount: number
@@ -309,6 +327,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      allow_repair_delete_attempt: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      delete_repairs_verified: {
+        Args: { p_ids: string[]; p_user_id: string }
+        Returns: string[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

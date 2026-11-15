@@ -142,8 +142,18 @@ export function useRepairs() {
     if (error) throw new Error(error.message);
   };
 
-  const deleteRepairs = async (ids: string[]) => {
-    await supabase.from("repairs").delete().in("id", ids);
+  const deleteRepairs = async (ids: string[], password: string) => {
+    const { data, error } = await supabase.functions.invoke("delete-repairs", { body: { ids, password } });
+    if (error) {
+      let message = "No se pudo eliminar. Revisa tu conexión.";
+      if (error.context instanceof Response) {
+        const details = await error.context.json().catch(() => null);
+        if (typeof details?.error === "string") message = details.error;
+      }
+      throw new Error(message);
+    }
+    if (!Array.isArray(data?.deleted_ids)) throw new Error("No se confirmó la eliminación");
+    setRepairs(previous => previous.filter(repair => !data.deleted_ids.includes(repair.id)));
   };
 
   return { repairs, loading, saveRepair, deleteRepairs, refreshRepairs: fetchRepairs, setBusy };

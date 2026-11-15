@@ -1,5 +1,6 @@
 import { Repair } from "@/types/repair";
-import { Phone } from "lucide-react";
+import { Phone, Eye, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface MobileRepairCardProps {
   repair: Repair;
@@ -7,6 +8,8 @@ interface MobileRepairCardProps {
   onShowQR: (repair: Repair) => void;
   onUpdateStatus: (repair: Repair) => void;
   onReopen: (repair: Repair) => void;
+  onDetails: (repair: Repair) => void;
+  onDelete: (repair: Repair) => void;
 }
 
 const estadoColor: Record<string, string> = {
@@ -17,7 +20,7 @@ const estadoColor: Record<string, string> = {
   ENTREGADO: "bg-status-delivered",
 };
 
-const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen }: MobileRepairCardProps) => {
+const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen, onDetails, onDelete }: MobileRepairCardProps) => {
   return (
     <div className="bg-card border border-border rounded-xl p-4 space-y-3">
       {/* Top row: ID + Status */}
@@ -30,7 +33,7 @@ const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen }
 
       {/* Client info */}
       <div>
-        <div className="text-foreground font-semibold text-sm">{repair.cliente}</div>
+        <Button variant="ghost" className="text-foreground font-semibold text-sm h-auto p-0 whitespace-normal text-left justify-start" onClick={() => onDetails(repair)}>{repair.cliente}</Button>
         <div className="flex items-center gap-2 mt-1">
           <a
             href={`tel:${repair.telefono}`}
@@ -55,6 +58,8 @@ const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen }
 
       {/* Action buttons - large touch targets */}
       <div className="flex flex-wrap gap-2 pt-1">
+        <Button variant="outline" size="icon" title="Ver detalles" aria-label={`Ver detalles ${repair.id}`} onClick={() => onDetails(repair)}><Eye className="h-4 w-4" /></Button>
+        <Button variant="outline" size="icon" title="Eliminar registro" aria-label={`Eliminar ${repair.id}`} className="text-destructive" onClick={() => onDelete(repair)}><Trash2 className="h-4 w-4" /></Button>
         <button
           onClick={() => onShowQR(repair)}
           className="flex-1 min-w-[60px] bg-primary text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"

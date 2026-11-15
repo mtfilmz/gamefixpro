@@ -350,10 +350,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
                       size="sm"
                       className="ml-auto gap-1.5"
                       onClick={() => {
-                        if (confirm(`¿Eliminar ${selectedIds.size} equipo(s)? Esta acción no se puede deshacer.`)) {
-                          onDeleteRepairs?.(Array.from(selectedIds));
-                          setSelectedIds(new Set());
-                        }
+                        onDeleteRepairs?.(Array.from(selectedIds));
                       }}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -389,10 +386,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
                     size="sm"
                     className="w-full gap-1.5"
                     onClick={() => {
-                      if (confirm("¿Eliminar TODOS los equipos registrados? Esta acción no se puede deshacer.")) {
-                        onDeleteRepairs?.(repairs.map(r => r.id));
-                        setSelectedIds(new Set());
-                      }
+                      onDeleteRepairs?.(repairs.map(r => r.id));
                     }}
                   >
                     <AlertTriangle className="w-3.5 h-3.5" />

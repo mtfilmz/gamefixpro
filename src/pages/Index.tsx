@@ -16,6 +16,8 @@ import ConfigPanel from "@/components/ConfigPanel";
 import { PaymentDraft } from "@/lib/payments";
 import { recordPayment, syncPayment } from "@/lib/payment-service";
 import { toast } from "sonner";
+import RepairDetailsDialog from "@/components/RepairDetailsDialog";
+import DeleteRepairsDialog from "@/components/DeleteRepairsDialog";
 
 
 const Index = () => {
@@ -29,9 +31,12 @@ const Index = () => {
   const [qrRepair, setQrRepair] = useState<Repair | null>(null);
   const [statusRepair, setStatusRepair] = useState<Repair | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [detailRepair, setDetailRepair] = useState<Repair | null>(null);
+  const [deleteIds, setDeleteIds] = useState<string[]>([]);
+  const requestDelete = (repair: Repair) => { setDetailRepair(null); setDeleteIds([repair.id]); };
 
   // Pause auto-refresh while any modal is open
-  const anyModalOpen = formOpen || !!qrRepair || !!statusRepair;
+  const anyModalOpen = formOpen || !!qrRepair || !!statusRepair || !!detailRepair || deleteIds.length > 0;
   useEffect(() => {
     setBusy(anyModalOpen);
   }, [anyModalOpen, setBusy]);
@@ -113,9 +118,7 @@ const Index = () => {
           {activeView === "config" ? (
             <ConfigPanel
               repairs={repairs}
-              onDeleteRepairs={async (ids) => {
-                await deleteRepairs(ids);
-              }}
+              onDeleteRepairs={ids => setDeleteIds(ids)}
             />
           ) : activeView === "historial" ? (
             <RepairTable
@@ -127,6 +130,8 @@ const Index = () => {
               filterEstado={filterEstado}
               onFilterChange={setFilterEstado}
               title="HISTORIAL COMPLETO"
+              onDetails={setDetailRepair}
+              onDelete={requestDelete}
             />
           ) : activeView === "buscar" ? (
             <div>
@@ -154,6 +159,8 @@ const Index = () => {
                 onFilterChange={setFilterEstado}
                 searchQuery={searchQuery}
                 title="RESULTADOS"
+                onDetails={setDetailRepair}
+                onDelete={requestDelete}
               />
             </div>
           ) : (
@@ -173,6 +180,8 @@ const Index = () => {
                 onReopen={openReopen}
                 filterEstado={filterEstado}
                 onFilterChange={setFilterEstado}
+                onDetails={setDetailRepair}
+                onDelete={requestDelete}
               />
             </>
           )}
@@ -192,6 +201,8 @@ const Index = () => {
 
       {/* Mobile bottom nav */}
       <BottomNav activeView={activeView} onViewChange={setActiveView} onNewRecord={openNew} />
+      <RepairDetailsDialog repair={detailRepair} onClose={() => setDetailRepair(null)} />
+      {deleteIds.length > 0 && <DeleteRepairsDialog ids={deleteIds} onClose={() => setDeleteIds([])} onDelete={async password => { await deleteRepairs(deleteIds, password); toast.success("Registros eliminados. Pagos conservados."); }} />}
 
       <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); setPrefillRepair(null); }} onSave={handleSave} editRepair={editRepair} prefillRepair={prefillRepair} repairs={repairs} />
       <QRTicketModal repair={qrRepair} open={!!qrRepair} onClose={() => setQrRepair(null)} />
