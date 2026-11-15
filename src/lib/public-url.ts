@@ -12,7 +12,7 @@ export function getPublicBaseUrl(): string {
 
   const host = window.location.hostname;
   // Lovable preview/sandbox hosts → use published URL instead
-  if (host.includes("preview--") || host.includes("lovableproject.com") || host.includes("sandbox")) {
+  if (host === "localhost" || host === "127.0.0.1" || host.includes("preview--") || host.includes("lovableproject.com") || host.includes("sandbox")) {
     return PUBLISHED_URL;
   }
   return window.location.origin;

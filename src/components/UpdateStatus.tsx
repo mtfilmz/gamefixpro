@@ -4,7 +4,7 @@ import { X, Check, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploader from "./ImageUploader";
 import { notifyStatusChange } from "@/lib/notifications";
-import { getTrackUrl } from "@/lib/public-url";
+import { Button } from "@/components/ui/button";
 import RepairPayments from "./RepairPayments";
 
 interface UpdateStatusProps {
@@ -281,24 +281,10 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
 
             {/* Action buttons */}
             <div className="space-y-2">
-              <button
-                onClick={async () => {
-                  const url = getTrackUrl(repair.id);
-                  const text = `Hola ${repair.cliente}, puedes ver el estado de tu reparación aquí: ${url}`;
-                  if (navigator.share) {
-                    try {
-                      await navigator.share({ title: `Reparación ${repair.id}`, text, url });
-                    } catch { /* cancelled */ }
-                  } else {
-                    await navigator.clipboard.writeText(url);
-                    toast.success("Enlace copiado al portapapeles");
-                  }
-                }}
-                className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-lg hover:opacity-90 transition-opacity text-sm flex items-center justify-center gap-2"
-              >
+              <Button onClick={() => onShowQR(repair)} className="w-full">
                 <LinkIcon className="w-4 h-4" />
-                Compartir enlace con el cliente
-              </button>
+                Compartir registro y factura
+              </Button>
               <div className="flex gap-3">
                 <button
                   onClick={onClose}

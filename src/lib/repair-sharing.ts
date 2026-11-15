@@ -1,0 +1,19 @@
+import { Repair } from "@/types/repair";
+
+export function repairTotal(repair: Repair): number {
+  return (repair.costoReparacion ?? 0) + (repair.costoComponente ?? 0) - (repair.costoDiagnostico ?? 0);
+}
+
+export function repairMessage(repair: Repair, url: string): string {
+  return `Game Fix Pro — ${repair.id}\nCliente: ${repair.cliente}\nEquipo: ${repair.marca} — ${repair.consola}\nEstado: ${repair.estado}\nTotal presupuestado: $${repairTotal(repair).toFixed(2)}\nSeguimiento: ${url}`;
+}
+
+export function smsLink(phone: string, message: string, userAgent: string): string | null {
+  const trimmed = phone.trim();
+  if (!/^\+?[\d\s().-]+$/.test(trimmed)) return null;
+  const digits = trimmed.replace(/\D/g, "");
+  if (digits.length < 7 || digits.length > 15) return null;
+  const recipient = `${trimmed.startsWith("+") ? "+" : ""}${digits}`;
+  const apple = /iPhone|iPad|iPod/.test(userAgent) || /Macintosh/.test(userAgent);
+  return `sms:${recipient}${apple ? "&" : "?"}body=${encodeURIComponent(message)}`;
+}

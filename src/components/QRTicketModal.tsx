@@ -1,9 +1,12 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import { Repair } from "@/types/repair";
 import { QRCodeSVG } from "qrcode.react";
-import { X, Download, Share2, Printer, Phone, Link as LinkIcon } from "lucide-react";
+import { X, Download, Share2, Printer, Phone, Link as LinkIcon, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { toBlob } from "html-to-image";
+import { Button } from "@/components/ui/button";
 import { getTrackUrl } from "@/lib/public-url";
+import { repairTotal, repairMessage, smsLink } from "@/lib/repair-sharing";
 
 interface QRTicketModalProps {
   repair: Repair | null;
@@ -13,214 +16,117 @@ interface QRTicketModalProps {
 
 const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
   const ticketRef = useRef<HTMLDivElement>(null);
-
+  const [image, setImage] = useState<{ repair: Repair; file: File } | null>(null);
+  const [imageError, setImageError] = useState(false);
   const trackUrl = repair ? getTrackUrl(repair.id) : "";
-  const qrValue = trackUrl;
+  const file = image?.repair === repair ? image.file : null;
 
-  const handleDownloadQR = useCallback(() => {
-    if (!repair) return;
-    const svg = document.getElementById("qr-ticket-svg");
-    if (!svg) return;
+  useEffect(() => {
+    setImage(null);
+    setImageError(false);
+    if (!open || !repair) return;
+    let cancelled = false;
+    const node = ticketRef.current;
+    if (!node) return;
+    // Capture only the receipt, never surrounding controls or private photos.
+    toBlob(node, { pixelRatio: 2, filter: element => !(element instanceof HTMLElement && element.dataset.capture === "exclude") })
+      .then(blob => {
+        if (cancelled) return;
+        if (!blob) { setImageError(true); return; }
+        setImage({ repair, file: new File([blob], `Factura-${repair.id.replace(/[^a-z0-9-]/gi, "")}.png`, { type: "image/png" }) });
+      }).catch(() => { if (!cancelled) setImageError(true); });
+    return () => { cancelled = true; };
+  }, [open, repair]);
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [open, onClose]);
 
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const img = new Image();
-    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(svgBlob);
+  const download = useCallback(() => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.download = file.name;
+    link.href = url;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    toast.success("Imagen de factura descargada");
+  }, [file]);
 
-    img.onload = () => {
-      canvas.width = 400;
-      canvas.height = 400;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, 400, 400);
-      ctx.drawImage(img, 0, 0, 400, 400);
-      URL.revokeObjectURL(url);
-
-      const link = document.createElement("a");
-      link.download = `QR-${repair.id}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-      toast.success("QR descargado");
-    };
-    img.src = url;
-  }, [repair]);
-
-  const handleShare = useCallback(async () => {
-    if (!repair) return;
-    const text = `Game Fix Pro - ${repair.id}\nCliente: ${repair.cliente}\nConsola: ${repair.consola}\nEstado: ${repair.estado}\nVer estado: ${trackUrl}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: `Game Fix Pro ${repair.id}`, text, url: trackUrl });
-      } catch {
-        // user cancelled
+  const share = async () => {
+    if (!repair || !file) return;
+    try {
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ title: `Game Fix Pro ${repair.id}`, text: repairMessage(repair, trackUrl), files: [file] });
+      } else {
+        download();
+        toast.info("Este navegador no permite compartir imágenes directamente; se descargó la factura");
       }
-    } else {
-      await navigator.clipboard.writeText(text);
-      toast.success("Información copiada al portapapeles");
+    } catch (error) {
+      if (!(error instanceof Error && error.name === "AbortError")) toast.error("No se pudo compartir; puedes descargar la factura");
     }
-  }, [repair, trackUrl]);
-
-  const handleCopyLink = useCallback(async () => {
-    if (!repair) return;
-    await navigator.clipboard.writeText(trackUrl);
-    toast.success("Enlace copiado al portapapeles");
-  }, [repair, trackUrl]);
-
-  const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+  };
 
   if (!open || !repair) return null;
+  const sms = smsLink(repair.telefono, repairMessage(repair, trackUrl), navigator.userAgent);
+  const costs = [["Reparación", repair.costoReparacion ?? 0], ["Componente", repair.costoComponente ?? 0], ["Diagnóstico acreditado", -(repair.costoDiagnostico ?? 0)]] as const;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start md:items-start justify-center bg-background/70 backdrop-blur-sm overflow-y-auto py-0 md:py-6 px-0 md:px-4 print:bg-white print:p-0">
-      {/* Action buttons - fixed bar on mobile, floating on desktop */}
-      <div className="fixed bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:top-4 md:right-4 z-[60] flex gap-2 p-3 md:p-0 bg-card md:bg-transparent border-t border-border md:border-0 safe-bottom print:hidden">
-        <button
-          onClick={handleDownloadQR}
-          className="flex-1 md:flex-none bg-status-repaired text-primary-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
-        >
-          <Download className="w-5 h-5" />
-          <span className="text-xs font-bold md:hidden">Descargar</span>
-        </button>
-        <button
-          onClick={handleShare}
-          className="flex-1 md:flex-none bg-stat-completed text-primary-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
-        >
-          <Share2 className="w-5 h-5" />
-          <span className="text-xs font-bold md:hidden">Compartir</span>
-        </button>
-        <button
-          onClick={handlePrint}
-          className="flex-1 md:flex-none bg-accent text-accent-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
-        >
-          <Printer className="w-5 h-5" />
-          <span className="text-xs font-bold md:hidden">Imprimir</span>
-        </button>
-        <button
-          onClick={onClose}
-          className="flex-1 md:flex-none bg-destructive text-destructive-foreground p-3 md:p-2.5 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2 min-h-[44px]"
-        >
-          <X className="w-5 h-5" />
-          <span className="text-xs font-bold md:hidden">Cerrar</span>
-        </button>
+    <div role="dialog" aria-modal="true" aria-label={`Compartir registro ${repair.id}`} className="fixed inset-0 z-[60] flex flex-col items-center bg-background/90 overflow-y-auto p-3 md:p-6">
+      <div className="w-full max-w-lg flex flex-wrap items-center justify-end gap-2 mb-3 print:hidden">
+        <Button size="icon" variant="secondary" title="Descargar factura" aria-label="Descargar factura" onClick={download} disabled={!file}><Download /></Button>
+        <Button size="icon" title="Compartir factura" aria-label="Compartir factura" onClick={share} disabled={!file}><Share2 /></Button>
+        {sms ? <Button asChild variant="secondary"><a href={sms} aria-label="Enviar SMS al cliente" title={`Enviar SMS a ${repair.telefono}`}><MessageSquare /> SMS</a></Button> : <Button variant="secondary" disabled title="El registro no tiene un teléfono válido"><MessageSquare /> SMS</Button>}
+        <Button size="icon" variant="secondary" title="Imprimir factura" aria-label="Imprimir factura" onClick={() => window.print()}><Printer /></Button>
+        <Button size="icon" variant="destructive" title="Cerrar" aria-label="Cerrar comprobante" onClick={onClose}><X /></Button>
       </div>
-
-      {/* Ticket */}
-      <div
-        ref={ticketRef}
-        className="bg-white text-gray-900 w-full md:max-w-sm md:rounded-xl shadow-2xl overflow-hidden mb-20 md:mb-0 print:shadow-none print:rounded-none print:max-w-full"
-        id="print-ticket"
-      >
-        {/* Header */}
-        <div className="bg-[hsl(var(--primary))] px-6 py-5 text-center">
-          <div className="text-2xl md:text-3xl font-black text-white tracking-wider">[&gt;] GAME FIX PRO</div>
-          <div className="text-white/80 text-sm mt-1 font-medium tracking-wide">Comprobante de Recepción</div>
+      {imageError && <p role="alert" className="text-destructive mb-3 print:hidden">No se pudo generar la imagen. Cierra y vuelve a abrir el comprobante.</p>}
+      <div ref={ticketRef} className="repair-receipt w-full max-w-lg overflow-hidden shrink-0" id="print-ticket">
+        <header className="receipt-header px-6 py-5">
+          <h2 className="text-2xl font-black">GAME FIX PRO</h2>
+          <p className="text-sm mt-1">Factura de servicio · Comprobante de reparación</p>
+        </header>
+        <div className="px-6 py-4 border-b border-inherit flex justify-between gap-3">
+          <div><p className="text-xs uppercase">Orden de servicio</p><p className="text-3xl font-black break-all">{repair.id}</p></div>
+          <div className="text-right text-sm"><p>{repair.fecha}</p><p className="font-bold mt-1">{repair.estado}</p></div>
         </div>
-
-        {/* ID */}
-        <div className="text-center py-4 border-b-2 border-dashed border-gray-300">
-          <div className="text-xs text-gray-500 uppercase tracking-widest">Orden de Servicio</div>
-          <div className="text-5xl font-black text-gray-900 mt-1">{repair.id}</div>
-          <div className="text-sm text-gray-500 mt-1">{repair.fecha}</div>
+        <section className="px-6 py-4 border-b border-inherit break-words">
+          <h3 className="text-xs uppercase font-bold mb-2">Cliente</h3>
+          <p className="font-bold">{repair.cliente}</p>
+          <p className="flex items-center gap-2 text-sm mt-1"><Phone size={14} />{repair.telefono || "Sin teléfono"}</p>
+          {repair.email && <p className="text-sm mt-1">{repair.email}</p>}
+        </section>
+        <section className="px-6 py-4 border-b border-inherit break-words text-sm space-y-1">
+          <h3 className="text-xs uppercase font-bold mb-2">Equipo</h3>
+          <p className="font-bold">{repair.marca} — {repair.consola}</p>
+          {repair.numeroSerie && <p>Serie: {repair.numeroSerie}</p>}
+          {repair.color && <p>Color: {repair.color}</p>}
+          {repair.accesorios && <p>Accesorios: {repair.accesorios}</p>}
+          <p className="pt-2 font-semibold">Problemas reportados</p>
+          <p>{repair.problemas.join(", ") || "—"}</p>
+          {repair.detalles && <p className="whitespace-pre-wrap">{repair.detalles}</p>}
+        </section>
+        <section className="px-6 py-4 border-b border-inherit">
+          <h3 className="text-xs uppercase font-bold mb-3">Costos presupuestados</h3>
+          <dl className="space-y-2 text-sm">{costs.map(([label, amount]) => <div key={label} className="flex justify-between gap-3"><dt>{label}</dt><dd className="shrink-0">{amount < 0 ? "−" : ""}${Math.abs(amount).toFixed(2)}</dd></div>)}
+            <div className="flex justify-between gap-3 border-t border-inherit pt-3 font-bold text-lg"><dt>Total</dt><dd>${repairTotal(repair).toFixed(2)}</dd></div>
+          </dl>
+          <p className="text-xs mt-3">Presupuesto de servicio; no acredita pago ni sustituye una factura fiscal.</p>
+        </section>
+        <div className="px-6 py-5 flex flex-col items-center gap-3">
+          <QRCodeSVG value={trackUrl} size={160} level="H" />
+          <p className="text-xs">Seguimiento de la reparación</p>
+          <Button data-capture="exclude" variant="link" className="print:hidden" onClick={async () => {
+            try { await navigator.clipboard.writeText(trackUrl); toast.success("Enlace copiado"); }
+            catch { toast.error("No se pudo copiar el enlace"); }
+          }}><LinkIcon />Copiar enlace</Button>
         </div>
-
-        {/* Cliente */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Cliente</div>
-          <div className="text-base font-bold text-gray-900">{repair.cliente}</div>
-          <a href={`tel:${repair.telefono}`} className="flex items-center gap-1.5 text-sm text-blue-600 font-medium mt-1 min-h-[44px]">
-            <Phone className="w-4 h-4" />
-            {repair.telefono}
-          </a>
-          {repair.email && <div className="text-sm text-gray-600">{repair.email}</div>}
-        </div>
-
-        {/* Equipo */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Equipo</div>
-          <div className="grid grid-cols-2 gap-y-1 text-sm">
-            <span className="text-gray-500">Marca:</span>
-            <span className="font-semibold text-gray-900">{repair.marca}</span>
-            <span className="text-gray-500">Modelo:</span>
-            <span className="font-semibold text-gray-900">{repair.consola}</span>
-            {repair.numeroSerie && (
-              <>
-                <span className="text-gray-500">Serie:</span>
-                <span className="font-semibold text-gray-900">{repair.numeroSerie}</span>
-              </>
-            )}
-            {repair.color && (
-              <>
-                <span className="text-gray-500">Color:</span>
-                <span className="font-semibold text-gray-900">{repair.color}</span>
-              </>
-            )}
-          </div>
-          {repair.accesorios && (
-            <div className="mt-2 text-sm">
-              <span className="text-gray-500">Accesorios: </span>
-              <span className="text-gray-900">{repair.accesorios}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Problemas */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Problemas Reportados</div>
-          <ul className="space-y-1">
-            {(repair.problemas || []).map((p) => (
-              <li key={p} className="flex items-center gap-2 text-sm text-gray-900">
-                <span className="text-green-600 font-bold">✓</span>
-                {p}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Detalles */}
-        {repair.detalles && (
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Detalles Adicionales</div>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{repair.detalles}</p>
-          </div>
-        )}
-
-        {/* Estado */}
-        <div className="px-6 py-3 border-b border-gray-200 flex items-center justify-between">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Estado</span>
-          <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">{repair.estado}</span>
-        </div>
-
-        {/* QR */}
-        <div className="px-6 py-6 flex flex-col items-center">
-          <QRCodeSVG id="qr-ticket-svg" value={qrValue} size={180} bgColor="#ffffff" fgColor="#1a1a3e" level="H" />
-          <div className="text-xs text-gray-400 mt-3 tracking-wide">Escanear para ver estado en línea</div>
-          <button
-            onClick={handleCopyLink}
-            className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 print:hidden"
-          >
-            <LinkIcon className="w-3.5 h-3.5" />
-            Copiar enlace
-          </button>
-          <div className="hidden print:block text-[10px] text-gray-500 mt-2 break-all px-4 text-center">
-            {trackUrl}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="bg-gray-100 px-6 py-4 text-center border-t border-gray-200">
-          <div className="text-xs text-gray-500 font-bold">Game Fix Pro</div>
-          <div className="text-xs text-gray-400 mt-0.5">Tel: (555) 123-4567 | info@gamefixpro.com</div>
-          <div className="text-xs text-gray-400">www.gamefixpro.com</div>
-        </div>
+        <footer className="px-6 py-3 border-t border-inherit text-center text-xs font-semibold">Game Fix Pro · {repair.id}</footer>
       </div>
     </div>
   );
 };
-
 export default QRTicketModal;

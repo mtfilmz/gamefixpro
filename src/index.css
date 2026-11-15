@@ -32,6 +32,10 @@
     --input: 233 30% 25%;
     --ring: 343 100% 59%;
 
+    --receipt-paper: 0 0% 100%;
+    --receipt-ink: 220 20% 15%;
+    --receipt-border: 220 15% 85%;
+
     --radius: 0.75rem;
 
     --status-pending: 0 72% 63%;
@@ -88,6 +92,16 @@ html {
 }
 
 /* Print styles */
+.repair-receipt {
+  background: hsl(var(--receipt-paper));
+  color: hsl(var(--receipt-ink));
+  border-color: hsl(var(--receipt-border));
+}
+.receipt-header {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
 @media print {
   body * {
     visibility: hidden;
