@@ -1,6 +1,6 @@
 # Architecture rules
 - Route all repair deletion, including bulk actions, through authenticated password verification and a server-only transactional RPC retaining owner/admin rules; revoke browser DELETE and rate-limit attempts to prevent bypass and brute force while preserving payment snapshots.
-- Reuse a read-only details dialog across repair lists; delayed mouse entry opens it and explicit controls support touch/keyboard without editing the record.
+- Reuse a read-only details dialog across repair lists with explicit activation controls supporting mouse, touch and keyboard without editing the record.
 - Keep actual payments in an immutable ledger separate from repair estimates; edits to a repair must not rewrite paid amounts or exported snapshots.
 - Snapshot the repair phone on new payment insertion and export it as optional client_phone; never backfill existing payments or derive export contact data from mutable repairs, so retries preserve the original receipt contract.
 - Route financial exports through an authenticated edge function using a server-only explicit account binding, a stable payment UUID and a verified receiver receipt; missing configuration leaves payments pending.

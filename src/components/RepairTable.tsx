@@ -1,6 +1,5 @@
 import { Repair, EstadoReparacion } from "@/types/repair";
 import MobileRepairCard from "./MobileRepairCard";
-import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Eye, Trash2 } from "lucide-react";
 
@@ -40,9 +39,6 @@ function newestFirst(a: Repair, b: Repair): number {
 }
 
 const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDetails, onDelete, filterEstado, onFilterChange, searchQuery = "", title = "HISTORIAL DE EQUIPOS" }: RepairTableProps) => {
-  const hoverTimer = useRef<ReturnType<typeof setTimeout>>();
-  const cancelHover = () => clearTimeout(hoverTimer.current);
-  useEffect(() => cancelHover, []);
   const byEstado = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
   const q = searchQuery.trim().toLowerCase();
   const filtered = (q
@@ -112,9 +108,9 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDe
           </thead>
           <tbody>
             {filtered.map((r, i) => (
-              <tr key={r.id} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"} onPointerEnter={e => { if (e.pointerType === "mouse") { cancelHover(); hoverTimer.current = setTimeout(() => onDetails(r), 500); } }} onPointerLeave={cancelHover}>
+              <tr key={r.id} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
                 <td className="py-3 px-4 text-foreground">{r.id}</td>
-                <td className="py-3 px-4 text-foreground">{r.cliente}</td>
+                <td className="py-3 px-4 text-foreground"><Button variant="ghost" className="h-auto p-0 whitespace-normal text-left justify-start" onClick={() => onDetails(r)}>{r.cliente}</Button></td>
                 <td className="py-3 px-4 text-foreground">{r.consola}</td>
                 <td className="py-3 px-4 text-foreground">{getProblemSummary(r)}</td>
                 <td className="py-3 px-4 text-center">
@@ -124,8 +120,8 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDe
                 </td>
                 <td className="py-3 px-4 text-center">
                   <div className="flex gap-2 justify-center flex-wrap">
-                    <Button variant="ghost" size="icon" title="Ver detalles" aria-label={`Ver detalles ${r.id}`} onPointerEnter={cancelHover} onClick={() => onDetails(r)}><Eye className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" title="Eliminar registro" aria-label={`Eliminar ${r.id}`} className="text-destructive" onPointerEnter={cancelHover} onClick={() => onDelete(r)}><Trash2 className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" title="Ver detalles" aria-label={`Ver detalles ${r.id}`} onClick={() => onDetails(r)}><Eye className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" title="Eliminar registro" aria-label={`Eliminar ${r.id}`} className="text-destructive" onClick={() => onDelete(r)}><Trash2 className="h-4 w-4" /></Button>
                     <button
                       onClick={() => onShowQR(r)}
                       className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-md hover:opacity-80 transition-opacity"
