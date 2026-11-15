@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link2, RefreshCw, ExternalLink } from "lucide-react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeAuthenticatedFunction } from "@/lib/authenticated-function";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,7 @@ export default function FinanceAccountConnection() {
   const call = async (body: object) => {
     setBusy(true); setError("");
     try {
-      const { data, error: failure } = await supabase.functions.invoke("link-finance-account", { body });
+      const { data, error: failure } = await invokeAuthenticatedFunction("link-finance-account", body);
       if (failure) {
         let message = "No se pudo consultar la vinculación";
         if (failure instanceof FunctionsHttpError) {
@@ -41,7 +41,7 @@ export default function FinanceAccountConnection() {
       <h3 className="font-bold text-foreground flex items-center gap-2"><Link2 className="h-4 w-4" />Balans Board</h3>
       <Button variant="ghost" size="icon" aria-label="Actualizar vínculo" disabled={busy} onClick={() => void call({ action: "status" })}><RefreshCw className={busy ? "h-4 w-4 animate-spin" : "h-4 w-4"} /></Button>
     </div>
-    <p className="text-sm text-muted-foreground">{!loaded ? "Consultando conexión…" : connected ? "Cuenta vinculada" : configured ? "Cuenta sin vincular" : "Pendiente de configurar la clave privada en ambas aplicaciones"}</p>
+    <p className="text-sm text-muted-foreground">{!loaded ? error ? "No se pudo consultar la conexión" : "Consultando conexión…" : connected ? "Cuenta vinculada" : configured ? "Cuenta sin vincular" : "Pendiente de configurar la clave privada en ambas aplicaciones"}</p>
     {error && <p role="alert" className="text-sm text-destructive break-words">{error}</p>}
     <Button asChild variant="outline" size="sm"><a href="https://ingreso-impuesto-compass.lovable.app" target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" />Abrir Balans Board</a></Button>
     {loaded && !connected && <form className="space-y-3" onSubmit={e => { e.preventDefault(); if (confirmed) void call({ action: "link", code: code.trim(), currency }); }}>

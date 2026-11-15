@@ -1,9 +1,10 @@
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentDraft, paymentSchema } from "./payments";
+import { invokeAuthenticatedFunction } from "./authenticated-function";
 
 export async function syncPayment(id: string) {
-  const { data, error } = await supabase.functions.invoke("sync-repair-payment", { body: { payment_id: id } });
+  const { data, error } = await invokeAuthenticatedFunction("sync-repair-payment", { payment_id: id });
   if (error) {
     if (error instanceof FunctionsHttpError) {
       const text = await error.context.text();

@@ -2,11 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { paymentSchema } from "@/lib/payments";
 import { paymentPayload } from "../../supabase/functions/_shared/payment-contract";
 
-const mock = vi.hoisted(() => ({ rpc: vi.fn(), invoke: vi.fn() }));
-vi.mock("@/integrations/supabase/client", () => ({ supabase: { rpc: mock.rpc, functions: { invoke: mock.invoke } } }));
+const mock = vi.hoisted(() => ({ rpc: vi.fn(), invoke: vi.fn(), getSession: vi.fn() }));
+vi.mock("@/integrations/supabase/client", () => ({ supabase: { rpc: mock.rpc, functions: { invoke: mock.invoke }, auth: { getSession: mock.getSession } } }));
 import { recordPayment, syncPayment } from "@/lib/payment-service";
 const draft = { id: "a57c1010-e596-4fd0-a401-bd718d8a4c3a", amount: 150, paid_on: "2026-11-15", method: "cash" as const };
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  mock.getSession.mockResolvedValue({ data: { session: { access_token: "test-session", expires_at: Math.floor(Date.now() / 1000) + 3600 } }, error: null });
+});
 describe("pagos reales", () => {
   it("rechaza un pago de cero o negativo", () => {
     expect(paymentSchema.safeParse({ ...draft, amount: 0 }).success).toBe(false);
