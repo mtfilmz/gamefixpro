@@ -1,5 +1,17 @@
 import { Repair } from "@/types/repair";
 
+// A share action must never download as a fallback.
+export async function shareReceipt(api: Partial<Pick<Navigator, "share" | "canShare">>, file: File, title: string, text: string, url: string): Promise<"shared" | "options" | "cancelled"> {
+  if (!api.share) return "options";
+  try {
+    const data = api.canShare?.({ files: [file] }) ? { title, text, files: [file] } : { title, text, url };
+    await api.share(data);
+    return "shared";
+  } catch (error) {
+    return typeof error === "object" && error !== null && "name" in error && error.name === "AbortError" ? "cancelled" : "options";
+  }
+}
+
 export function repairTotal(repair: Repair): number {
   return (repair.costoReparacion ?? 0) + (repair.costoComponente ?? 0) - (repair.costoDiagnostico ?? 0);
 }

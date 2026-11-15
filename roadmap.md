@@ -1,6 +1,7 @@
 # Pagos a Balans Board
+- [x] Corregir Compartir: envío nativo o selección de canales, sin descarga automática; ocho pruebas y flujo con sesión real verificados, sin enviar mensajes externos.
 - [x] Añadir SMS al teléfono del registro y factura PNG descargable/compartible; 15 pruebas correctas y comprobante aislado verificado en computadora/móvil, sin enviar mensajes.
-- [ ] Verificar compartir desde un registro con sesión real (bloqueado: no se pudo abrir una sesión de la cuenta solicitante; requiere iniciar sesión en la vista previa).
+- [x] Verificar compartir desde un registro con sesión real: opciones visibles y solicitudes de compartir texto/imagen comprobadas sin descargas automáticas.
 - [x] Abrir detalles únicamente con clic o toque en Dashboard, Historial y Buscar; sin apertura automática al pasar el mouse.
 - [x] Añadir eliminación por registro y proteger también eliminación múltiple con contraseña validada en servidor y permisos existentes.
 - [x] Verificar detalles en computadora/móvil y rechazo real de contraseña incorrecta; 13 pruebas correctas. No ejecutar eliminación válida de registros reales durante pruebas.

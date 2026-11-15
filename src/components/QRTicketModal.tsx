@@ -5,8 +5,9 @@ import { X, Download, Share2, Printer, Phone, Link as LinkIcon, MessageSquare } 
 import { toast } from "sonner";
 import { toBlob } from "html-to-image";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { getTrackUrl } from "@/lib/public-url";
-import { repairTotal, repairMessage, smsLink } from "@/lib/repair-sharing";
+import { repairTotal, repairMessage, smsLink, shareReceipt } from "@/lib/repair-sharing";
 
 interface QRTicketModalProps {
   repair: Repair | null;
@@ -18,12 +19,14 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
   const ticketRef = useRef<HTMLDivElement>(null);
   const [image, setImage] = useState<{ repair: Repair; file: File } | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [shareOptions, setShareOptions] = useState(false);
   const trackUrl = repair ? getTrackUrl(repair.id) : "";
   const file = image?.repair === repair ? image.file : null;
 
   useEffect(() => {
     setImage(null);
     setImageError(false);
+    setShareOptions(false);
     if (!open || !repair) return;
     let cancelled = false;
     const node = ticketRef.current;
@@ -58,16 +61,8 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
 
   const share = async () => {
     if (!repair || !file) return;
-    try {
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ title: `Game Fix Pro ${repair.id}`, text: repairMessage(repair, trackUrl), files: [file] });
-      } else {
-        download();
-        toast.info("Este navegador no permite compartir imágenes directamente; se descargó la factura");
-      }
-    } catch (error) {
-      if (!(error instanceof Error && error.name === "AbortError")) toast.error("No se pudo compartir; puedes descargar la factura");
-    }
+    const result = await shareReceipt(navigator, file, `Game Fix Pro ${repair.id}`, repairMessage(repair, trackUrl), trackUrl);
+    if (result === "options") setShareOptions(true);
   };
 
   if (!open || !repair) return null;
@@ -78,7 +73,20 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
     <div role="dialog" aria-modal="true" aria-label={`Compartir registro ${repair.id}`} className="fixed inset-0 z-[60] flex flex-col items-center bg-background/90 overflow-y-auto p-3 md:p-6">
       <div className="w-full max-w-lg flex flex-wrap items-center justify-end gap-2 mb-3 print:hidden">
         <Button size="icon" variant="secondary" title="Descargar factura" aria-label="Descargar factura" onClick={download} disabled={!file}><Download /></Button>
-        <Button size="icon" title="Compartir factura" aria-label="Compartir factura" onClick={share} disabled={!file}><Share2 /></Button>
+        <Popover open={shareOptions} onOpenChange={setShareOptions}>
+          <PopoverTrigger asChild><Button size="icon" title="Compartir factura" aria-label="Compartir factura" onClick={event => { event.preventDefault(); void share(); }} disabled={!file}><Share2 /></Button></PopoverTrigger>
+          <PopoverContent align="end" onEscapeKeyDown={event => event.stopPropagation()} className="z-[70] space-y-2 max-w-[calc(100vw-2rem)]">
+            <h3 className="font-semibold text-sm">Compartir registro</h3>
+            <Button asChild variant="secondary" className="w-full"><a href={`https://wa.me/?text=${encodeURIComponent(repairMessage(repair, trackUrl))}`} target="_blank" rel="noopener noreferrer">WhatsApp</a></Button>
+            {sms && <Button asChild variant="secondary" className="w-full"><a href={sms}><MessageSquare />Mensaje de texto</a></Button>}
+            <Button asChild variant="secondary" className="w-full"><a href={`mailto:${encodeURIComponent(repair.email || "")}?subject=${encodeURIComponent(`Game Fix Pro ${repair.id}`)}&body=${encodeURIComponent(repairMessage(repair, trackUrl))}`}>Correo electrónico</a></Button>
+            <Button variant="outline" className="w-full" onClick={async () => {
+              try { await navigator.clipboard.writeText(repairMessage(repair, trackUrl)); toast.success("Registro copiado"); setShareOptions(false); }
+              catch { toast.error("No se pudo copiar el registro"); }
+            }}><LinkIcon />Copiar registro y enlace</Button>
+            <p className="text-xs text-muted-foreground">Estas opciones envían texto y enlace; la imagen requiere adjuntarla desde tu dispositivo.</p>
+          </PopoverContent>
+        </Popover>
         {sms ? <Button asChild variant="secondary"><a href={sms} aria-label="Enviar SMS al cliente" title={`Enviar SMS a ${repair.telefono}`}><MessageSquare /> SMS</a></Button> : <Button variant="secondary" disabled title="El registro no tiene un teléfono válido"><MessageSquare /> SMS</Button>}
         <Button size="icon" variant="secondary" title="Imprimir factura" aria-label="Imprimir factura" onClick={() => window.print()}><Printer /></Button>
         <Button size="icon" variant="destructive" title="Cerrar" aria-label="Cerrar comprobante" onClick={onClose}><X /></Button>

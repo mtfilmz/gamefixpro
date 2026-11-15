@@ -1,5 +1,5 @@
 # Architecture rules
-- Share repair receipts through a shared client-side PNG capture and validated SMS deep links; SMS opens the device composer for confirmation, while receipt estimates never imply a ledger payment or fiscal invoice.
+- Share repair receipts through shared client-side PNG capture and validated SMS deep links; use native file sharing, then native text sharing or channel options, never automatic downloads. SMS opens the device composer; estimates never imply a ledger payment or fiscal invoice.
 - Route all repair deletion, including bulk actions, through authenticated password verification and a server-only transactional RPC retaining owner/admin rules; revoke browser DELETE and rate-limit attempts to prevent bypass and brute force while preserving payment snapshots.
 - Reuse a read-only details dialog across repair lists with explicit activation controls supporting mouse, touch and keyboard without editing the record.
 - Keep actual payments in an immutable ledger separate from repair estimates; edits to a repair must not rewrite paid amounts or exported snapshots.
