@@ -1,4 +1,6 @@
 # Pagos a Balans Board
+- [ ] Añadir finalización segura de vinculación en Configuración y conectar con el contrato existente de Balans Board.
+- [ ] Configurar clave compartida y comprobar ambas cuentas (requiere clave y código del propietario).
 - [x] Registrar pagos reales separados de presupuestos, con fecha, método e identificador por abono.
 - [x] Guardar pagos inmutables y pendientes; permitir reintentos autenticados con el mismo identificador.
 - [x] Preparar envío privado condicionado a vínculo explícito y confirmación del receptor.
