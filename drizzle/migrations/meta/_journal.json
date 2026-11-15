@@ -64,6 +64,13 @@
       "when": 1794722067860,
       "tag": "0008_restrict_shop_staff_access",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794722093746,
+      "tag": "0009_payment_rpc_staff_check",
+      "breakpoints": true
     }
   ]
 }
