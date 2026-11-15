@@ -7,6 +7,7 @@ import ImageUploader from "./ImageUploader";
 import { Button } from "@/components/ui/button";
 import RepairPayments from "./RepairPayments";
 import { PaymentDraft, paymentSchema, localPaymentDate } from "@/lib/payments";
+import PreviousClientPicker from "./PreviousClientPicker";
 
 interface RepairFormProps {
   open: boolean;
@@ -178,6 +179,12 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
           {/* SECCIÓN 1 - Datos del Cliente */}
           <section>
             <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📋 Datos del Cliente</h3>
+            {!editRepair && <PreviousClientPicker key={`${open}-${nextId}`} repairs={repairs} onSelect={client => {
+              setCliente(client.cliente);
+              setTelefono(client.telefono);
+              setEmail(client.email);
+              setErrors(previous => Object.fromEntries(Object.entries(previous).filter(([key]) => !["cliente", "telefono", "email"].includes(key))));
+            }} />}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="sm:col-span-2">
                 <input required placeholder="Nombre completo *" value={cliente} onChange={(e) => setCliente(e.target.value)} className={inputClass} maxLength={100} />

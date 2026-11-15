@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [x] Buscar clientes anteriores por nombre, teléfono o correo al crear un registro; cuatro pruebas correctas y selección con sesión real en computadora/móvil sin guardar registros de prueba.
 - [x] Incluir nombre, dirección, teléfono y web del negocio de referencia en el comprobante compartido; verificar imagen descargada, impresión y móvil con comprobante aislado y nueve pruebas correctas.
 - [ ] Verificar los datos del negocio desde un registro con sesión real (bloqueado: sesión disponible vuelve a la pantalla de acceso).
 - [x] Revisar Compartir en Dashboard, Historial, Buscar, móvil, estado y recepción nueva; seis entradas con sesión real y nueve pruebas correctas, sin alterar datos. Revisión en docs/share-flow-review.md.
