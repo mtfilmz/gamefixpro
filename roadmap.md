@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [x] Añadir historial administrativo de cambios y operaciones desde su activación: creación/edición con sesión real visibles en escritorio/móvil, seis pruebas correctas, política solo-admin y permisos de escritura revocados comprobados. Operaciones del servidor sin sesión se identifican como no atribuidas.
 - [x] Permitir editar clientes guardados y del historial sin alterar reparaciones ni pagos anteriores; ocho pruebas correctas, edición y lectura tras recarga verificadas con sesión real, formulario móvil comprobado.
 - [x] Añadir Clientes debajo de Historial, listar clientes anteriores y guardar nuevos clientes; siete pruebas correctas y guardado/lectura tras recarga con sesión real en computadora/móvil. Cliente temporal eliminado.
 - [x] Buscar clientes anteriores por nombre, teléfono o correo al crear un registro; cuatro pruebas correctas y selección con sesión real en computadora/móvil sin guardar registros de prueba.

@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_history: {
+        Row: {
+          actor_id: string | null
+          after_values: Json | null
+          before_values: Json | null
+          changed_fields: string[]
+          entity: string
+          id: number
+          occurred_at: string
+          operation: string
+          record_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          after_values?: Json | null
+          before_values?: Json | null
+          changed_fields?: string[]
+          entity: string
+          id?: never
+          occurred_at?: string
+          operation: string
+          record_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          after_values?: Json | null
+          before_values?: Json | null
+          changed_fields?: string[]
+          entity?: string
+          id?: never
+          occurred_at?: string
+          operation?: string
+          record_id?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           config: Json

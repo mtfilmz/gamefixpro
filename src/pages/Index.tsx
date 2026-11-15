@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import RepairDetailsDialog from "@/components/RepairDetailsDialog";
 import DeleteRepairsDialog from "@/components/DeleteRepairsDialog";
 import ClientsPage from "@/components/ClientsPage";
+import ActivityHistoryPage from "@/components/ActivityHistoryPage";
 
 
 const Index = () => {
@@ -121,6 +122,8 @@ const Index = () => {
               repairs={repairs}
               onDeleteRepairs={ids => setDeleteIds(ids)}
             />
+          ) : activeView === "actividad" ? (
+            <ActivityHistoryPage />
           ) : activeView === "clientes" ? (
             <ClientsPage repairs={repairs} />
           ) : activeView === "historial" ? (

@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { EstadoReparacion } from "@/types/repair";
 import { Camera } from "lucide-react";
-import { Users } from "lucide-react";
+import { Users, History } from "lucide-react";
+import { useRole } from "@/hooks/use-role";
 import { Button } from "@/components/ui/button";
 
 const LOGO_KEY = "gfp-logo";
@@ -13,6 +14,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
+  const { isAdmin } = useRole();
   const [logo, setLogo] = useState<string | null>(() => localStorage.getItem(LOGO_KEY));
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -33,6 +35,7 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
     { key: "dashboard", label: "Dashboard", icon: ">>" },
     { key: "historial", label: "Historial", icon: "||" },
     { key: "clientes", label: "Clientes", icon: "" },
+    ...(isAdmin ? [{ key: "actividad", label: "Historial", icon: "" }] : []),
     { key: "config", label: "Configuración", icon: "*" },
   ];
 
@@ -73,7 +76,7 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
                 : "text-foreground hover:bg-muted"
             }`}
           >
-            {item.key === "clientes" ? <Users className="h-4 w-4" /> : item.icon} {item.label}
+            {item.key === "clientes" ? <Users className="h-4 w-4" /> : item.key === "actividad" ? <History className="h-4 w-4" /> : item.icon} {item.label}
           </Button>
         ))}
       </nav>

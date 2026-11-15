@@ -1,4 +1,5 @@
-import { Home, PlusCircle, Clock, Settings, Search, Users } from "lucide-react";
+import { Home, PlusCircle, Clock, Settings, Search, Users, History } from "lucide-react";
+import { useRole } from "@/hooks/use-role";
 import { Button } from "@/components/ui/button";
 
 interface BottomNavProps {
@@ -17,10 +18,12 @@ const navItems = [
 ];
 
 const BottomNav = ({ activeView, onViewChange, onNewRecord }: BottomNavProps) => {
+  const { isAdmin } = useRole();
+  const items = navItems.flatMap(item => item.key === "clientes" && isAdmin ? [item, { key: "actividad", label: "Actividad", icon: History }] : [item]);
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border lg:hidden print:hidden safe-bottom">
       <div className="flex items-center justify-around h-16">
-        {navItems.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           const isActive = activeView === item.key;
 
