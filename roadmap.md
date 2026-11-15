@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [x] Añadir Clientes debajo de Historial, listar clientes anteriores y guardar nuevos clientes; siete pruebas correctas y guardado/lectura tras recarga con sesión real en computadora/móvil. Cliente temporal eliminado.
 - [x] Buscar clientes anteriores por nombre, teléfono o correo al crear un registro; cuatro pruebas correctas y selección con sesión real en computadora/móvil sin guardar registros de prueba.
 - [x] Incluir nombre, dirección, teléfono y web del negocio de referencia en el comprobante compartido; verificar imagen descargada, impresión y móvil con comprobante aislado y nueve pruebas correctas.
 - [ ] Verificar los datos del negocio desde un registro con sesión real (bloqueado: sesión disponible vuelve a la pantalla de acceso).

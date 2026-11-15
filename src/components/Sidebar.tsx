@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { EstadoReparacion } from "@/types/repair";
 import { Camera } from "lucide-react";
+import { Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const LOGO_KEY = "gfp-logo";
 
@@ -30,6 +32,7 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
   const menuItems = [
     { key: "dashboard", label: "Dashboard", icon: ">>" },
     { key: "historial", label: "Historial", icon: "||" },
+    { key: "clientes", label: "Clientes", icon: "" },
     { key: "config", label: "Configuración", icon: "*" },
   ];
 
@@ -60,7 +63,8 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
 
       <nav className="flex flex-col gap-2 w-full px-4 mt-4">
         {menuItems.map((item) => (
-          <button
+          <Button
+            variant="ghost"
             key={item.key}
             onClick={() => onViewChange(item.key)}
             className={`w-full py-2.5 px-4 rounded-lg text-sm font-bold text-left transition-colors ${
@@ -69,8 +73,8 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
                 : "text-foreground hover:bg-muted"
             }`}
           >
-            {item.icon} {item.label}
-          </button>
+            {item.key === "clientes" ? <Users className="h-4 w-4" /> : item.icon} {item.label}
+          </Button>
         ))}
       </nav>
     </aside>

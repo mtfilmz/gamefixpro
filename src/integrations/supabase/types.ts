@@ -130,6 +130,33 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          cliente: string
+          created_at: string
+          email: string
+          id: string
+          telefono: string
+          user_id: string
+        }
+        Insert: {
+          cliente: string
+          created_at?: string
+          email?: string
+          id?: string
+          telefono?: string
+          user_id?: string
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          email?: string
+          id?: string
+          telefono?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       finance_account_links: {
         Row: {
           binding_id: string

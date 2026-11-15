@@ -18,6 +18,7 @@ import { recordPayment, syncPayment } from "@/lib/payment-service";
 import { toast } from "sonner";
 import RepairDetailsDialog from "@/components/RepairDetailsDialog";
 import DeleteRepairsDialog from "@/components/DeleteRepairsDialog";
+import ClientsPage from "@/components/ClientsPage";
 
 
 const Index = () => {
@@ -120,6 +121,8 @@ const Index = () => {
               repairs={repairs}
               onDeleteRepairs={ids => setDeleteIds(ids)}
             />
+          ) : activeView === "clientes" ? (
+            <ClientsPage repairs={repairs} />
           ) : activeView === "historial" ? (
             <RepairTable
               repairs={repairs}

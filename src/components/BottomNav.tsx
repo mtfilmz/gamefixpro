@@ -1,4 +1,5 @@
-import { Home, PlusCircle, Clock, Settings, Search } from "lucide-react";
+import { Home, PlusCircle, Clock, Settings, Search, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface BottomNavProps {
   activeView: string;
@@ -9,6 +10,7 @@ interface BottomNavProps {
 const navItems = [
   { key: "dashboard", label: "Inicio", icon: Home },
   { key: "historial", label: "Historial", icon: Clock },
+  { key: "clientes", label: "Clientes", icon: Users },
   { key: "new", label: "Nuevo", icon: PlusCircle, isAction: true },
   { key: "buscar", label: "Buscar", icon: Search },
   { key: "config", label: "Config", icon: Settings },
@@ -37,16 +39,17 @@ const BottomNav = ({ activeView, onViewChange, onNewRecord }: BottomNavProps) =>
           }
 
           return (
-            <button
+            <Button
+              variant="ghost"
               key={item.key}
               onClick={() => onViewChange(item.key)}
-              className={`flex flex-col items-center justify-center min-w-[60px] min-h-[44px] gap-0.5 transition-colors active:scale-95 ${
+              className={`flex flex-col items-center justify-center min-w-0 flex-1 px-1 h-14 gap-0.5 transition-colors active:scale-95 ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
             >
               <Icon className="w-5 h-5" />
               <span className="text-[10px] font-bold">{item.label}</span>
-            </button>
+            </Button>
           );
         })}
       </div>

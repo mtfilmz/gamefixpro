@@ -2,11 +2,14 @@ import { useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Repair } from "@/types/repair";
-import { PreviousClient, previousClients, findPreviousClients } from "@/lib/previous-clients";
+import { PreviousClient, findPreviousClients } from "@/lib/previous-clients";
+import { useClients } from "@/hooks/use-clients";
+import { clientDirectory } from "@/lib/clients";
 
 export default function PreviousClientPicker({ repairs, onSelect }: { repairs: Repair[]; onSelect: (client: PreviousClient) => void }) {
   const [query, setQuery] = useState("");
-  const clients = useMemo(() => previousClients(repairs), [repairs]);
+  const { clients: savedClients } = useClients();
+  const clients = useMemo(() => clientDirectory(repairs, savedClients), [repairs, savedClients]);
   const matches = useMemo(() => findPreviousClients(clients, query), [clients, query]);
   return <div className="mb-4 space-y-2">
     <label htmlFor="previous-client-search" className="text-sm font-medium">Buscar cliente anterior</label>
