@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import RepairPayments from "./RepairPayments";
 import { PaymentDraft, paymentSchema, localPaymentDate } from "@/lib/payments";
 import ClientNameAutocomplete from "./ClientNameAutocomplete";
+import { costPaymentAmount } from "@/lib/cost-payment";
 
 interface RepairFormProps {
   open: boolean;
@@ -46,7 +47,8 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [paymentEnabled, setPaymentEnabled] = useState(false);
   const [paymentId, setPaymentId] = useState("");
-  const [paidAmount, setPaidAmount] = useState("");
+  const [manualPaidAmount, setManualPaidAmount] = useState<string | null>(null);
+  const paidAmount = costPaymentAmount(costoReparacion, costoComponente, costoDiagnostico, manualPaidAmount);
   const [paidOn, setPaidOn] = useState(localPaymentDate);
   const [paymentMethod, setPaymentMethod] = useState<PaymentDraft["method"]>("cash");
   const [saving, setSaving] = useState(false);
@@ -101,7 +103,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
     setErrors({});
     setPaymentEnabled(false);
     setPaymentId(crypto.randomUUID());
-    setPaidAmount("");
+    setManualPaidAmount(null);
     setPaidOn(localPaymentDate());
     setPaymentMethod("cash");
   }, [editRepair, prefillRepair, open]);
@@ -290,6 +292,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
                   <input
+                    aria-label="Costo de Diagnóstico"
                     type="number"
                     min="0"
                     step="0.01"
@@ -310,6 +313,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
                     step="0.01"
                     placeholder="0.00"
                     value={costoReparacion}
+                    aria-label="Costo de Reparación"
                     onChange={(e) => setCostoReparacion(e.target.value)}
                     className={`${inputClass} pl-8`}
                   />
@@ -325,6 +329,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
                     step="0.01"
                     placeholder="0.00"
                     value={costoComponente}
+                    aria-label="Componente Adicional"
                     onChange={(e) => setCostoComponente(e.target.value)}
                     className={`${inputClass} pl-8`}
                   />
@@ -368,7 +373,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
               {editRepair ? "Registrar un nuevo abono recibido" : "Registrar pago recibido"}
             </label>
             {paymentEnabled && <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div><label htmlFor="paid-amount" className="text-xs text-muted-foreground block mb-1">Monto pagado</label><input id="paid-amount" type="number" min="0.01" step="0.01" required value={paidAmount} onChange={e => setPaidAmount(e.target.value)} className={inputClass} /></div>
+              <div><label htmlFor="paid-amount" className="text-xs text-muted-foreground block mb-1">Monto pagado</label><input id="paid-amount" type="number" min="0.01" step="0.01" required value={paidAmount} onChange={e => setManualPaidAmount(e.target.value === "" ? null : e.target.value)} className={inputClass} /></div>
               <div><label htmlFor="paid-on" className="text-xs text-muted-foreground block mb-1">Fecha del pago</label><input id="paid-on" type="date" required value={paidOn} onChange={e => setPaidOn(e.target.value)} className={inputClass} /></div>
               <div><label htmlFor="payment-method" className="text-xs text-muted-foreground block mb-1">Método de pago</label><select id="payment-method" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value as PaymentDraft["method"])} className={inputClass}><option value="cash">Efectivo</option><option value="card">Tarjeta</option><option value="transfer">Transferencia</option><option value="other">Otro</option></select></div>
             </div>}
