@@ -1,10 +1,11 @@
 # Pagos a Balans Board
-- [ ] Añadir finalización segura de vinculación en Configuración y conectar con el contrato existente de Balans Board.
-- [ ] Configurar clave compartida y comprobar ambas cuentas (requiere clave y código del propietario).
+- [x] Añadir finalización segura de vinculación en Configuración y conectar con el contrato existente de Balans Board.
+- [x] Configurar direcciones reales y guardar clave compartida en Game Fix Pro.
+- [ ] Finalizar vínculo (requiere código de un solo uso generado en Balans Board y misma clave guardada allí).
 - [x] Registrar pagos reales separados de presupuestos, con fecha, método e identificador por abono.
 - [x] Guardar pagos inmutables y pendientes; permitir reintentos autenticados con el mismo identificador.
 - [x] Preparar envío privado condicionado a vínculo explícito y confirmación del receptor.
 - [x] Entregar prompt preciso para recepción y vinculación en Balans Board.
 - [x] Probar nueve reglas de pagos y verificar acceso público sin errores en computadora y teléfono.
-- [ ] Verificar un pago y reintento en Balans Board (bloqueado: falta receptor y vinculación).
-- [ ] Verificar recorrido autenticado en esta app (bloqueado: se requiere sesión del usuario en la vista previa).
+- [ ] Verificar un pago y reintento en Balans Board (bloqueado: falta vínculo verificado, lectura desde la app financiera y autorización de un pago de prueba).
+- [x] Verificar con sesión real la consulta de estado y formulario de vinculación en esta app, sin errores de página.
