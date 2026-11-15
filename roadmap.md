@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [x] Añadir pago de prueba de 150 con confirmación explícita, recibo visible y reintento sin duplicados; verificar 19 pruebas y el bloqueo sin vínculo con sesión real.
 - [x] Añadir finalización segura de vinculación en Configuración y conectar con el contrato existente de Balans Board.
 - [x] Configurar direcciones reales y guardar clave compartida en Game Fix Pro.
 - [ ] Finalizar vínculo (requiere código de un solo uso generado en Balans Board y misma clave guardada allí).

@@ -8,6 +8,13 @@
       "when": 1794714904617,
       "tag": "0000_repair_payment_ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794716153293,
+      "tag": "0001_finance_test_payment",
+      "breakpoints": true
     }
   ]
 }

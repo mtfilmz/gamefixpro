@@ -3,3 +3,4 @@
 - Route financial exports through an authenticated edge function using a server-only explicit account binding, a stable payment UUID and a verified receiver receipt; missing configuration leaves payments pending.
 - Expose payment insertion through a validated security-definer RPC and payment reads through owner-only RLS; synchronization metadata and account bindings are server-write-only.
 - Complete account linking only through a server-authenticated one-time code redemption; derive the source identity from the validated session and persist only a matching-currency verified remote receipt to prevent unverified destinations.
+- Keep integration test payments in the immutable ledger with a partial unique owner index and a validated owner RPC; retries reuse the same stored payment and display success only with a verified receiver movement UUID.

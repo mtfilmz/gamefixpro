@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import FinanceTestPayment from "@/components/FinanceTestPayment";
 
 export default function FinanceAccountConnection() {
   const [connected, setConnected] = useState(false);
@@ -49,5 +50,6 @@ export default function FinanceAccountConnection() {
       <div className="flex items-start gap-2"><Checkbox id="finance-currency-confirm" checked={confirmed} onCheckedChange={v => setConfirmed(v === true)} /><Label htmlFor="finance-currency-confirm" className="text-sm leading-5">Confirmo que ambas cuentas usan esta moneda, sin conversión.</Label></div>
       <Button type="submit" disabled={busy || !configured || !confirmed || !/^[0-9a-f]{64}$/.test(code.trim())}><Link2 className="h-4 w-4" />Vincular cuenta</Button>
     </form>}
+    <FinanceTestPayment ready={loaded && configured && connected} />
   </section>;
 }

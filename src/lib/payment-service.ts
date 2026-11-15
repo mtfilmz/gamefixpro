@@ -13,6 +13,7 @@ export async function syncPayment(id: string) {
     throw new Error("Pago guardado; envío pendiente. Revisa tu conexión.");
   }
   if (data?.status !== "synced") throw new Error(data?.error || "Pago guardado; conexión con Balans Board pendiente");
+  return data;
 }
 export async function recordPayment(repairId: string, draft: PaymentDraft) {
   const payment = paymentSchema.parse(draft);

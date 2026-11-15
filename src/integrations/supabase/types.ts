@@ -164,6 +164,7 @@ export type Database = {
           created_at: string
           equipment: string
           id: string
+          is_test: boolean
           method: string
           paid_on: string
           remote_movement_id: string | null
@@ -179,6 +180,7 @@ export type Database = {
           created_at?: string
           equipment: string
           id: string
+          is_test?: boolean
           method: string
           paid_on: string
           remote_movement_id?: string | null
@@ -194,6 +196,7 @@ export type Database = {
           created_at?: string
           equipment?: string
           id?: string
+          is_test?: boolean
           method?: string
           paid_on?: string
           remote_movement_id?: string | null
@@ -309,6 +312,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      record_finance_test_payment: {
+        Args: { p_confirm: boolean; p_paid_on: string }
+        Returns: Json
       }
       record_repair_payment: {
         Args: {
