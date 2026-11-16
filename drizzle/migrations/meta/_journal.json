@@ -71,6 +71,20 @@
       "when": 1794722093746,
       "tag": "0009_payment_rpc_staff_check",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794796570926,
+      "tag": "0010_tech_repair_client_connection",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794796632063,
+      "tag": "0011_disconnect_tech_client_link",
+      "breakpoints": true
     }
   ]
 }

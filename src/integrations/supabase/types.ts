@@ -169,27 +169,36 @@ export type Database = {
       clients: {
         Row: {
           cliente: string
+          contacto: string
           created_at: string
+          direccion: string
           email: string
           id: string
+          notas: string
           source_key: string | null
           telefono: string
           user_id: string
         }
         Insert: {
           cliente: string
+          contacto?: string
           created_at?: string
+          direccion?: string
           email?: string
           id?: string
+          notas?: string
           source_key?: string | null
           telefono?: string
           user_id?: string
         }
         Update: {
           cliente?: string
+          contacto?: string
           created_at?: string
+          direccion?: string
           email?: string
           id?: string
+          notas?: string
           source_key?: string | null
           telefono?: string
           user_id?: string
@@ -367,6 +376,39 @@ export type Database = {
         }
         Relationships: []
       }
+      tech_repair_client_links: {
+        Row: {
+          code_hash: string | null
+          created_at: string
+          enabled: boolean
+          expires_at: string | null
+          id: string
+          target_email: string
+          target_user_id: string | null
+          user_id: string
+        }
+        Insert: {
+          code_hash?: string | null
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          id?: string
+          target_email?: string
+          target_user_id?: string | null
+          user_id: string
+        }
+        Update: {
+          code_hash?: string | null
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          id?: string
+          target_email?: string
+          target_user_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -401,12 +443,17 @@ export type Database = {
         Args: { p_ids: string[]; p_user_id: string }
         Returns: string[]
       }
+      disconnect_tech_client_link: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      prepare_tech_client_link: {
+        Args: { p_hash: string; p_user: string }
+        Returns: undefined
       }
       record_finance_test_payment: {
         Args: { p_confirm: boolean; p_paid_on: string }
@@ -420,6 +467,10 @@ export type Database = {
           p_paid_on: string
           p_repair_id: string
         }
+        Returns: Json
+      }
+      redeem_tech_client_link: {
+        Args: { p_email: string; p_hash: string; p_target: string }
         Returns: Json
       }
     }

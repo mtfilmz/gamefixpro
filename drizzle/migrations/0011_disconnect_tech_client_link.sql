@@ -1,0 +1,3 @@
+CREATE OR REPLACE FUNCTION public.disconnect_tech_client_link() RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$ BEGIN IF auth.uid() IS NULL THEN RAISE EXCEPTION 'unauthorized'; END IF; UPDATE public.tech_repair_client_links SET enabled=false,target_user_id=null,code_hash=null,expires_at=null WHERE user_id=auth.uid(); END; $$;
+REVOKE ALL ON FUNCTION public.disconnect_tech_client_link() FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.disconnect_tech_client_link() TO authenticated;

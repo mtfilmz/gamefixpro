@@ -6,9 +6,12 @@ export const clientSchema = z.object({
   cliente: z.string().trim().min(1, "Nombre requerido").max(200),
   telefono: z.string().trim().max(30),
   email: z.string().trim().max(254).refine(value => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), "Correo inválido"),
+  contacto: z.string().trim().max(200).default(""),
+  direccion: z.string().trim().max(1000).default(""),
+  notas: z.string().trim().max(4000).default(""),
 });
 
-export type DirectoryClient = PreviousClient & { id?: string; source_key?: string | null };
+export type DirectoryClient = PreviousClient & { id?: string; source_key?: string | null; contacto?: string; direccion?: string; notas?: string };
 
 export function clientKey(client: PreviousClient): string {
   const name = client.cliente.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();

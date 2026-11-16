@@ -9,6 +9,7 @@ import { useRole } from "@/hooks/use-role";
 import UserRolesPanel from "@/components/UserRolesPanel";
 import GoogleDriveConnectButton from "@/components/GoogleDriveConnectButton";
 import FinanceAccountConnection from "@/components/FinanceAccountConnection";
+import TechRepairClientConnection from "@/components/TechRepairClientConnection";
 
 const ForceUpdateSection = () => {
   const { signOut } = useAuth();
@@ -403,6 +404,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
 
         <GoogleDriveConnectButton />
         <FinanceAccountConnection />
+        <TechRepairClientConnection />
 
         {/* Roles section - only for admins */}
         {isAdmin && (

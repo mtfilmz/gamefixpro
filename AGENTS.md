@@ -1,4 +1,5 @@
 # Architecture rules
+- Keep Tech Repair client access separate from financial links: owner-issued expiring one-use pairing, a dedicated server-only shared credential, owner-scoped read-only pages and remote verified owner/employee permissions prevent contact sharing from changing repairs or payments.
 - Apply the shared semantic record-highlight treatment to list entries for consistent pointer and keyboard feedback without attaching automatic detail-opening behavior.
 - Derive unsaved payment suggestions from current cost inputs unless the user overrides the amount; filling costs must never enable or insert a ledger payment automatically, preserving explicit payment confirmation and historical amounts.
 - Validate protected edge-function identities with verified authenticated JWT claims using a caller-scoped anon client; renew client sessions before financial calls and retry only a local authentication rejection once, so expired sessions never require disabling authentication or replaying uncertain redemptions.

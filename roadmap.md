@@ -1,4 +1,5 @@
 # Pagos a Balans Board
+- [ ] Preparar consulta y sincronización de clientes hacia Tech Repair con vínculo de ambas sesiones, campos de contacto adicionales y permisos por dueño/empleado; conservar clientes y pagos. Completar receptor en Tech Repair requiere cambios en ese proyecto.
 - [x] Resaltar registros al pasar el mouse en listas de reparaciones, clientes, actividad, pagos y configuración; consulta real confirma cambio de color en Dashboard, Historial, Clientes, Actividad, Configuración y tarjetas móviles sin apertura automática de detalles.
 - [x] Autocompletar el monto desde costos conservando abonos manuales y confirmación explícita; 16 pruebas correctas y nuevo registro verificado con sesión real en computadora/teléfono sin guardar pagos de prueba. La edición utiliza el mismo cálculo sin alterar pagos guardados.
 - [x] Corregir rechazo de sesión al vincular: firmas verificadas, renovación y reintento limitado; 32 pruebas correctas y consulta/actualización con sesión real devuelven 200 en computadora y teléfono, sin crear ingresos ni canjear códigos.
