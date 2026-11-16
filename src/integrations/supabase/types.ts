@@ -376,6 +376,87 @@ export type Database = {
         }
         Relationships: []
       }
+      tech_client_conflicts: {
+        Row: {
+          binding_id: string
+          client_id: string
+          id: string
+          incoming: Json
+          local_snapshot: Json
+          source_id: string
+          user_id: string
+        }
+        Insert: {
+          binding_id: string
+          client_id: string
+          id?: string
+          incoming: Json
+          local_snapshot: Json
+          source_id: string
+          user_id: string
+        }
+        Update: {
+          binding_id?: string
+          client_id?: string
+          id?: string
+          incoming?: Json
+          local_snapshot?: Json
+          source_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tech_client_conflicts_binding_id_fkey"
+            columns: ["binding_id"]
+            isOneToOne: false
+            referencedRelation: "tech_repair_client_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tech_client_conflicts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tech_client_imports: {
+        Row: {
+          binding_id: string
+          client_id: string
+          last_remote: Json
+          source_id: string
+        }
+        Insert: {
+          binding_id: string
+          client_id: string
+          last_remote: Json
+          source_id: string
+        }
+        Update: {
+          binding_id?: string
+          client_id?: string
+          last_remote?: Json
+          source_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tech_client_imports_binding_id_fkey"
+            columns: ["binding_id"]
+            isOneToOne: false
+            referencedRelation: "tech_repair_client_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tech_client_imports_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tech_repair_client_links: {
         Row: {
           code_hash: string | null
@@ -383,6 +464,7 @@ export type Database = {
           enabled: boolean
           expires_at: string | null
           id: string
+          receive_enabled: boolean
           target_email: string
           target_user_id: string | null
           user_id: string
@@ -393,6 +475,7 @@ export type Database = {
           enabled?: boolean
           expires_at?: string | null
           id?: string
+          receive_enabled?: boolean
           target_email?: string
           target_user_id?: string | null
           user_id: string
@@ -403,6 +486,7 @@ export type Database = {
           enabled?: boolean
           expires_at?: string | null
           id?: string
+          receive_enabled?: boolean
           target_email?: string
           target_user_id?: string | null
           user_id?: string
@@ -455,6 +539,17 @@ export type Database = {
         Args: { p_hash: string; p_user: string }
         Returns: undefined
       }
+      receive_tech_client: {
+        Args: {
+          p_binding: string
+          p_key: Json
+          p_origin?: string
+          p_source: string
+          p_target: string
+          p_values: Json
+        }
+        Returns: Json
+      }
       record_finance_test_payment: {
         Args: { p_confirm: boolean; p_paid_on: string }
         Returns: Json
@@ -471,6 +566,18 @@ export type Database = {
       }
       redeem_tech_client_link: {
         Args: { p_email: string; p_hash: string; p_target: string }
+        Returns: Json
+      }
+      resolve_tech_client_conflict: {
+        Args: { p_id: string; p_use_remote: boolean }
+        Returns: undefined
+      }
+      set_tech_client_receive: {
+        Args: { p_enabled: boolean }
+        Returns: undefined
+      }
+      tech_client_values: {
+        Args: { c: Database["public"]["Tables"]["clients"]["Row"] }
         Returns: Json
       }
     }

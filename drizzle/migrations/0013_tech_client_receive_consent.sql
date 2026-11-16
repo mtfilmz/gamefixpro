@@ -1,0 +1,6 @@
+ALTER TABLE public.tech_repair_client_links ADD COLUMN receive_enabled boolean NOT NULL DEFAULT false;
+CREATE FUNCTION public.set_tech_client_receive(p_enabled boolean) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN IF auth.uid() IS NULL THEN RAISE EXCEPTION 'unauthorized'; END IF; UPDATE public.tech_repair_client_links SET receive_enabled=p_enabled WHERE user_id=auth.uid() AND enabled; IF NOT FOUND THEN RAISE EXCEPTION 'not_linked'; END IF; END $$;
+REVOKE ALL ON FUNCTION public.set_tech_client_receive(boolean) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.set_tech_client_receive(boolean) TO authenticated;
+CREATE FUNCTION public.guard_tech_client_import() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN IF NOT EXISTS(SELECT 1 FROM public.tech_repair_client_links WHERE id=NEW.binding_id AND enabled AND receive_enabled) THEN RAISE EXCEPTION 'receive_disabled'; END IF; RETURN NEW; END $$;
+CREATE TRIGGER guard_tech_client_import BEFORE INSERT OR UPDATE ON public.tech_client_imports FOR EACH ROW EXECUTE FUNCTION public.guard_tech_client_import();

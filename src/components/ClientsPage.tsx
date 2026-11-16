@@ -7,6 +7,7 @@ import { clientDirectory, clientSchema, clientKey, DirectoryClient } from "@/lib
 import { findPreviousClients } from "@/lib/previous-clients";
 import { useClients } from "@/hooks/use-clients";
 import { toast } from "sonner";
+import TechClientConflicts from "./TechClientConflicts";
 
 const inputClass = "w-full bg-input border border-border rounded-md px-3 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary";
 
@@ -46,6 +47,7 @@ export default function ClientsPage({ repairs }: { repairs: Repair[] }) {
       <Button onClick={() => { setEditing(null); setForm({ cliente: "", telefono: "", email: "", contacto: "", direccion: "", notas: "" }); setFormError(""); setOpen(true); }}><UserPlus />Agregar cliente</Button>
     </div>
     <div className="relative max-w-xl"><Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" /><input aria-label="Buscar clientes" type="search" placeholder="Nombre, teléfono o correo" value={query} onChange={event => setQuery(event.target.value)} className={`${inputClass} pl-10`} /></div>
+    <TechClientConflicts />
     {error && <div role="alert" className="text-sm text-destructive">No se pudieron cargar los clientes guardados. <Button variant="link" onClick={() => refresh()}>Reintentar</Button></div>}
     {loading ? <p role="status" className="text-muted-foreground">Cargando clientes...</p> : visible.length ? <div className="divide-y divide-border border-y border-border">
       <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_2.5rem] gap-4 py-3 text-xs uppercase font-bold text-muted-foreground"><span>Cliente</span><span>Teléfono</span><span>Correo</span><span /></div>

@@ -85,6 +85,20 @@
       "when": 1794796632063,
       "tag": "0011_disconnect_tech_client_link",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794799147036,
+      "tag": "0012_tech_client_bidirectional",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794799277737,
+      "tag": "0013_tech_client_receive_consent",
+      "breakpoints": true
     }
   ]
 }
