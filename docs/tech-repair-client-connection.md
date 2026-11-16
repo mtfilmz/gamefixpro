@@ -8,7 +8,7 @@ Implementa una conexión de consulta y sincronización de clientes desde Super M
 
 Solicita TECH_REPAIR_CLIENT_SHARED_SECRET mediante formulario seguro con Generar/copiar, destino: formulario del mismo secreto en Super Mobile Game Fix. Usa el mismo valor una sola vez en ambos formularios. Nunca lo muestres en chat, navegador, registros ni archivos. No uses BALANS_PAYMENT_SHARED_SECRET. La conexión está deshabilitada hasta configurar este secreto en ambas apps.
 
-Solicita TECH_REPAIR_CLIENT_SOURCE_URL como configuración privada: URL HTTPS completa de la función tech-repair-clients de Super Mobile Game Fix. Obtén esa dirección real desde el proyecto origen; no construyas rutas relativas /api. Todas las llamadas son POST servidor-a-servidor, Content-Type application/json y X-Client-Integration-Secret con el secreto. No sigas redirecciones ni permitas URL suministrada por el navegador.
+Configura TECH_REPAIR_CLIENT_SOURCE_URL privadamente: URL HTTPS completa de la función tech-repair-clients de Super Mobile Game Fix. Consulta una instantánea de ese proyecto (d5fd06a7-08ea-4153-a340-9d298c566b03), lee su configuración pública del cliente y deriva en servidor la dirección completa /functions/v1/tech-repair-clients; no la muestres en chat ni construyas rutas relativas /api. No uses las credenciales de la instantánea para leer registros: únicamente llama al endpoint dedicado una vez configurada la clave compartida y realizado el canje. Todas las llamadas son POST servidor-a-servidor, Content-Type application/json y X-Client-Integration-Secret con el secreto. No sigas redirecciones ni permitas URL suministrada por el navegador.
 
 ### Canje
 

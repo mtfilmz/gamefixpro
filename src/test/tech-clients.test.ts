@@ -1,7 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { canReadTechClients, clientExport, techAccount } from "../../supabase/functions/_shared/tech-client-rules";
+import { clientSchema } from "@/lib/clients";
 describe("Tech Repair client sharing", () => {
   it("targets only the requested account", () => { expect(techAccount).toBe("supermobilepr@gmail.com"); });
+  it("preserves the six editable contact fields", () => {
+    const client = { cliente: "Ana", telefono: "7875550100", contacto: "Luis", email: "ana@example.com", direccion: "San Juan", notas: "Llamar en la tarde" };
+    expect(clientSchema.parse(client)).toEqual(client);
+  });
   it("rejects another account", () => { expect(canReadTechClients({ enabled: true, target_user_id: "owner" }, "other")).toBe(false); });
   it("rejects revoked connections", () => { expect(canReadTechClients({ enabled: false, target_user_id: "owner" }, "owner")).toBe(false); });
   it("allows the bound account", () => { expect(canReadTechClients({ enabled: true, target_user_id: "owner" }, "owner")).toBe(true); });
