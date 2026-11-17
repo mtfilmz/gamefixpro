@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
+// Clave del correo recordado en este dispositivo.
 const REMEMBER_KEY = "gfp_remembered_email";
 type PasswordCredentialCtor = new (data: { id: string; password: string }) => Credential;
 
