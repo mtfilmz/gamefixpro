@@ -54,3 +54,23 @@ export function resetConfig(): AppConfig {
   localStorage.removeItem(CONFIG_KEY);
   return { ...defaultConfig };
 }
+
+// Cloud sync: settings live in the shared app_settings row so they persist across devices/sessions.
+import { supabase } from "@/integrations/supabase/client";
+
+export async function fetchRemoteConfig(): Promise<AppConfig | null> {
+  const { data, error } = await supabase.from("app_settings").select("config").eq("singleton_key", true).maybeSingle();
+  if (error || !data?.config) return null;
+  const merged = { ...defaultConfig, ...(data.config as Partial<AppConfig>) };
+  try { localStorage.setItem(CONFIG_KEY, JSON.stringify(merged)); } catch { /* ignore */ }
+  return merged;
+}
+
+export async function saveRemoteConfig(config: AppConfig): Promise<void> {
+  const { data: existing } = await supabase.from("app_settings").select("id").eq("singleton_key", true).maybeSingle();
+  const payload = JSON.parse(JSON.stringify(config));
+  const { error } = existing
+    ? await supabase.from("app_settings").update({ config: payload }).eq("id", existing.id)
+    : await supabase.from("app_settings").insert({ config: payload, singleton_key: true });
+  if (error) throw new Error(error.message);
+}

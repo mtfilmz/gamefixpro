@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { getConfig, saveConfig, resetConfig, AppConfig } from "@/lib/config";
+import { useState, useEffect } from "react";
+import { getConfig, saveConfig, resetConfig, AppConfig, fetchRemoteConfig, saveRemoteConfig } from "@/lib/config";
 import { Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight, AlertTriangle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "@/hooks/use-toast";
@@ -242,7 +242,10 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
     const updated = { ...config, ...partial };
     setConfig(updated);
     saveConfig(updated);
+    saveRemoteConfig(updated).catch((e) => toast({ title: "No se guardó en la nube", description: e instanceof Error ? e.message : "Solo un administrador puede cambiar la configuración", variant: "destructive" }));
   };
+
+  useEffect(() => { fetchRemoteConfig().then((c) => { if (c) setConfig(c); }); }, []);
 
   const handleMarcasChange = (marcas: string[]) => {
     // Clean up modelosPorMarca: remove models for deleted brands, add empty for new
@@ -262,6 +265,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
     if (confirm("¿Restablecer toda la configuración a los valores por defecto?")) {
       const def = resetConfig();
       setConfig(def);
+      saveRemoteConfig(def).catch(() => {});
     }
   };
 

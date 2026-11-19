@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Repair, EstadoReparacion } from "@/types/repair";
 import { generateId } from "@/lib/repairs";
+import { fetchRemoteConfig } from "@/lib/config";
 import { notifyNewRepair } from "@/lib/notifications";
 import { useRepairs } from "@/hooks/use-repairs";
 
@@ -36,6 +37,8 @@ const Index = () => {
   const [detailRepair, setDetailRepair] = useState<Repair | null>(null);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
   const requestDelete = (repair: Repair) => { setDetailRepair(null); setDeleteIds([repair.id]); };
+
+  useEffect(() => { fetchRemoteConfig(); }, []);
 
   // Pause auto-refresh while any modal is open
   const anyModalOpen = formOpen || !!qrRepair || !!statusRepair || !!detailRepair || deleteIds.length > 0;
