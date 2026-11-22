@@ -178,17 +178,21 @@ jobs:
         run: |
           python3 -c "import json,os;p='src-tauri/tauri.conf.json';c=json.load(open(p,encoding='utf-8'));c['version']=os.environ['VERSION'];open(p,'w',encoding='utf-8').write(json.dumps(c,ensure_ascii=False,indent=2))"
 
-      - name: Instalar las piezas de la app
-        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+      # Android llama a "npm run tauri" desde Gradle: se agrega ese atajo solo aquí (no cambia el package.json del repo).
+      - name: Instalar las piezas de la app y la herramienta de Tauri
+        run: |
+          npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund @tauri-apps/cli@2
+          python3 -c "import json;p='package.json';d=json.load(open(p));d.setdefault('scripts',{})['tauri']='tauri';open(p,'w').write(json.dumps(d,indent=2))"
 
       - name: Crear el proyecto de Android
-        run: npx --yes @tauri-apps/cli@2 android init --ci
+        run: npm run tauri -- android init --ci
 
       - name: Crear los íconos (también los de Android)
-        run: npx --yes @tauri-apps/cli@2 icon src-tauri/app-icon.png
+        run: npm run tauri -- icon src-tauri/app-icon.png
 
       - name: Crear el APK
-        run: npx --yes @tauri-apps/cli@2 android build --apk --target aarch64 --target armv7 --ci
+        run: npm run tauri -- android build --apk --target aarch64 --target armv7 --ci
 
       - name: Firmar el APK
         env:
