@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Game Fix",
+  "mainBinaryName": "gamefix",
+  "version": "1.0.0",
+  "identifier": "pr.supermobile.gamefix",
+  "build": {
+    "frontendDist": "../dist",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Super Mobile Game Fix",
+        "width": 1320,
+        "height": 860,
+        "minWidth": 380,
+        "minHeight": 600,
+        "resizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "publisher": "Super Mobile Tech Repair",
+    "shortDescription": "Reparaciones de consolas, clientes y pagos",
+    "longDescription": "Super Mobile Game Fix: reparaciones de consolas, clientes y pagos, conectado a FinTrack y a Cobro.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM1NjkzODMzRjZGRTQ2RTkKUldUcFJ2NzJNemhweFpoeVlyYkMzMzExMVExYlNCQTBkcDdlbG92cFJpOS9NR0VRb2ZDL0pDd2sK",
+      "endpoints": [
+        "https://github.com/mtfilmz/gamefixpro/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

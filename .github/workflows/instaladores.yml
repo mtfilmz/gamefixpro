@@ -1,0 +1,247 @@
+name: Crear instaladores de Game Fix (Windows y Android)
+
+# Se arma solo cada vez que cambia la app (también lo que se cambia en Lovable) y se puede lanzar a mano.
+# La versión es 1.0.<número de compilación>, así cada compilación es una versión nueva y los programas
+# instalados la ofrecen como actualización.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "index.html"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.ts"
+      - "tailwind.config.ts"
+      - ".env"
+      - "src-tauri/**"
+      - ".github/workflows/instaladores.yml"
+      - ".github/notas-version.md"
+  workflow_dispatch:
+
+# Si llegan varios cambios seguidos (Lovable guarda cada paso), solo se compila el último.
+concurrency:
+  group: instaladores
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  esperar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Esperar 5 minutos por si llegan más cambios de Lovable
+        if: github.event_name == 'push'
+        run: sleep 300
+      - name: Calcular la versión
+        id: ver
+        run: echo "version=1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+
+  windows:
+    needs: esperar
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.esperar.outputs.version }}
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Preparar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Reusar compilaciones anteriores
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Poner la versión ${{ env.VERSION }}
+        shell: pwsh
+        run: |
+          python -c "import json,os;p='src-tauri/tauri.conf.json';c=json.load(open(p,encoding='utf-8'));c['version']=os.environ['VERSION'];open(p,'w',encoding='utf-8').write(json.dumps(c,ensure_ascii=False,indent=2))"
+
+      - name: Instalar las piezas de la app
+        shell: bash
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Crear los íconos
+        run: npx --yes @tauri-apps/cli@2 icon src-tauri/app-icon.png
+
+      - name: Crear y firmar el instalador .exe
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+        shell: bash
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::error::Falta el secreto TAURI_SIGNING_PRIVATE_KEY en GitHub (Settings › Secrets and variables › Actions)."
+            exit 1
+          fi
+          npx --yes @tauri-apps/cli@2 build
+
+      - name: Comprobar la firma de la actualización
+        shell: pwsh
+        run: |
+          python -m pip install --quiet cryptography
+          python .github/verificar_firma.py
+
+      - name: Nombre sin espacios y latest.json (lo lee el programa para saber si hay versión nueva)
+        shell: pwsh
+        run: |
+          $v = $env:VERSION
+          $exe = Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe | Select-Object -First 1
+          $nombre = "GameFix_${v}_x64-setup.exe"
+          New-Item -ItemType Directory -Force -Path salida | Out-Null
+          Copy-Item $exe.FullName "salida/$nombre"
+          Copy-Item "$($exe.FullName).sig" "salida/$nombre.sig"
+          $sig = (Get-Content "salida/$nombre.sig" -Raw).Trim()
+          $notes = (Get-Content .github/notas-version.md -Raw).Trim()
+          $data = [ordered]@{
+            version   = $v
+            notes     = $notes
+            pub_date  = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+            platforms = [ordered]@{
+              "windows-x86_64" = [ordered]@{
+                signature = $sig
+                url       = "https://github.com/${{ github.repository }}/releases/download/v$v/$nombre"
+              }
+            }
+          }
+          $data | ConvertTo-Json -Depth 6 | Set-Content -Path salida/latest.json -Encoding utf8NoBOM
+          Get-Content salida/latest.json
+
+      - name: Guardar el instalador para descargarlo
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameFix-Windows
+          path: |
+            salida/*.exe
+            salida/latest.json
+          if-no-files-found: error
+
+      - name: Publicar en Releases (descarga directa y actualizaciones)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Game Fix ${{ env.VERSION }}
+          body_path: .github/notas-version.md
+          files: |
+            salida/*.exe
+            salida/latest.json
+          make_latest: true
+
+  android:
+    needs: [esperar, windows]
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.esperar.outputs.version }}
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Preparar el SDK y el NDK de Android
+        run: |
+          echo "NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+          echo "SDK: $ANDROID_HOME"
+          echo "NDK: $ANDROID_NDK_LATEST_HOME"
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Preparar Rust para Android
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+
+      - name: Reusar compilaciones anteriores
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Poner la versión ${{ env.VERSION }}
+        run: |
+          python3 -c "import json,os;p='src-tauri/tauri.conf.json';c=json.load(open(p,encoding='utf-8'));c['version']=os.environ['VERSION'];open(p,'w',encoding='utf-8').write(json.dumps(c,ensure_ascii=False,indent=2))"
+
+      - name: Instalar las piezas de la app
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Crear el proyecto de Android
+        run: npx --yes @tauri-apps/cli@2 android init --ci
+
+      - name: Crear los íconos (también los de Android)
+        run: npx --yes @tauri-apps/cli@2 icon src-tauri/app-icon.png
+
+      - name: Crear el APK
+        run: npx --yes @tauri-apps/cli@2 android build --apk --target aarch64 --target armv7 --ci
+
+      - name: Firmar el APK
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE" ]; then
+            echo "::error::Falta el secreto ANDROID_KEYSTORE en GitHub (Settings › Secrets and variables › Actions)."
+            exit 1
+          fi
+          python3 - <<'PY'
+          import base64, json, os
+          d = json.loads(os.environ["ANDROID_KEYSTORE"])
+          open("firma.p12", "wb").write(base64.b64decode(d["p12"]))
+          open("ks-pass.txt", "w").write(d["password"])
+          open("ks-alias.txt", "w").write(d.get("alias", "cobro"))
+          PY
+          KS_PASS="$(cat ks-pass.txt)"; echo "::add-mask::$KS_PASS"; export KS_PASS
+          ALIAS="$(cat ks-alias.txt)"
+          rm -f ks-pass.txt ks-alias.txt
+          BT="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          UNSIGNED="$(find src-tauri/gen/android/app/build/outputs/apk -name '*release*.apk' | head -1)"
+          echo "APK sin firmar: $UNSIGNED"
+          test -n "$UNSIGNED"
+          "$BT/zipalign" -f -p 4 "$UNSIGNED" alineado.apk
+          "$BT/apksigner" sign --ks firma.p12 --ks-type PKCS12 --ks-pass env:KS_PASS --ks-key-alias "$ALIAS" --key-pass env:KS_PASS --out "GameFix_${VERSION}_android.apk" alineado.apk
+          "$BT/apksigner" verify --print-certs "GameFix_${VERSION}_android.apk" | head -5
+          rm -f firma.p12 alineado.apk
+          ls -la "GameFix_${VERSION}_android.apk"
+
+      - name: Crear android.json (lo lee el programa del teléfono para saber si hay versión nueva)
+        run: |
+          python3 - <<'PY'
+          import json, os
+          v = os.environ["VERSION"]
+          notes = open(".github/notas-version.md", encoding="utf-8").read().strip()
+          data = {"version": v, "url": f"https://github.com/${{ github.repository }}/releases/download/v{v}/GameFix_{v}_android.apk", "notes": notes}
+          open("android.json", "w", encoding="utf-8").write(json.dumps(data, ensure_ascii=False, indent=2))
+          print(open("android.json", encoding="utf-8").read())
+          PY
+
+      - name: Guardar el APK para descargarlo
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameFix-Android
+          path: |
+            GameFix_*_android.apk
+            android.json
+          if-no-files-found: error
+
+      - name: Publicar el APK en Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          files: |
+            GameFix_*_android.apk
+            android.json

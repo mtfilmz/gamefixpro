@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "movil",
+  "description": "Solo en Android: compartir la imagen del recibo y guardarla con la ventana de guardar del teléfono",
+  "windows": [
+    "main"
+  ],
+  "platforms": [
+    "android"
+  ],
+  "permissions": [
+    "compartir:default",
+    "dialog:allow-save",
+    "fs:allow-write-file"
+  ]
+}

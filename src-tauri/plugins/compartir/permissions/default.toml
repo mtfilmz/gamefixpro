@@ -1,0 +1,3 @@
+[default]
+description = "Permite compartir la factura: menú Compartir, WhatsApp directo al número y mensaje de texto"
+permissions = ["allow-share-file", "allow-share-whatsapp", "allow-share-sms", "allow-whatsapp-apps"]
