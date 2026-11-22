@@ -205,6 +205,39 @@ export type Database = {
         }
         Relationships: []
       }
+      cobro_records: {
+        Row: {
+          data: Json | null
+          deleted: boolean
+          device: string | null
+          id: string
+          modified_at: number
+          server_updated_at: string
+          store: string
+          user_id: string
+        }
+        Insert: {
+          data?: Json | null
+          deleted?: boolean
+          device?: string | null
+          id: string
+          modified_at?: number
+          server_updated_at?: string
+          store: string
+          user_id?: string
+        }
+        Update: {
+          data?: Json | null
+          deleted?: boolean
+          device?: string | null
+          id?: string
+          modified_at?: number
+          server_updated_at?: string
+          store?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       finance_account_links: {
         Row: {
           binding_id: string
