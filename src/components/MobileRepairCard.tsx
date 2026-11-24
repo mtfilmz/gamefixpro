@@ -2,6 +2,27 @@ import { Repair } from "@/types/repair";
 import { Phone, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+export type FinTrackState = "synced" | "pending" | "none";
+
+const finTrackInfo: Record<FinTrackState, { label: string; dot: string }> = {
+  synced: { label: "Pago registrado en FinTrack", dot: "bg-[hsl(var(--fintrack-ok))]" },
+  pending: { label: "Pago sin llegar a FinTrack", dot: "bg-[hsl(var(--fintrack-pending))]" },
+  none: { label: "Sin pagos registrados", dot: "border-2 border-muted-foreground bg-transparent" },
+};
+
+/** Verde: el pago llegó a FinTrack. Rojo: el pago no ha llegado. Hueco: todavía no hay pago. */
+export const FinTrackDot = ({ state = "none" }: { state?: FinTrackState }) => {
+  const info = finTrackInfo[state];
+  return (
+    <span
+      role="img"
+      aria-label={info.label}
+      title={info.label}
+      className={`inline-block h-3.5 w-3.5 shrink-0 rounded-full ring-2 ring-[hsl(var(--card))] ${info.dot}`}
+    />
+  );
+};
+
 interface MobileRepairCardProps {
   repair: Repair;
   onEdit: (repair: Repair) => void;
@@ -10,30 +31,51 @@ interface MobileRepairCardProps {
   onReopen: (repair: Repair) => void;
   onDetails: (repair: Repair) => void;
   onDelete: (repair: Repair) => void;
+  finTrack?: FinTrackState;
 }
 
 const estadoColor: Record<string, string> = {
   PENDIENTE: "bg-status-pending",
-  "DIAGNÓSTICO": "bg-status-diagnostic",
+  DIAGNÓSTICO: "bg-status-diagnostic",
   "EN REPARACIÓN": "bg-status-repairing",
   REPARADO: "bg-status-repaired",
   ENTREGADO: "bg-status-delivered",
 };
 
-const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen, onDetails, onDelete }: MobileRepairCardProps) => {
+const MobileRepairCard = ({
+  repair,
+  onEdit,
+  onShowQR,
+  onUpdateStatus,
+  onReopen,
+  onDetails,
+  onDelete,
+  finTrack = "none",
+}: MobileRepairCardProps) => {
   return (
-    <div className="record-highlight bg-card border border-border rounded-xl p-4 space-y-3">
+    <div className="record-highlight bg-card border-2 border-[hsl(var(--card-outline))] shadow-md rounded-xl p-4 space-y-3">
       {/* Top row: ID + Status */}
       <div className="flex items-center justify-between">
-        <span className="text-foreground font-mono font-bold text-lg">{repair.id}</span>
-        <span className={`${estadoColor[repair.estado] || "bg-muted"} text-xs font-bold px-3 py-1 rounded-full text-primary-foreground`}>
+        <div className="flex items-center gap-2">
+          <span className="text-foreground font-mono font-bold text-lg">{repair.id}</span>
+          <FinTrackDot state={finTrack} />
+        </div>
+        <span
+          className={`${estadoColor[repair.estado] || "bg-muted"} text-xs font-bold px-3 py-1 rounded-full text-primary-foreground`}
+        >
           {repair.estado}
         </span>
       </div>
 
       {/* Client info */}
       <div>
-        <Button variant="ghost" className="text-foreground font-semibold text-sm h-auto p-0 whitespace-normal text-left justify-start" onClick={() => onDetails(repair)}>{repair.cliente}</Button>
+        <Button
+          variant="ghost"
+          className="text-foreground font-semibold text-sm h-auto p-0 whitespace-normal text-left justify-start"
+          onClick={() => onDetails(repair)}
+        >
+          {repair.cliente}
+        </Button>
         <div className="flex items-center gap-2 mt-1">
           <a
             href={`tel:${repair.telefono}`}
@@ -58,8 +100,25 @@ const MobileRepairCard = ({ repair, onEdit, onShowQR, onUpdateStatus, onReopen, 
 
       {/* Action buttons - large touch targets */}
       <div className="flex flex-wrap gap-2 pt-1">
-        <Button variant="outline" size="icon" title="Ver detalles" aria-label={`Ver detalles ${repair.id}`} onClick={() => onDetails(repair)}><Eye className="h-4 w-4" /></Button>
-        <Button variant="outline" size="icon" title="Eliminar registro" aria-label={`Eliminar ${repair.id}`} className="text-destructive" onClick={() => onDelete(repair)}><Trash2 className="h-4 w-4" /></Button>
+        <Button
+          variant="outline"
+          size="icon"
+          title="Ver detalles"
+          aria-label={`Ver detalles ${repair.id}`}
+          onClick={() => onDetails(repair)}
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          title="Eliminar registro"
+          aria-label={`Eliminar ${repair.id}`}
+          className="text-destructive"
+          onClick={() => onDelete(repair)}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
         <button
           onClick={() => onShowQR(repair)}
           className="flex-1 min-w-[60px] bg-primary text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
