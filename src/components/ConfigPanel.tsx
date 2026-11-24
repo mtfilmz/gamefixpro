@@ -303,7 +303,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
           {([
             [HardDrive, "Respaldos", "Copias de seguridad en Google Drive.", <GoogleDriveConnectButton key="d" />],
             [Wallet, "Pagos", "Envía los pagos registrados a Balans Board.", <FinanceAccountConnection key="f" />],
-            [Users, "Clientes", "Comparte tus clientes con Super Mobile Tech Repair.", <TechRepairClientConnection key="t" />],
+            [Users, "Clientes", "Comparte tus clientes con COBRO.", <TechRepairClientConnection key="t" />],
           ] as const).map(([Icon, title, desc, node]) => (
             <section key={title} className="border border-border rounded-xl overflow-hidden bg-card">
               <header className="flex items-center gap-3 px-4 py-3 bg-muted/30 border-b border-border">
