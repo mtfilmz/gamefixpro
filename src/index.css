@@ -32,6 +32,10 @@
     --input: 233 30% 25%;
     --ring: 343 100% 59%;
     --record-highlight: 233 30% 32%;
+    /* Contorno de las tarjetas y círculo de FinTrack (verde = llegó, rojo = no ha llegado) */
+    --card-outline: 233 40% 50%;
+    --fintrack-ok: 145 70% 45%;
+    --fintrack-pending: 0 85% 58%;
 
     --receipt-paper: 0 0% 100%;
     --receipt-ink: 220 20% 15%;
@@ -67,7 +71,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
   }
