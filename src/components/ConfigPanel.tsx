@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getConfig, saveConfig, resetConfig, AppConfig, fetchRemoteConfig, saveRemoteConfig } from "@/lib/config";
-import { Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight, AlertTriangle, RefreshCw } from "lucide-react";
+import { Plug, Settings2, HardDrive, Wallet, Users, Plus, Trash2, Edit2, Check, X, RotateCcw, ChevronDown, ChevronRight, AlertTriangle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -235,6 +235,7 @@ interface ConfigPanelProps {
 
 const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
   const [config, setConfig] = useState<AppConfig>(getConfig);
+  const [section, setSection] = useState<"general" | "conexiones">("general");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { isAdmin } = useRole();
 
@@ -279,6 +280,47 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
         </Button>
       </div>
 
+      <div role="tablist" className="grid grid-cols-2 gap-1 p-1 bg-muted/40 rounded-xl">
+        {([["general", "General", Settings2], ["conexiones", "Conexiones", Plug]] as const).map(([key, label, Icon]) => (
+          <button
+            key={key}
+            role="tab"
+            aria-selected={section === key}
+            onClick={() => setSection(key)}
+            className={`flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-colors ${section === key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {section === "conexiones" ? (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Cada conexión es independiente. Desconectar o cambiar una no afecta a las demás.
+          </p>
+          {([
+            [HardDrive, "Respaldos", "Copias de seguridad en Google Drive.", <GoogleDriveConnectButton key="d" />],
+            [Wallet, "Pagos", "Envía los pagos registrados a Balans Board.", <FinanceAccountConnection key="f" />],
+            [Users, "Clientes", "Comparte tus clientes con Super Mobile Tech Repair.", <TechRepairClientConnection key="t" />],
+          ] as const).map(([Icon, title, desc, node]) => (
+            <section key={title} className="border border-border rounded-xl overflow-hidden bg-card">
+              <header className="flex items-center gap-3 px-4 py-3 bg-muted/30 border-b border-border">
+                <div className="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center">
+                  <Icon className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-foreground">{title}</h3>
+                  <p className="text-xs text-muted-foreground">{desc}</p>
+                </div>
+              </header>
+              <div className="p-4">{node}</div>
+            </section>
+          ))}
+        </div>
+      ) : (
+      <>
       <p className="text-sm text-muted-foreground">
         Personaliza las opciones del sistema. Los cambios se aplican inmediatamente.
       </p>
@@ -406,9 +448,6 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
         {/* Force Update Section */}
         <ForceUpdateSection />
 
-        <GoogleDriveConnectButton />
-        <FinanceAccountConnection />
-        <TechRepairClientConnection />
 
         {/* Roles section - only for admins */}
         {isAdmin && (
@@ -417,6 +456,8 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };
