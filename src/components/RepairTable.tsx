@@ -1,5 +1,7 @@
+import { useCallback, useEffect, useState } from "react";
 import { Repair, EstadoReparacion } from "@/types/repair";
-import MobileRepairCard from "./MobileRepairCard";
+import MobileRepairCard, { FinTrackDot, type FinTrackState } from "./MobileRepairCard";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Eye, Trash2 } from "lucide-react";
 
@@ -19,7 +21,7 @@ interface RepairTableProps {
 
 const estadoColor: Record<EstadoReparacion, string> = {
   PENDIENTE: "bg-status-pending",
-  "DIAGNÓSTICO": "bg-status-diagnostic",
+  DIAGNÓSTICO: "bg-status-diagnostic",
   "EN REPARACIÓN": "bg-status-repairing",
   REPARADO: "bg-status-repaired",
   ENTREGADO: "bg-status-delivered",
@@ -32,24 +34,77 @@ function getProblemSummary(repair: Repair): string {
   return repair.detalles || "Sin detalle";
 }
 
+/** Lee los pagos y dice, por reparación, si ya llegaron a FinTrack (verde) o falta alguno (rojo). */
+function useFinTrackStates(refreshKey: number) {
+  const [states, setStates] = useState<Record<string, FinTrackState>>({});
+  const load = useCallback(async () => {
+    const { data, error } = await supabase.from("repair_payments").select("repair_id,sync_status").eq("is_test", false);
+    if (error || !data) return;
+    const next: Record<string, FinTrackState> = {};
+    for (const p of data) {
+      if (p.sync_status !== "synced") next[p.repair_id] = "pending";
+      else if (next[p.repair_id] !== "pending") next[p.repair_id] = "synced";
+    }
+    setStates(next);
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load, refreshKey]);
+  useEffect(() => {
+    const refresh = () => {
+      void load();
+    };
+    window.addEventListener("focus", refresh);
+    const timer = window.setInterval(refresh, 30000);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.clearInterval(timer);
+    };
+  }, [load]);
+  return states;
+}
+
 function newestFirst(a: Repair, b: Repair): number {
   const ka = a.createdAt || a.fecha || "";
   const kb = b.createdAt || b.fecha || "";
   return kb.localeCompare(ka);
 }
 
-const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDetails, onDelete, filterEstado, onFilterChange, searchQuery = "", title = "HISTORIAL DE EQUIPOS" }: RepairTableProps) => {
+const RepairTable = ({
+  repairs,
+  onEdit,
+  onShowQR,
+  onUpdateStatus,
+  onReopen,
+  onDetails,
+  onDelete,
+  filterEstado,
+  onFilterChange,
+  searchQuery = "",
+  title = "HISTORIAL DE EQUIPOS",
+}: RepairTableProps) => {
+  const finTrack = useFinTrackStates(repairs.length);
   const byEstado = filterEstado === "TODOS" ? repairs : repairs.filter((r) => r.estado === filterEstado);
   const q = searchQuery.trim().toLowerCase();
-  const filtered = (q
-    ? byEstado.filter((r) =>
-        [r.id, r.cliente, r.telefono, r.consola, r.marca, r.numeroSerie, ...(r.problemas || [])]
-          .filter(Boolean)
-          .some((v) => String(v).toLowerCase().includes(q))
-      )
-    : byEstado
-  ).slice().sort(newestFirst);
-  const estados: (EstadoReparacion | "TODOS")[] = ["TODOS", "PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
+  const filtered = (
+    q
+      ? byEstado.filter((r) =>
+          [r.id, r.cliente, r.telefono, r.consola, r.marca, r.numeroSerie, ...(r.problemas || [])]
+            .filter(Boolean)
+            .some((v) => String(v).toLowerCase().includes(q)),
+        )
+      : byEstado
+  )
+    .slice()
+    .sort(newestFirst);
+  const estados: (EstadoReparacion | "TODOS")[] = [
+    "TODOS",
+    "PENDIENTE",
+    "DIAGNÓSTICO",
+    "EN REPARACIÓN",
+    "REPARADO",
+    "ENTREGADO",
+  ];
 
   return (
     <div className="mt-6">
@@ -65,7 +120,9 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDe
               key={e}
               onClick={() => onFilterChange(e)}
               className={`text-xs px-3 py-2 rounded-full font-bold transition-colors whitespace-nowrap min-h-[36px] ${
-                filterEstado === e ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground active:bg-muted/80"
+                filterEstado === e
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground active:bg-muted/80"
               }`}
             >
               {e}
@@ -86,11 +143,10 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDe
             onReopen={onReopen}
             onDetails={onDetails}
             onDelete={onDelete}
+            finTrack={finTrack[r.id] ?? "none"}
           />
         ))}
-        {filtered.length === 0 && (
-          <div className="py-8 text-center text-muted-foreground">No hay registros</div>
-        )}
+        {filtered.length === 0 && <div className="py-8 text-center text-muted-foreground">No hay registros</div>}
       </div>
 
       {/* Desktop: Table layout */}
@@ -109,19 +165,51 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDe
           <tbody>
             {filtered.map((r, i) => (
               <tr key={r.id} className={`record-highlight ${i % 2 === 0 ? "bg-card" : "bg-muted/30"}`}>
-                <td className="py-3 px-4 text-foreground">{r.id}</td>
-                <td className="py-3 px-4 text-foreground"><Button variant="ghost" className="h-auto p-0 whitespace-normal text-left justify-start" onClick={() => onDetails(r)}>{r.cliente}</Button></td>
+                <td className="py-3 px-4 text-foreground">
+                  <span className="inline-flex items-center gap-2">
+                    {r.id}
+                    <FinTrackDot state={finTrack[r.id] ?? "none"} />
+                  </span>
+                </td>
+                <td className="py-3 px-4 text-foreground">
+                  <Button
+                    variant="ghost"
+                    className="h-auto p-0 whitespace-normal text-left justify-start"
+                    onClick={() => onDetails(r)}
+                  >
+                    {r.cliente}
+                  </Button>
+                </td>
                 <td className="py-3 px-4 text-foreground">{r.consola}</td>
                 <td className="py-3 px-4 text-foreground">{getProblemSummary(r)}</td>
                 <td className="py-3 px-4 text-center">
-                  <span className={`${estadoColor[r.estado]} text-xs font-bold px-3 py-1 rounded-full text-primary-foreground`}>
+                  <span
+                    className={`${estadoColor[r.estado]} text-xs font-bold px-3 py-1 rounded-full text-primary-foreground`}
+                  >
                     {r.estado}
                   </span>
                 </td>
                 <td className="py-3 px-4 text-center">
                   <div className="flex gap-2 justify-center flex-wrap">
-                    <Button variant="ghost" size="icon" title="Ver detalles" aria-label={`Ver detalles ${r.id}`} onClick={() => onDetails(r)}><Eye className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" title="Eliminar registro" aria-label={`Eliminar ${r.id}`} className="text-destructive" onClick={() => onDelete(r)}><Trash2 className="h-4 w-4" /></Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Ver detalles"
+                      aria-label={`Ver detalles ${r.id}`}
+                      onClick={() => onDetails(r)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Eliminar registro"
+                      aria-label={`Eliminar ${r.id}`}
+                      className="text-destructive"
+                      onClick={() => onDelete(r)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                     <button
                       onClick={() => onShowQR(r)}
                       className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-md hover:opacity-80 transition-opacity"
@@ -155,7 +243,9 @@ const RepairTable = ({ repairs, onEdit, onShowQR, onUpdateStatus, onReopen, onDe
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-muted-foreground">No hay registros</td>
+                <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                  No hay registros
+                </td>
               </tr>
             )}
           </tbody>
