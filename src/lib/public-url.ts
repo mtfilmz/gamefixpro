@@ -28,7 +28,17 @@ export function getPublicBaseUrl(): string {
   return window.location.origin;
 }
 
-export function getTrackUrl(repairId: string): string {
-  // IMPORTANT: encode the ID — repair IDs include "#" which is a URL fragment delimiter
-  return `${getPublicBaseUrl()}/track/${encodeURIComponent(repairId)}`;
+/**
+ * Enlace que se comparte con el cliente. Usa el código secreto de la orden, así nadie puede
+ * ver otra orden cambiando el número. Si la orden todavía no tiene código, usa el número
+ * (enlace de antes, que solo muestra el estado).
+ */
+export function getTrackUrl(repair: { id: string; trackingCode?: string } | string): string {
+  const base = getPublicBaseUrl();
+  if (typeof repair !== "string" && repair.trackingCode) {
+    return `${base}/track/${encodeURIComponent(repair.trackingCode)}`;
+  }
+  const id = typeof repair === "string" ? repair : repair.id;
+  // El número lleva "#", que en una dirección corta el enlace: por eso va codificado.
+  return `${base}/track/${encodeURIComponent(id)}`;
 }
