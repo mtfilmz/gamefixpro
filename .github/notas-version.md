@@ -1,3 +1,4 @@
-Game Fix para Windows y Android: la misma app de Game Fix, con los últimos cambios hechos en Lovable.
-- Usa la misma base de datos que la web: reparaciones, clientes y pagos son los mismos en todos los equipos.
+Game Fix ahora usa tu propia nube en Supabase (ya no depende de Lovable).
+- Tus reparaciones, clientes, pagos y fotos se mudaron completos.
+- Al abrirla, entra otra vez con tu mismo correo y contraseña.
 - Sigue conectada a FinTrack y comparte clientes con Cobro.
