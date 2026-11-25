@@ -1,25 +1,54 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Repair, EstadoReparacion, StatusChange, RepairImage } from "@/types/repair";
 import { useAuth } from "@/hooks/use-auth";
 
-async function refreshImageUrls(images: RepairImage[]): Promise<RepairImage[]> {
-  if (!images || images.length === 0) return [];
-  const refreshed: RepairImage[] = [];
-  for (const img of images) {
-    // Extract storage path from any supabase URL (public or signed)
-    const match = img.dataUrl?.match(/repair-images\/(.+?)(?:\?|$)/);
-    if (match) {
-      const path = decodeURIComponent(match[1]);
-      const { data } = await supabase.storage
-        .from("repair-images")
-        .createSignedUrl(path, 60 * 60 * 24 * 365);
-      refreshed.push({ ...img, dataUrl: data?.signedUrl || img.dataUrl });
-    } else {
-      refreshed.push(img);
+/* Fotos: en la base se guarda solo la ruta ("repair-images/<carpeta>/<archivo>"), sin enlace.
+   Para verlas se piden enlaces que duran 1 hora, todos juntos en una sola consulta,
+   y se reusan mientras les queden más de 10 minutos. */
+const FOTO_DURA = 60 * 60;
+const firmas = new Map<string, { url: string; vence: number }>();
+
+export function rutaDeFoto(dataUrl?: string): string | null {
+  const m = dataUrl?.match(/repair-images\/(.+?)(?:\?|$)/);
+  if (!m) return null;
+  try {
+    return decodeURIComponent(m[1]);
+  } catch {
+    return m[1];
+  }
+}
+
+function fotoParaGuardar(img: RepairImage): RepairImage {
+  const ruta = rutaDeFoto(img.dataUrl);
+  return ruta ? { ...img, dataUrl: "repair-images/" + ruta } : img;
+}
+
+async function firmarFotos(lista: Repair[]): Promise<Repair[]> {
+  const ahora = Date.now();
+  const faltan = new Set<string>();
+  for (const r of lista) {
+    for (const img of r.imagenes || []) {
+      const ruta = rutaDeFoto(img.dataUrl);
+      const f = ruta ? firmas.get(ruta) : undefined;
+      if (ruta && (!f || f.vence - ahora < 10 * 60 * 1000)) faltan.add(ruta);
     }
   }
-  return refreshed;
+  const rutas = [...faltan];
+  for (let i = 0; i < rutas.length; i += 100) {
+    const { data } = await supabase.storage.from("repair-images").createSignedUrls(rutas.slice(i, i + 100), FOTO_DURA);
+    for (const d of data || []) {
+      if (d.path && d.signedUrl) firmas.set(d.path, { url: d.signedUrl, vence: ahora + FOTO_DURA * 1000 });
+    }
+  }
+  return lista.map((r) => ({
+    ...r,
+    imagenes: (r.imagenes || []).map((img) => {
+      const ruta = rutaDeFoto(img.dataUrl);
+      const f = ruta ? firmas.get(ruta) : undefined;
+      return f ? { ...img, dataUrl: f.url } : img;
+    }),
+  }));
 }
 
 function dbToRepair(row: any): Repair {
@@ -43,10 +72,12 @@ function dbToRepair(row: any): Repair {
     costoDiagnostico: row.costo_diagnostico != null ? Number(row.costo_diagnostico) : undefined,
     costoReparacion: row.costo_reparacion != null ? Number(row.costo_reparacion) : undefined,
     costoComponente: row.costo_componente != null ? Number(row.costo_componente) : undefined,
+    trackingCode: row.tracking_code || undefined,
   };
 }
 
-function repairToDb(r: Repair, userId: string) {
+/* Lo que la app guarda de una orden. El dueño (user_id) y el código del enlace los pone la nube. */
+function repairToDb(r: Repair) {
   return {
     id: r.id,
     cliente: r.cliente,
@@ -62,12 +93,22 @@ function repairToDb(r: Repair, userId: string) {
     estado: r.estado,
     fecha: r.fecha,
     historial: JSON.parse(JSON.stringify(r.historial || [])),
-    imagenes: JSON.parse(JSON.stringify(r.imagenes || [])),
+    imagenes: JSON.parse(JSON.stringify((r.imagenes || []).map(fotoParaGuardar))),
     costo_diagnostico: r.costoDiagnostico ?? null,
     costo_reparacion: r.costoReparacion ?? null,
     costo_componente: r.costoComponente ?? null,
-    user_id: userId,
   };
+}
+
+/* Solo los campos que cambiaron, para no pisar lo que otro equipo cambió en otros campos. */
+function cambios(antes: Repair, despues: Repair): Record<string, unknown> {
+  const a = repairToDb(antes) as Record<string, unknown>;
+  const d = repairToDb(despues) as Record<string, unknown>;
+  const diff: Record<string, unknown> = {};
+  for (const k of Object.keys(d)) {
+    if (k !== "id" && JSON.stringify(a[k]) !== JSON.stringify(d[k])) diff[k] = d[k];
+  }
+  return diff;
 }
 
 export function useRepairs() {
@@ -75,6 +116,8 @@ export function useRepairs() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const { user } = useAuth();
+  const repairsRef = useRef<Repair[]>([]);
+  repairsRef.current = repairs;
 
   const fetchRepairs = async () => {
     if (!user) { setRepairs([]); setLoading(false); return; }
@@ -84,15 +127,7 @@ export function useRepairs() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      const parsed = data.map(dbToRepair);
-      // Refresh signed URLs for images in parallel
-      const withUrls = await Promise.all(
-        parsed.map(async (r) => ({
-          ...r,
-          imagenes: await refreshImageUrls(r.imagenes || []),
-        }))
-      );
-      setRepairs(withUrls);
+      setRepairs(await firmarFotos(data.map(dbToRepair)));
     }
     setLoading(false);
   };
@@ -113,19 +148,18 @@ export function useRepairs() {
         { event: "*", schema: "public", table: "repairs" },
         (payload) => {
           if (busy) return;
-          if (payload.eventType === "INSERT") {
-            const newRepair = dbToRepair(payload.new);
-            setRepairs((prev) => {
-              if (prev.some((r) => r.id === newRepair.id)) return prev;
-              return [newRepair, ...prev];
-            });
-          } else if (payload.eventType === "UPDATE") {
-            const updated = dbToRepair(payload.new);
-            setRepairs((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
-          } else if (payload.eventType === "DELETE") {
+          if (payload.eventType === "DELETE") {
             const deletedId = (payload.old as any).id;
             setRepairs((prev) => prev.filter((r) => r.id !== deletedId));
+            return;
           }
+          const fila = dbToRepair(payload.new);
+          void firmarFotos([fila]).then(([conFotos]) => {
+            setRepairs((prev) => {
+              if (prev.some((r) => r.id === conFotos.id)) return prev.map((r) => (r.id === conFotos.id ? conFotos : r));
+              return payload.eventType === "INSERT" ? [conFotos, ...prev] : prev;
+            });
+          });
         }
       )
       .subscribe();
@@ -135,11 +169,33 @@ export function useRepairs() {
     };
   }, [busy]);
 
-  const saveRepair = async (repair: Repair) => {
+  /** Número de una orden nueva: lo da la nube, así dos equipos nunca repiten el mismo. */
+  const nextRepairId = async (): Promise<string> => {
+    const { data, error } = await (supabase.rpc as any)("next_repair_id");
+    if (error || typeof data !== "string") throw new Error("No se pudo obtener el número de orden. Revisa la conexión.");
+    return data;
+  };
+
+  /** Guarda una orden. Si es nueva la crea. Si ya existe, manda solo lo que cambió comparando
+      con cómo estaba cuando se abrió (antes), para no pisar lo que otro equipo cambió. */
+  const saveRepair = async (repair: Repair, antes?: Repair | null): Promise<Repair> => {
     if (!user) throw new Error("Debes iniciar sesión para guardar");
-    const dbData = repairToDb(repair, user.id);
-    const { error } = await supabase.from("repairs").upsert(dbData);
+    const previo = antes ?? repairsRef.current.find((r) => r.id === repair.id) ?? null;
+    if (!previo) {
+      const { data, error } = await (supabase.from("repairs") as any)
+        .insert({ ...repairToDb(repair), user_id: user.id })
+        .select("tracking_code")
+        .single();
+      if (error) throw new Error(error.code === "23505" ? "Ese número de orden ya existe. Vuelve a guardar." : error.message);
+      return { ...repair, trackingCode: data?.tracking_code ?? undefined };
+    }
+    const resultado = { ...repair, trackingCode: repair.trackingCode ?? previo.trackingCode };
+    const diff = cambios(previo, repair);
+    if (Object.keys(diff).length === 0) return resultado;
+    const { data, error } = await (supabase.from("repairs") as any).update(diff).eq("id", repair.id).select("id");
     if (error) throw new Error(error.message);
+    if (!data || data.length === 0) throw new Error("No se guardó: la orden ya no existe o no tienes permiso.");
+    return resultado;
   };
 
   const deleteRepairs = async (ids: string[], password: string) => {
@@ -156,5 +212,5 @@ export function useRepairs() {
     setRepairs(previous => previous.filter(repair => !data.deleted_ids.includes(repair.id)));
   };
 
-  return { repairs, loading, saveRepair, deleteRepairs, refreshRepairs: fetchRepairs, setBusy };
+  return { repairs, loading, saveRepair, nextRepairId, deleteRepairs, refreshRepairs: fetchRepairs, setBusy };
 }
