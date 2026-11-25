@@ -6,6 +6,14 @@ import "./index.css";
 import { initInstallPrompt } from "./lib/pwa-utils";
 import { requestNotificationPermission } from "./lib/notifications";
 
+// Tema elegido en Configuración › Apariencia (se guarda en este equipo)
+try {
+  const tema = localStorage.getItem("gamefix-tema");
+  if (tema && tema !== "original") document.documentElement.dataset.theme = tema;
+} catch {
+  // sin localStorage: se usa el tema original
+}
+
 // Limpiar datos viejos de localStorage (migrados a la nube) — protegido para Safari modo privado
 try {
   localStorage.removeItem("gamefixpro_repairs");
@@ -22,8 +30,7 @@ const isInIframe = (() => {
 })();
 
 const isPreviewHost =
-  window.location.hostname.includes("id-preview--") ||
-  window.location.hostname.includes("lovableproject.com");
+  window.location.hostname.includes("id-preview--") || window.location.hostname.includes("lovableproject.com");
 
 function setupProductionPwa() {
   let hasReloaded = false;
@@ -77,5 +84,5 @@ if (isPreviewHost || isInIframe) {
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
     <App />
-  </ErrorBoundary>
+  </ErrorBoundary>,
 );
