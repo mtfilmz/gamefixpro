@@ -19,20 +19,31 @@ interface PublicRepair {
 }
 
 const estadoColors: Record<string, string> = {
-  "PENDIENTE": "bg-status-pending",
-  "DIAGNÓSTICO": "bg-status-diagnostic",
+  PENDIENTE: "bg-status-pending",
+  DIAGNÓSTICO: "bg-status-diagnostic",
   "EN REPARACIÓN": "bg-status-repairing",
-  "REPARADO": "bg-status-repaired",
-  "ENTREGADO": "bg-status-delivered",
+  REPARADO: "bg-status-repaired",
+  ENTREGADO: "bg-status-delivered",
+  "EN MANTENIMIENTO": "bg-status-repairing",
+  "LISTO PARA ENTREGAR": "bg-status-repaired",
 };
 
 const estadoOrder = ["PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"];
 
+// Estados agregados en Configuración: en qué paso del progreso van.
+const pasoDeEstado: Record<string, string> = {
+  "EN MANTENIMIENTO": "EN REPARACIÓN",
+  "LISTO PARA ENTREGAR": "REPARADO",
+};
+
 function formatTimestamp(iso: string): string {
   try {
     return new Date(iso).toLocaleDateString("es-MX", {
-      day: "2-digit", month: "short", year: "numeric",
-      hour: "2-digit", minute: "2-digit",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   } catch {
     return iso;
@@ -51,14 +62,46 @@ const TrackRepair = () => {
     document.title = `Estado de Reparación ${id} | Super Mobile Game Fix`;
 
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-repair-status?id=${encodeURIComponent(id)}`;
-    fetch(url)
-      .then(async (res) => {
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error || "Error");
-        setRepair(json);
-      })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    let activo = true;
+    // Se vuelve a consultar cada minuto y al regresar a la página, para mostrar siempre lo último.
+    const cargar = () =>
+      fetch(url, { cache: "no-store" })
+        .then(async (res) => {
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error || "Error");
+          if (!activo) return;
+          // Conserva las fotos ya cargadas para que no parpadeen en cada actualización.
+          setRepair((prev) =>
+            prev
+              ? {
+                  ...json,
+                  imagenes: (json.imagenes || []).map(
+                    (img: PublicRepair["imagenes"][number]) => prev.imagenes?.find((p) => p.id === img.id) ?? img,
+                  ),
+                }
+              : json,
+          );
+          setError(null);
+        })
+        .catch((e) => {
+          if (activo) setError(e.message);
+        })
+        .finally(() => {
+          if (activo) setLoading(false);
+        });
+    void cargar();
+    const timer = window.setInterval(() => {
+      void cargar();
+    }, 60000);
+    const alVolver = () => {
+      if (document.visibilityState === "visible") void cargar();
+    };
+    document.addEventListener("visibilitychange", alVolver);
+    return () => {
+      activo = false;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", alVolver);
+    };
   }, [id]);
 
   if (loading) {
@@ -69,7 +112,7 @@ const TrackRepair = () => {
     );
   }
 
-  if (error || !repair) {
+  if (!repair) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
         <h1 className="text-2xl font-bold text-foreground mb-2">Reparación no encontrada</h1>
@@ -78,15 +121,9 @@ const TrackRepair = () => {
     );
   }
 
-  const currentIdx = estadoOrder.indexOf(repair.estado);
-  const total =
-    (repair.costoReparacion || 0) +
-    (repair.costoComponente || 0) -
-    (repair.costoDiagnostico || 0);
-  const hasCosts =
-    repair.costoDiagnostico != null ||
-    repair.costoReparacion != null ||
-    repair.costoComponente != null;
+  const currentIdx = estadoOrder.indexOf(pasoDeEstado[repair.estado] ?? repair.estado);
+  const total = (repair.costoReparacion || 0) + (repair.costoComponente || 0) - (repair.costoDiagnostico || 0);
+  const hasCosts = repair.costoDiagnostico != null || repair.costoReparacion != null || repair.costoComponente != null;
 
   return (
     <div className="min-h-screen bg-background pb-12">
@@ -133,14 +170,10 @@ const TrackRepair = () => {
                   </div>
                   <span
                     className={`text-sm ${
-                      isCurrent
-                        ? "font-bold text-foreground"
-                        : done
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                      isCurrent ? "font-bold text-foreground" : done ? "text-foreground" : "text-muted-foreground"
                     }`}
                   >
-                    {e}
+                    {isCurrent ? repair.estado : e}
                   </span>
                 </div>
               );
@@ -161,9 +194,7 @@ const TrackRepair = () => {
           </div>
           {repair.problemas?.length > 0 && (
             <div className="mt-4 pt-3 border-t border-border">
-              <div className="text-xs font-bold text-muted-foreground uppercase mb-2">
-                Problemas reportados
-              </div>
+              <div className="text-xs font-bold text-muted-foreground uppercase mb-2">Problemas reportados</div>
               <ul className="space-y-1">
                 {repair.problemas.map((p) => (
                   <li key={p} className="flex items-center gap-2 text-sm text-foreground">
@@ -179,9 +210,7 @@ const TrackRepair = () => {
         {/* Photos */}
         {repair.imagenes && repair.imagenes.length > 0 && (
           <section className="bg-card border border-border rounded-xl p-5 shadow-sm">
-            <h2 className="text-sm font-bold text-primary uppercase tracking-wide mb-3">
-              Fotos del equipo
-            </h2>
+            <h2 className="text-sm font-bold text-primary uppercase tracking-wide mb-3">Fotos del equipo</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {repair.imagenes.map((img, idx) => (
                 <button
@@ -206,9 +235,7 @@ const TrackRepair = () => {
         {/* History */}
         {repair.historial && repair.historial.length > 0 && (
           <section className="bg-card border border-border rounded-xl p-5 shadow-sm">
-            <h2 className="text-sm font-bold text-primary uppercase tracking-wide mb-3">
-              Historial
-            </h2>
+            <h2 className="text-sm font-bold text-primary uppercase tracking-wide mb-3">Historial</h2>
             <div className="relative ml-3">
               <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-border" />
               <div className="space-y-4">
@@ -219,13 +246,9 @@ const TrackRepair = () => {
                         estadoColors[entry.estado] || "bg-muted"
                       }`}
                     />
-                    <div className="text-xs text-muted-foreground">
-                      {formatTimestamp(entry.fecha)}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{formatTimestamp(entry.fecha)}</div>
                     <div className="text-sm font-bold text-foreground">{entry.estado}</div>
-                    {entry.nota && (
-                      <div className="text-xs text-muted-foreground mt-0.5">"{entry.nota}"</div>
-                    )}
+                    {entry.nota && <div className="text-xs text-muted-foreground mt-0.5">"{entry.nota}"</div>}
                   </div>
                 ))}
               </div>
@@ -236,32 +259,24 @@ const TrackRepair = () => {
         {/* Costs */}
         {hasCosts && (
           <section className="bg-card border border-border rounded-xl p-5 shadow-sm">
-            <h2 className="text-sm font-bold text-primary uppercase tracking-wide mb-3">
-              Costos
-            </h2>
+            <h2 className="text-sm font-bold text-primary uppercase tracking-wide mb-3">Costos</h2>
             <div className="space-y-1 text-sm">
               {repair.costoDiagnostico != null && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Diagnóstico (acreditado):</span>
-                  <span className="text-foreground font-semibold">
-                    -${repair.costoDiagnostico.toFixed(2)}
-                  </span>
+                  <span className="text-foreground font-semibold">-${repair.costoDiagnostico.toFixed(2)}</span>
                 </div>
               )}
               {repair.costoReparacion != null && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Reparación:</span>
-                  <span className="text-foreground font-semibold">
-                    ${repair.costoReparacion.toFixed(2)}
-                  </span>
+                  <span className="text-foreground font-semibold">${repair.costoReparacion.toFixed(2)}</span>
                 </div>
               )}
               {repair.costoComponente != null && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Componente:</span>
-                  <span className="text-foreground font-semibold">
-                    ${repair.costoComponente.toFixed(2)}
-                  </span>
+                  <span className="text-foreground font-semibold">${repair.costoComponente.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between pt-2 mt-2 border-t border-border">
@@ -274,10 +289,7 @@ const TrackRepair = () => {
 
         {/* Footer */}
         <footer className="text-center text-xs text-muted-foreground pt-4">
-          <a
-            href="tel:7875001324"
-            className="inline-flex items-center gap-1.5 text-primary font-medium"
-          >
+          <a href="tel:7875001324" className="inline-flex items-center gap-1.5 text-primary font-medium">
             <Phone className="w-3.5 h-3.5" />
             787-500-1324
           </a>
@@ -294,10 +306,7 @@ const TrackRepair = () => {
           total={repair.imagenes.length}
           onPrev={
             repair.imagenes.length > 1
-              ? () =>
-                  setPreviewIdx(
-                    (c) => (c === null ? c : (c - 1 + repair.imagenes.length) % repair.imagenes.length),
-                  )
+              ? () => setPreviewIdx((c) => (c === null ? c : (c - 1 + repair.imagenes.length) % repair.imagenes.length))
               : undefined
           }
           onNext={
