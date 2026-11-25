@@ -22,7 +22,6 @@ import DeleteRepairsDialog from "@/components/DeleteRepairsDialog";
 import ClientsPage from "@/components/ClientsPage";
 import ActivityHistoryPage from "@/components/ActivityHistoryPage";
 
-
 const Index = () => {
   const { repairs, loading, saveRepair, deleteRepairs, refreshRepairs, setBusy } = useRepairs();
   const [activeView, setActiveView] = useState("dashboard");
@@ -36,9 +35,14 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [detailRepair, setDetailRepair] = useState<Repair | null>(null);
   const [deleteIds, setDeleteIds] = useState<string[]>([]);
-  const requestDelete = (repair: Repair) => { setDetailRepair(null); setDeleteIds([repair.id]); };
+  const requestDelete = (repair: Repair) => {
+    setDetailRepair(null);
+    setDeleteIds([repair.id]);
+  };
 
-  useEffect(() => { fetchRemoteConfig(); }, []);
+  useEffect(() => {
+    fetchRemoteConfig();
+  }, []);
 
   // Pause auto-refresh while any modal is open
   const anyModalOpen = formOpen || !!qrRepair || !!statusRepair || !!detailRepair || deleteIds.length > 0;
@@ -56,10 +60,19 @@ const Index = () => {
     }
     await saveRepair(savedRepair);
     if (payment) {
-      try { await recordPayment(savedRepair.id, payment); }
-      catch (e) { throw new Error(`Equipo guardado; no se confirmó el pago. Reintenta sin cerrar: ${e instanceof Error ? e.message : "Error al guardar"}`); }
-      try { await syncPayment(payment.id); toast.success("Pago confirmado por Balans Board"); }
-      catch (e) { toast.warning(e instanceof Error ? e.message : "Pago guardado; envío pendiente"); }
+      try {
+        await recordPayment(savedRepair.id, payment);
+      } catch (e) {
+        throw new Error(
+          `Equipo guardado; no se confirmó el pago. Reintenta sin cerrar: ${e instanceof Error ? e.message : "Error al guardar"}`,
+        );
+      }
+      try {
+        await syncPayment(payment.id);
+        toast.success("Pago confirmado por Balans Board");
+      } catch (e) {
+        toast.warning(e instanceof Error ? e.message : "Pago guardado; envío pendiente");
+      }
     }
     setEditRepair(null);
     await refreshRepairs();
@@ -112,19 +125,26 @@ const Index = () => {
         <>
           <div className="fixed inset-0 bg-background/60 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
           <div className="fixed z-40 lg:hidden">
-            <Sidebar activeView={activeView} onViewChange={(v) => { setActiveView(v); setSidebarOpen(false); }} onNewRecord={() => { openNew(); setSidebarOpen(false); }} />
+            <Sidebar
+              activeView={activeView}
+              onViewChange={(v) => {
+                setActiveView(v);
+                setSidebarOpen(false);
+              }}
+              onNewRecord={() => {
+                openNew();
+                setSidebarOpen(false);
+              }}
+            />
           </div>
         </>
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
         <Header onRefresh={refreshRepairs} />
-        <main className="flex-1 p-3 md:p-6 overflow-auto pb-20 lg:pb-6">
+        <main className="flex-1 p-3 md:p-6 overflow-auto pb-[calc(7.5rem+env(safe-area-inset-bottom))] lg:pb-6">
           {activeView === "config" ? (
-            <ConfigPanel
-              repairs={repairs}
-              onDeleteRepairs={ids => setDeleteIds(ids)}
-            />
+            <ConfigPanel repairs={repairs} onDeleteRepairs={(ids) => setDeleteIds(ids)} />
           ) : activeView === "actividad" ? (
             <ActivityHistoryPage />
           ) : activeView === "clientes" ? (
@@ -145,7 +165,9 @@ const Index = () => {
           ) : activeView === "buscar" ? (
             <div>
               <div className="bg-card border border-border rounded-xl p-4 mb-4">
-                <label className="text-xs text-muted-foreground mb-1 block font-bold uppercase tracking-wide">Buscar reparación</label>
+                <label className="text-xs text-muted-foreground mb-1 block font-bold uppercase tracking-wide">
+                  Buscar reparación
+                </label>
                 <input
                   type="search"
                   autoFocus
@@ -211,9 +233,29 @@ const Index = () => {
       {/* Mobile bottom nav */}
       <BottomNav activeView={activeView} onViewChange={setActiveView} onNewRecord={openNew} />
       <RepairDetailsDialog repair={detailRepair} onClose={() => setDetailRepair(null)} />
-      {deleteIds.length > 0 && <DeleteRepairsDialog ids={deleteIds} onClose={() => setDeleteIds([])} onDelete={async password => { await deleteRepairs(deleteIds, password); toast.success("Registros eliminados. Pagos conservados."); }} />}
+      {deleteIds.length > 0 && (
+        <DeleteRepairsDialog
+          ids={deleteIds}
+          onClose={() => setDeleteIds([])}
+          onDelete={async (password) => {
+            await deleteRepairs(deleteIds, password);
+            toast.success("Registros eliminados. Pagos conservados.");
+          }}
+        />
+      )}
 
-      <RepairForm open={formOpen} onClose={() => { setFormOpen(false); setEditRepair(null); setPrefillRepair(null); }} onSave={handleSave} editRepair={editRepair} prefillRepair={prefillRepair} repairs={repairs} />
+      <RepairForm
+        open={formOpen}
+        onClose={() => {
+          setFormOpen(false);
+          setEditRepair(null);
+          setPrefillRepair(null);
+        }}
+        onSave={handleSave}
+        editRepair={editRepair}
+        prefillRepair={prefillRepair}
+        repairs={repairs}
+      />
       <QRTicketModal repair={qrRepair} open={!!qrRepair} onClose={() => setQrRepair(null)} />
       <UpdateStatus
         repair={statusRepair}
