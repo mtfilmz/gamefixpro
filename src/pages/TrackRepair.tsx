@@ -16,6 +16,8 @@ interface PublicRepair {
   costoDiagnostico?: number;
   costoReparacion?: number;
   costoComponente?: number;
+  /** Enlace de antes (con el número de orden): solo trae el estado. */
+  legacy?: boolean;
 }
 
 const estadoColors: Record<string, string> = {
@@ -59,9 +61,11 @@ const TrackRepair = () => {
 
   useEffect(() => {
     if (!id) return;
-    document.title = `Estado de Reparación ${id} | Super Mobile Game Fix`;
+    document.title = "Estado de Reparación | Super Mobile Game Fix";
 
-    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-repair-status?id=${encodeURIComponent(id)}`;
+    // Enlace nuevo: código secreto de la orden. Enlace de antes: número de orden (#055), que solo muestra el estado.
+    const esViejo = id.startsWith("#");
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-repair-status?${esViejo ? "id" : "code"}=${encodeURIComponent(id)}`;
     let activo = true;
     // Se vuelve a consultar cada minuto y al regresar a la página, para mostrar siempre lo último.
     const cargar = () =>
@@ -116,7 +120,7 @@ const TrackRepair = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
         <h1 className="text-2xl font-bold text-foreground mb-2">Reparación no encontrada</h1>
-        <p className="text-muted-foreground">No pudimos localizar la orden #{id}.</p>
+        <p className="text-muted-foreground">No pudimos localizar esta orden. Revisa el enlace o llama a la tienda al 787-500-1324.</p>
       </div>
     );
   }
@@ -136,6 +140,11 @@ const TrackRepair = () => {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+        {repair.legacy && (
+          <section className="bg-card border border-border rounded-xl p-4 text-sm text-foreground shadow-sm">
+            Este enlace es de antes: aquí solo se ve el estado de tu equipo. Para ver las fotos y los costos, pide el enlace nuevo a la tienda al 787-500-1324.
+          </section>
+        )}
         {/* Order ID + Current Status */}
         <section className="bg-card border border-border rounded-xl p-6 text-center shadow-sm">
           <div className="text-xs text-muted-foreground uppercase tracking-widest">Orden</div>
@@ -185,8 +194,12 @@ const TrackRepair = () => {
         <section className="bg-card border border-border rounded-xl p-5 shadow-sm">
           <h2 className="text-sm font-bold text-primary uppercase tracking-wide mb-3">Equipo</h2>
           <div className="grid grid-cols-2 gap-y-2 text-sm">
-            <span className="text-muted-foreground">Cliente:</span>
-            <span className="text-foreground font-semibold">{repair.cliente}</span>
+            {repair.cliente && (
+              <>
+                <span className="text-muted-foreground">Cliente:</span>
+                <span className="text-foreground font-semibold">{repair.cliente}</span>
+              </>
+            )}
             <span className="text-muted-foreground">Marca:</span>
             <span className="text-foreground">{repair.marca}</span>
             <span className="text-muted-foreground">Modelo:</span>
