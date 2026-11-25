@@ -74,10 +74,11 @@ const ImageUploader = ({ images, onChange, readOnly = false }: ImageUploaderProp
           continue;
         }
 
-        // Use signed URL (valid 1 year) since bucket is private
+        // Enlace de 1 hora solo para verla ahora. Al guardar la orden se guarda solo la ruta,
+        // y cada vez que se abre la app se pide un enlace nuevo.
         const { data: signedData, error: signError } = await supabase.storage
           .from("repair-images")
-          .createSignedUrl(fileName, 60 * 60 * 24 * 365);
+          .createSignedUrl(fileName, 60 * 60);
 
         if (signError || !signedData?.signedUrl) {
           console.error("Signed URL error:", signError);
