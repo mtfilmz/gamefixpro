@@ -46,6 +46,10 @@ jobs:
     runs-on: windows-latest
     env:
       VERSION: ${{ needs.esperar.outputs.version }}
+      # Nube propia del usuario en Supabase (GameFix-Cobro). La clave es la pública.
+      VITE_SUPABASE_URL: https://emaukmpwvmddmwkfoffk.supabase.co
+      VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_oNUnnAakI5F_GPJRO0-uIw_eC482aNK
+      VITE_SUPABASE_PROJECT_ID: emaukmpwvmddmwkfoffk
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
@@ -143,6 +147,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.esperar.outputs.version }}
+      # Nube propia del usuario en Supabase (GameFix-Cobro). La clave es la pública.
+      VITE_SUPABASE_URL: https://emaukmpwvmddmwkfoffk.supabase.co
+      VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_oNUnnAakI5F_GPJRO0-uIw_eC482aNK
+      VITE_SUPABASE_PROJECT_ID: emaukmpwvmddmwkfoffk
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
