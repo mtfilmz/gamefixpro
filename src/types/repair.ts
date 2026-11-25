@@ -33,4 +33,6 @@ export interface Repair {
   costoDiagnostico?: number;
   costoReparacion?: number;
   costoComponente?: number;
+  /** Código secreto del enlace que se comparte con el cliente (lo pone la nube). */
+  trackingCode?: string;
 }
