@@ -20,7 +20,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
   const [image, setImage] = useState<{ repair: Repair; file: File } | null>(null);
   const [imageError, setImageError] = useState(false);
   const [shareOptions, setShareOptions] = useState(false);
-  const trackUrl = repair ? getTrackUrl(repair.id) : "";
+  const trackUrl = repair ? getTrackUrl(repair) : "";
   const file = image?.repair === repair ? image.file : null;
 
   useEffect(() => {
