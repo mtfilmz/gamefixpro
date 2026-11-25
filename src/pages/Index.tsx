@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Repair, EstadoReparacion } from "@/types/repair";
-import { generateId } from "@/lib/repairs";
 import { fetchRemoteConfig } from "@/lib/config";
 import { notifyNewRepair } from "@/lib/notifications";
 import { useRepairs } from "@/hooks/use-repairs";
@@ -23,7 +22,7 @@ import ClientsPage from "@/components/ClientsPage";
 import ActivityHistoryPage from "@/components/ActivityHistoryPage";
 
 const Index = () => {
-  const { repairs, loading, saveRepair, deleteRepairs, refreshRepairs, setBusy } = useRepairs();
+  const { repairs, loading, saveRepair, nextRepairId, deleteRepairs, refreshRepairs, setBusy } = useRepairs();
   const [activeView, setActiveView] = useState("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editRepair, setEditRepair] = useState<Repair | null>(null);
@@ -52,13 +51,15 @@ const Index = () => {
 
   const handleSave = async (data: Omit<Repair, "id"> & { id?: string }, payment?: PaymentDraft) => {
     const isNew = !editRepair;
-    let savedRepair: Repair;
-    if (data.id) {
-      savedRepair = { ...data, id: data.id } as Repair;
-    } else {
-      savedRepair = { ...data, id: generateId(repairs) } as Repair;
+    let savedRepair: Repair = { ...data, id: data.id || "" } as Repair;
+    // Orden nueva (no reabierta): el número lo da la nube, así dos equipos no repiten el mismo.
+    if (isNew && !String(data.id || "").includes("-R")) {
+      const asignado = await nextRepairId();
+      if (data.id && asignado !== data.id) toast.info(`El número asignado es ${asignado}`);
+      savedRepair = { ...data, id: asignado } as Repair;
     }
-    await saveRepair(savedRepair);
+    // Se compara con cómo estaba la orden al abrirla para guardar solo lo que cambió.
+    savedRepair = await saveRepair(savedRepair, editRepair);
     if (payment) {
       try {
         await recordPayment(savedRepair.id, payment);
@@ -83,8 +84,8 @@ const Index = () => {
   };
 
   const handleStatusSave = async (updatedRepair: Repair) => {
-    await saveRepair(updatedRepair);
-    setStatusRepair(updatedRepair);
+    const guardada = await saveRepair(updatedRepair, statusRepair);
+    setStatusRepair(guardada);
   };
 
   const openEdit = (r: Repair) => {
