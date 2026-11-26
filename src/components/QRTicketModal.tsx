@@ -7,6 +7,7 @@ import { toBlob } from "html-to-image";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { getTrackUrl } from "@/lib/public-url";
+import { getNegocio } from "@/lib/config";
 import { repairTotal, repairMessage, smsLink, shareReceipt } from "@/lib/repair-sharing";
 
 interface QRTicketModalProps {
@@ -21,6 +22,8 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
   const [imageError, setImageError] = useState(false);
   const [shareOptions, setShareOptions] = useState(false);
   const trackUrl = repair ? getTrackUrl(repair) : "";
+  // Datos del negocio que se configuran en Ajustes › Datos del negocio.
+  const negocio = getNegocio();
   const file = image?.repair === repair ? image.file : null;
 
   useEffect(() => {
@@ -61,7 +64,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
 
   const share = async () => {
     if (!repair || !file) return;
-    const result = await shareReceipt(navigator, file, `Super Mobile Game Fix ${repair.id}`, repairMessage(repair, trackUrl), trackUrl);
+    const result = await shareReceipt(navigator, file, `${negocio.nombre} ${repair.id}`, repairMessage(repair, trackUrl), trackUrl);
     if (result === "options") setShareOptions(true);
   };
 
@@ -79,7 +82,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
             <h3 className="font-semibold text-sm">Compartir registro</h3>
             <Button asChild variant="secondary" className="w-full"><a href={`https://wa.me/?text=${encodeURIComponent(repairMessage(repair, trackUrl))}`} target="_blank" rel="noopener noreferrer">WhatsApp</a></Button>
             {sms && <Button asChild variant="secondary" className="w-full"><a href={sms}><MessageSquare />Mensaje de texto</a></Button>}
-            <Button asChild variant="secondary" className="w-full"><a href={`mailto:${encodeURIComponent(repair.email || "")}?subject=${encodeURIComponent(`Super Mobile Game Fix ${repair.id}`)}&body=${encodeURIComponent(repairMessage(repair, trackUrl))}`}>Correo electrónico</a></Button>
+            <Button asChild variant="secondary" className="w-full"><a href={`mailto:${encodeURIComponent(repair.email || "")}?subject=${encodeURIComponent(`${negocio.nombre} ${repair.id}`)}&body=${encodeURIComponent(repairMessage(repair, trackUrl))}`}>Correo electrónico</a></Button>
             <Button variant="outline" className="w-full" onClick={async () => {
               try { await navigator.clipboard.writeText(repairMessage(repair, trackUrl)); toast.success("Registro copiado"); setShareOptions(false); }
               catch { toast.error("No se pudo copiar el registro"); }
@@ -94,11 +97,12 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
       {imageError && <p role="alert" className="text-destructive mb-3 print:hidden">No se pudo generar la imagen. Cierra y vuelve a abrir el comprobante.</p>}
       <div ref={ticketRef} className="repair-receipt w-full max-w-lg overflow-hidden shrink-0" id="print-ticket">
         <header className="px-6 py-5 border-b border-inherit break-words">
-          <h2 className="text-xl font-bold">Súper Mobile Tech Repair</h2>
+          <h2 className="text-xl font-bold">{negocio.nombre}</h2>
           <address className="not-italic text-sm mt-2 space-y-1">
-            <p>PR-185 Km 5.0, Campo Rico, Canóvanas</p>
-            <p>Tel: 9394848958</p>
-            <p>reparaciondecelularespr.com</p>
+            {negocio.direccion && <p>{negocio.direccion}</p>}
+            {negocio.telefono && <p>Tel: {negocio.telefono}</p>}
+            {negocio.web && <p>{negocio.web}</p>}
+            {negocio.correo && <p>{negocio.correo}</p>}
           </address>
           <p className="text-xl font-bold text-center mt-5">FACTURA DE SERVICIO</p>
           <p className="text-xs text-center mt-1">Comprobante de reparación</p>
@@ -128,7 +132,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
           <dl className="space-y-2 text-sm">{costs.map(([label, amount]) => <div key={label} className="flex justify-between gap-3"><dt>{label}</dt><dd className="shrink-0">{amount < 0 ? "−" : ""}${Math.abs(amount).toFixed(2)}</dd></div>)}
             <div className="flex justify-between gap-3 border-t border-inherit pt-3 font-bold text-lg"><dt>Total</dt><dd>${repairTotal(repair).toFixed(2)}</dd></div>
           </dl>
-          <p className="text-xs mt-3">Presupuesto de servicio; no acredita pago ni sustituye una factura fiscal.</p>
+          {negocio.notaFactura && <p className="text-xs mt-3 whitespace-pre-wrap">{negocio.notaFactura}</p>}
         </section>
         <div className="px-6 py-5 flex flex-col items-center gap-3">
           <QRCodeSVG value={trackUrl} size={160} level="H" />
@@ -138,7 +142,7 @@ const QRTicketModal = ({ repair, open, onClose }: QRTicketModalProps) => {
             catch { toast.error("No se pudo copiar el enlace"); }
           }}><LinkIcon />Copiar enlace</Button>
         </div>
-        <footer className="px-6 py-3 border-t border-inherit text-center text-xs font-semibold">Super Mobile Game Fix · {repair.id}</footer>
+        <footer className="px-6 py-3 border-t border-inherit text-center text-xs font-semibold">{negocio.nombre} · {repair.id}</footer>
       </div>
     </div>
   );
