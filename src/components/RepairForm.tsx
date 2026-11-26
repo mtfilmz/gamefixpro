@@ -210,7 +210,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
           <fieldset disabled={saving} className="space-y-6 min-w-0">
             {/* SECCIÓN 1 - Datos del Cliente */}
             <section>
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📋 Datos del Cliente</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Datos del Cliente</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
                   {editRepair ? (
@@ -274,7 +274,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
 
             {/* SECCIÓN 2 - Datos de la Consola */}
             <section>
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">🎮 Datos de la Consola</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Datos de la Consola</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <select value={marca} onChange={(e) => setMarca(e.target.value)} className={inputClass}>
                   {marcas.map((m) => (
@@ -321,7 +321,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
 
             {/* SECCIÓN 3 - Problemas */}
             <section>
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">⚠️ Problemas Reportados</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Problemas Reportados</h3>
               {errors.problemas && <p className="text-destructive text-xs mb-2">{errors.problemas}</p>}
               <div className="grid grid-cols-2 gap-2">
                 {PROBLEMAS_OPTIONS.map((p) => (
@@ -347,7 +347,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
 
             {/* SECCIÓN 4 - Fotos del Equipo */}
             <section>
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📷 Fotos del Equipo</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Fotos del Equipo</h3>
               <p className="text-xs text-muted-foreground mb-2">
                 Toma o sube fotos del estado actual del equipo como evidencia.
               </p>
@@ -356,7 +356,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
 
             {/* SECCIÓN 5 - Detalles */}
             <section>
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📝 Detalles Adicionales</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Detalles Adicionales</h3>
               <textarea
                 placeholder="Notas libres, observaciones, detalles del problema..."
                 value={detalles}
@@ -369,7 +369,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
 
             {/* SECCIÓN 6 - Costos */}
             <section>
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">💰 Costos</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Costos</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">Costo de Diagnóstico</label>
@@ -529,7 +529,7 @@ const RepairForm = ({ open, onClose, onSave, editRepair, prefillRepair, repairs 
             {/* SECCIÓN 5 - Estado y QR */}
             <section>
               <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">
-                🔧 Estado e Identificación
+                Estado e Identificación
               </h3>
               <div className="flex flex-col sm:flex-row gap-4 items-start">
                 <div className="flex-1 space-y-3 w-full">
