@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getConfig, saveConfig, resetConfig, AppConfig, fetchRemoteConfig, saveRemoteConfig } from "@/lib/config";
+import { getConfig, saveConfig, resetConfig, AppConfig, Negocio, fetchRemoteConfig, saveRemoteConfig } from "@/lib/config";
 import {
   Palette,
   Plug,
@@ -17,6 +17,13 @@ import {
   ChevronRight,
   AlertTriangle,
   RefreshCw,
+  Store,
+  Gamepad2,
+  Tag,
+  Package,
+  Wrench,
+  History,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "@/hooks/use-toast";
@@ -77,7 +84,7 @@ const AparienciaSection = () => {
       </div>
       <div className="p-3 space-y-2">
         <p className="text-xs text-muted-foreground">
-          Elige cómo se ve Game Fix en este equipo. El cambio es inmediato.
+          Elige cómo se ve Gaming Fix en este equipo. El cambio es inmediato.
         </p>
         <div role="radiogroup" aria-label="Tema de la app" className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {TEMAS.map((t) => (
@@ -131,7 +138,7 @@ const ForceUpdateSection = () => {
   return (
     <div className="border border-border rounded-xl overflow-hidden">
       <div className="w-full flex items-center gap-2 px-4 py-3 bg-muted/30">
-        <span className="text-sm">🔄</span>
+        <RefreshCw className="w-4 h-4 text-primary" />
         <span className="font-bold text-sm text-foreground flex-1">Forzar Actualización</span>
       </div>
       <div className="p-3 space-y-2">
@@ -153,12 +160,12 @@ const inputClass =
 
 interface EditableListProps {
   title: string;
-  icon: string;
+  icon?: LucideIcon;
   items: string[];
   onChange: (items: string[]) => void;
 }
 
-const EditableList = ({ title, icon, items, onChange }: EditableListProps) => {
+const EditableList = ({ title, icon: Icon, items, onChange }: EditableListProps) => {
   const [newItem, setNewItem] = useState("");
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editVal, setEditVal] = useState("");
@@ -215,7 +222,7 @@ const EditableList = ({ title, icon, items, onChange }: EditableListProps) => {
         ) : (
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         )}
-        <span className="text-sm">{icon}</span>
+        {Icon ? <Icon className="w-4 h-4 text-primary" /> : null}
         <span className="font-bold text-sm text-foreground flex-1">{title}</span>
         <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{items.length}</span>
       </button>
@@ -330,7 +337,7 @@ const ModelosEditor = ({ marcas, modelosPorMarca, onChange }: ModelosEditorProps
         ) : (
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         )}
-        <span className="text-sm">🎮</span>
+        <Gamepad2 className="w-4 h-4 text-primary" />
         <span className="font-bold text-sm text-foreground flex-1">Modelos por Marca</span>
       </button>
 
@@ -340,7 +347,7 @@ const ModelosEditor = ({ marcas, modelosPorMarca, onChange }: ModelosEditorProps
             <EditableList
               key={marca}
               title={marca}
-              icon="📦"
+              icon={Package}
               items={modelosPorMarca[marca] || []}
               onChange={(models) => handleModelsChange(marca, models)}
             />
@@ -354,12 +361,78 @@ const ModelosEditor = ({ marcas, modelosPorMarca, onChange }: ModelosEditorProps
   );
 };
 
+const NegocioSection = ({ negocio, editable, onSave }: { negocio: Negocio; editable: boolean; onSave: (n: Negocio) => void }) => {
+  const [form, setForm] = useState<Negocio>(negocio);
+  useEffect(() => setForm(negocio), [negocio]);
+  const campos: [keyof Negocio, string, string][] = [
+    ["nombre", "Nombre del negocio", "Super Mobile Tech Repair"],
+    ["direccion", "Dirección", "Calle, pueblo"],
+    ["telefono", "Teléfono", "787-000-0000"],
+    ["web", "Página web", "minegocio.com"],
+    ["correo", "Correo", "correo@minegocio.com"],
+    ["notaFactura", "Nota al final de la factura", "Ej.: Garantía de 30 días en la reparación"],
+  ];
+  const cambiado = JSON.stringify(form) !== JSON.stringify(negocio);
+  return (
+    <div className="border border-border rounded-xl overflow-hidden">
+      <div className="w-full flex items-center gap-2 px-4 py-3 bg-muted/30">
+        <Store className="w-4 h-4 text-primary" />
+        <span className="font-bold text-sm text-foreground flex-1">Datos del negocio</span>
+      </div>
+      <div className="p-3 space-y-3">
+        <p className="text-xs text-muted-foreground">
+          Así sale tu negocio en las facturas, en los mensajes y en la página que ve el cliente.
+          {editable ? "" : " Solo un administrador puede cambiarlos."}
+        </p>
+        {campos.map(([key, label, ph]) => (
+          <label key={key} className="block space-y-1">
+            <span className="text-xs font-semibold text-foreground">{label}</span>
+            {key === "notaFactura" ? (
+              <textarea
+                value={form[key]}
+                disabled={!editable}
+                placeholder={ph}
+                rows={2}
+                maxLength={300}
+                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                className={inputClass}
+              />
+            ) : (
+              <input
+                value={form[key]}
+                disabled={!editable}
+                placeholder={ph}
+                maxLength={120}
+                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                className={inputClass}
+              />
+            )}
+          </label>
+        ))}
+        {editable && (
+          <Button
+            size="sm"
+            disabled={!cambiado || !form.nombre.trim()}
+            onClick={() => onSave({ ...form, nombre: form.nombre.trim() })}
+            className="gap-1.5"
+          >
+            <Check className="w-3.5 h-3.5" />
+            Guardar datos del negocio
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 interface ConfigPanelProps {
   repairs?: Repair[];
   onDeleteRepairs?: (ids: string[]) => void;
+  /** Abre el historial de actividad (solo administradores). */
+  onOpenActividad?: () => void;
 }
 
-const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
+const ConfigPanel = ({ repairs = [], onDeleteRepairs, onOpenActividad }: ConfigPanelProps) => {
   const [config, setConfig] = useState<AppConfig>(getConfig);
   const [section, setSection] = useState<"general" | "conexiones">("general");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -409,7 +482,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
   return (
     <div className="space-y-4 max-w-2xl">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">⚙️ Configuración</h2>
+        <h2 className="text-lg font-bold text-foreground">Ajustes</h2>
         <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5">
           <RotateCcw className="w-3.5 h-3.5" />
           Restablecer
@@ -471,7 +544,28 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
           <div className="space-y-3">
             <AparienciaSection />
 
-            <EditableList title="Marcas" icon="🏷️" items={config.marcas} onChange={handleMarcasChange} />
+            <NegocioSection
+              negocio={config.negocio}
+              editable={isAdmin}
+              onSave={(negocio) => {
+                update({ negocio });
+                toast({ title: "Datos del negocio guardados" });
+              }}
+            />
+
+            {isAdmin && onOpenActividad && (
+              <button
+                type="button"
+                onClick={onOpenActividad}
+                className="w-full border border-border rounded-xl px-4 py-3 bg-muted/30 hover:bg-muted/50 transition-colors flex items-center gap-2 text-left"
+              >
+                <History className="w-4 h-4 text-primary" />
+                <span className="font-bold text-sm text-foreground flex-1">Historial de actividad</span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+
+            <EditableList title="Marcas" icon={Tag} items={config.marcas} onChange={handleMarcasChange} />
 
             <ModelosEditor
               marcas={config.marcas}
@@ -481,28 +575,28 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
 
             <EditableList
               title="Problemas Reportados"
-              icon="⚠️"
+              icon={AlertTriangle}
               items={config.problemas}
               onChange={(problemas) => update({ problemas })}
             />
 
             <EditableList
               title="Estados de Reparación"
-              icon="🔧"
+              icon={Wrench}
               items={config.estados}
               onChange={(estados) => update({ estados })}
             />
 
             <EditableList
               title="Colores Preset"
-              icon="🎨"
+              icon={Palette}
               items={config.coloresPreset}
               onChange={(coloresPreset) => update({ coloresPreset })}
             />
 
             <EditableList
               title="Accesorios Preset"
-              icon="🔌"
+              icon={Plug}
               items={config.accesoriosPreset}
               onChange={(accesoriosPreset) => update({ accesoriosPreset })}
             />
@@ -510,7 +604,7 @@ const ConfigPanel = ({ repairs = [], onDeleteRepairs }: ConfigPanelProps) => {
             {/* Data Management Section */}
             <div className="border border-border rounded-xl overflow-hidden">
               <div className="w-full flex items-center gap-2 px-4 py-3 bg-muted/30">
-                <span className="text-sm">🗑️</span>
+                <Trash2 className="w-4 h-4 text-primary" />
                 <span className="font-bold text-sm text-foreground flex-1">Gestión de Equipos Registrados</span>
                 <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                   {repairs.length}
