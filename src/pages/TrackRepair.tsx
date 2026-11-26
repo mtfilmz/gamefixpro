@@ -18,6 +18,8 @@ interface PublicRepair {
   costoComponente?: number;
   /** Enlace de antes (con el número de orden): solo trae el estado. */
   legacy?: boolean;
+  /** Datos del negocio (Ajustes › Datos del negocio). */
+  negocio?: { nombre?: string; telefono?: string; web?: string };
 }
 
 const estadoColors: Record<string, string> = {
@@ -61,7 +63,7 @@ const TrackRepair = () => {
 
   useEffect(() => {
     if (!id) return;
-    document.title = "Estado de Reparación | Super Mobile Game Fix";
+    document.title = "Estado de reparación";
 
     // Enlace nuevo: código secreto de la orden. Enlace de antes: número de orden (#055), que solo muestra el estado.
     const esViejo = id.startsWith("#");
@@ -128,13 +130,18 @@ const TrackRepair = () => {
   const currentIdx = estadoOrder.indexOf(pasoDeEstado[repair.estado] ?? repair.estado);
   const total = (repair.costoReparacion || 0) + (repair.costoComponente || 0) - (repair.costoDiagnostico || 0);
   const hasCosts = repair.costoDiagnostico != null || repair.costoReparacion != null || repair.costoComponente != null;
+  const negocio = {
+    nombre: repair.negocio?.nombre || "Super Mobile Tech Repair",
+    telefono: repair.negocio?.telefono || "",
+    web: repair.negocio?.web || "",
+  };
 
   return (
     <div className="min-h-screen bg-background pb-12">
       {/* Header */}
       <header className="bg-primary px-6 py-6 text-center">
         <h1 className="text-2xl md:text-3xl font-black text-primary-foreground tracking-wider">
-          Super Mobile Game Fix
+          {negocio.nombre}
         </h1>
         <p className="text-primary-foreground/80 text-sm mt-1">Seguimiento de Reparación</p>
       </header>
@@ -142,7 +149,7 @@ const TrackRepair = () => {
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-5">
         {repair.legacy && (
           <section className="bg-card border border-border rounded-xl p-4 text-sm text-foreground shadow-sm">
-            Este enlace es de antes: aquí solo se ve el estado de tu equipo. Para ver las fotos y los costos, pide el enlace nuevo a la tienda al 787-500-1324.
+            Este enlace es de antes: aquí solo se ve el estado de tu equipo. Para ver las fotos y los costos, pide el enlace nuevo a la tienda{negocio.telefono ? " al " + negocio.telefono : ""}.
           </section>
         )}
         {/* Order ID + Current Status */}
@@ -302,11 +309,13 @@ const TrackRepair = () => {
 
         {/* Footer */}
         <footer className="text-center text-xs text-muted-foreground pt-4">
-          <a href="tel:7875001324" className="inline-flex items-center gap-1.5 text-primary font-medium">
-            <Phone className="w-3.5 h-3.5" />
-            787-500-1324
-          </a>
-          <div className="mt-1">Super Mobile Game Fix · www.gamefixpro.com</div>
+          {negocio.telefono && (
+            <a href={"tel:" + negocio.telefono.replace(/[^\d+]/g, "")} className="inline-flex items-center gap-1.5 text-primary font-medium">
+              <Phone className="w-3.5 h-3.5" />
+              {negocio.telefono}
+            </a>
+          )}
+          <div className="mt-1">{[negocio.nombre, negocio.web].filter(Boolean).join(" · ")}</div>
         </footer>
       </main>
 
