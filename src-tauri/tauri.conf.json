@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Super Mobile Game Fix",
+        "title": "Gaming Fix",
         "width": 1320,
         "height": 860,
         "minWidth": 380,
@@ -33,7 +33,7 @@
     ],
     "publisher": "Super Mobile Tech Repair",
     "shortDescription": "Reparaciones de consolas, clientes y pagos",
-    "longDescription": "Super Mobile Game Fix: reparaciones de consolas, clientes y pagos, conectado a FinTrack y a Cobro.",
+    "longDescription": "Gaming Fix: reparaciones de consolas, clientes y pagos, conectado a FinTrack y a Cobro.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
