@@ -115,7 +115,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
           <div className="space-y-5">
             {/* Equipment Info */}
             <section className="bg-muted/30 border border-border rounded-lg p-4">
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📋 Información del Equipo</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Información del Equipo</h3>
               <div className="grid grid-cols-2 gap-y-2 text-sm">
                 <span className="text-muted-foreground">ID:</span>
                 <span className="text-foreground font-bold">{repair.id}</span>
@@ -140,7 +140,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
 
             {/* Problems */}
             <section className="bg-muted/30 border border-border rounded-lg p-4">
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">⚠️ Problemas Reportados</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Problemas Reportados</h3>
               <ul className="space-y-1">
                 {(repair.problemas || []).map((p) => (
                   <li key={p} className="flex items-center gap-2 text-sm text-foreground">
@@ -157,14 +157,14 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
             {/* Photos */}
             {repair.imagenes && repair.imagenes.length > 0 && (
               <section className="bg-muted/30 border border-border rounded-lg p-4">
-                <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📷 Fotos del Equipo</h3>
+                <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Fotos del Equipo</h3>
                 <ImageUploader images={repair.imagenes} onChange={() => {}} readOnly />
               </section>
             )}
 
             {/* Timeline */}
             <section className="bg-muted/30 border border-border rounded-lg p-4">
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">🕐 Historial de Estados</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Historial de Estados</h3>
               {historial.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Sin cambios de estado registrados aún.</p>
               ) : (
@@ -205,7 +205,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
 
             {/* Select new status */}
             <section className="bg-muted/30 border border-border rounded-lg p-4">
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">🔄 Cambiar a:</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Cambiar a:</h3>
               <div className="grid grid-cols-1 gap-2">
                 {estados.map((e) => {
                   const isSelected = selectedEstado === e.value;
@@ -234,7 +234,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
 
             {/* Costs */}
             <section className="bg-muted/30 border border-border rounded-lg p-4">
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">💰 Costos</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Costos</h3>
               {repair.costoDiagnostico != null && (
                 <div className="flex justify-between items-center text-sm mb-2">
                   <span className="text-muted-foreground">Diagnóstico:</span>
@@ -293,7 +293,7 @@ const UpdateStatus = ({ repair, open, onClose, onSave, onShowQR }: UpdateStatusP
 
             {/* Notes */}
             <section className="bg-muted/30 border border-border rounded-lg p-4">
-              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">📝 Notas del cambio</h3>
+              <h3 className="text-primary font-bold text-sm mb-3 uppercase tracking-wide">Notas del cambio</h3>
               <textarea
                 placeholder="Agregar comentarios sobre la actualización (opcional)..."
                 value={nota}
