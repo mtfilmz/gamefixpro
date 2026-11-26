@@ -145,12 +145,16 @@ const Index = () => {
         <Header onRefresh={refreshRepairs} />
         <main className="flex-1 p-3 md:p-6 overflow-auto pb-[calc(7.5rem+env(safe-area-inset-bottom))] lg:pb-6">
           {activeView === "config" ? (
-            <ConfigPanel repairs={repairs} onDeleteRepairs={(ids) => setDeleteIds(ids)} />
+            <ConfigPanel
+              repairs={repairs}
+              onDeleteRepairs={(ids) => setDeleteIds(ids)}
+              onOpenActividad={() => setActiveView("actividad")}
+            />
           ) : activeView === "actividad" ? (
             <ActivityHistoryPage />
           ) : activeView === "clientes" ? (
             <ClientsPage repairs={repairs} />
-          ) : activeView === "historial" ? (
+          ) : activeView === "historial-completo" ? (
             <RepairTable
               repairs={repairs}
               onEdit={openEdit}
@@ -163,15 +167,15 @@ const Index = () => {
               onDetails={setDetailRepair}
               onDelete={requestDelete}
             />
-          ) : activeView === "buscar" ? (
+          ) : activeView === "historial" || activeView === "buscar" ? (
+            // Órdenes: todas las órdenes con el buscador arriba.
             <div>
               <div className="bg-card border border-border rounded-xl p-4 mb-4">
                 <label className="text-xs text-muted-foreground mb-1 block font-bold uppercase tracking-wide">
-                  Buscar reparación
+                  Buscar orden
                 </label>
                 <input
                   type="search"
-                  autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ID, cliente, teléfono, consola, número de serie..."
@@ -190,7 +194,7 @@ const Index = () => {
                 filterEstado={filterEstado}
                 onFilterChange={setFilterEstado}
                 searchQuery={searchQuery}
-                title="RESULTADOS"
+                title={searchQuery ? "RESULTADOS" : "ÓRDENES"}
                 onDetails={setDetailRepair}
                 onDelete={requestDelete}
               />
@@ -219,7 +223,7 @@ const Index = () => {
           )}
         </main>
         <footer className="text-center text-muted-foreground text-xs py-3 hidden lg:block">
-          Sistema de Gestión v1.0 | Super Mobile Game Fix
+          Gaming Fix
         </footer>
       </div>
 
