@@ -22,7 +22,7 @@ export default function TechClientConflicts() {
       const { error } = await supabase.rpc("resolve_tech_client_conflict", { p_id: id, p_use_remote: remote });
       if (error) throw error;
       await Promise.all([cache.invalidateQueries({ queryKey: ["tech-client-conflicts"] }), cache.invalidateQueries({ queryKey: ["clients"] })]);
-      toast.success(remote ? "Datos de COBRO aceptados" : "Datos de Game Fix conservados");
+      toast.success(remote ? "Datos de COBRO aceptados" : "Datos de Gaming Fix conservados");
     } catch { toast.error("No se resolvió el conflicto. Actualiza la lista y revisa los datos nuevamente."); }
     finally { setBusy(false); }
   };
@@ -34,10 +34,10 @@ export default function TechClientConflicts() {
       const remote = item.incoming as Record<string, string>;
       return <div key={item.id} className="record-highlight border-b border-border py-3 space-y-3">
         <h3 className="font-semibold break-words">{local.cliente}</h3>
-        <div className="grid grid-cols-2 gap-3 text-sm"><strong>Game Fix</strong><strong>COBRO</strong>
+        <div className="grid grid-cols-2 gap-3 text-sm"><strong>Gaming Fix</strong><strong>COBRO</strong>
           {Object.entries(fields).map(([key, label]) => <div key={key} className="col-span-2 grid grid-cols-2 gap-3"><div className="min-w-0 break-words"><span className="text-muted-foreground">{label}: </span>{local[key] || "—"}</div><div className="min-w-0 break-words">{remote[key] || "—"}</div></div>)}
         </div>
-        <div className="flex flex-wrap gap-2"><Button variant="outline" disabled={busy} onClick={() => void resolve(item.id, false)}>Conservar Game Fix</Button><Button disabled={busy} onClick={() => void resolve(item.id, true)}>Aceptar COBRO</Button></div>
+        <div className="flex flex-wrap gap-2"><Button variant="outline" disabled={busy} onClick={() => void resolve(item.id, false)}>Conservar Gaming Fix</Button><Button disabled={busy} onClick={() => void resolve(item.id, true)}>Aceptar COBRO</Button></div>
       </div>;
     })}
   </section>;
