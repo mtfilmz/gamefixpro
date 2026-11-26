@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, LogOut, RefreshCw } from "lucide-react";
+import { Download, LogOut, RefreshCw, Gamepad2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { canInstall, promptInstall } from "@/lib/pwa-utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -31,9 +31,9 @@ const Header = ({ onRefresh }: HeaderProps) => {
 
   return (
     <header className="w-full bg-primary py-3 px-4 md:px-6 flex items-center gap-3">
-      <span className="text-xl font-bold text-primary-foreground hidden md:inline">[&gt;]</span>
+      <Gamepad2 className="w-6 h-6 text-primary-foreground hidden md:inline shrink-0" aria-hidden="true" />
       <h1 className="text-base md:text-xl font-bold text-primary-foreground min-w-0 break-words flex-1">
-        Super Mobile Game Fix
+        Gaming Fix
       </h1>
       {user && (
         <button
@@ -44,7 +44,7 @@ const Header = ({ onRefresh }: HeaderProps) => {
           className="text-primary-foreground/70 text-xs hidden sm:inline truncate max-w-[200px] hover:text-primary-foreground cursor-pointer"
           title="Clic para copiar tu ID de usuario"
         >
-          {user.email} 📋
+          {user.email} <Copy className="inline w-3 h-3 ml-1 -mt-0.5" aria-hidden="true" />
         </button>
       )}
       {onRefresh && (
