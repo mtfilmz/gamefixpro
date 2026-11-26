@@ -43,11 +43,12 @@
 
     --radius: 0.75rem;
 
-    --status-pending: 0 72% 63%;
-    --status-diagnostic: 32 100% 50%;
-    --status-repairing: 213 100% 56%;
-    --status-repaired: 145 63% 50%;
-    --status-delivered: 180 70% 50%;
+    /* Colores de los estados: más oscuros para que el texto blanco se lea bien (contraste 4.6:1 o más). */
+    --status-pending: 0 72% 52%;
+    --status-diagnostic: 32 100% 35%;
+    --status-repairing: 213 100% 48%;
+    --status-repaired: 145 63% 32%;
+    --status-delivered: 180 70% 30%;
 
     --stat-pending: 0 72% 63%;
     --stat-repairing: 170 56% 55%;
