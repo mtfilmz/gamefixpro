@@ -112,7 +112,7 @@ const UserRolesPanel = () => {
         </div>
         <div className="min-w-0">
           <h2 className="text-lg font-bold text-foreground leading-tight">Usuarios y permisos</h2>
-          <p className="text-xs text-muted-foreground">Decide quién entra a Game Fix y qué rol tiene.</p>
+          <p className="text-xs text-muted-foreground">Decide quién entra a Gaming Fix y qué rol tiene.</p>
         </div>
       </header>
 
@@ -124,7 +124,7 @@ const UserRolesPanel = () => {
         </div>
         <div className="p-4 space-y-4">
           <ol className="text-xs text-muted-foreground space-y-1 list-decimal pl-4">
-            <li>La persona inicia sesión en Game Fix con su cuenta.</li>
+            <li>La persona inicia sesión en Gaming Fix con su cuenta.</li>
             <li>Toca su ID arriba, en el encabezado, para copiarlo y te lo envía.</li>
             <li>Lo pegas aquí, eliges el rol y tocas Asignar rol.</li>
           </ol>
