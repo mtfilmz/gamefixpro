@@ -1,5 +1,5 @@
-Game Fix: más seguro y sin choques entre equipos.
-- El enlace y el QR del cliente llevan un código secreto: nadie puede ver otra orden cambiando el número.
-- El número de las órdenes nuevas lo da la nube: dos equipos nunca repiten el mismo.
-- Al guardar se manda solo lo que cambiaste, sin borrar lo que cambió otro equipo (ni el historial).
-- Las fotos se ven con enlaces que duran 1 hora y cargan más rápido.
+Gaming Fix: nueva imagen, más clara y profesional.
+- La app se llama Gaming Fix.
+- Ajustes › Datos del negocio: cambia el nombre, teléfono, web, dirección, correo y la nota que salen en las facturas, los mensajes y la página del cliente.
+- Barra de abajo con 4 secciones: Inicio, Órdenes (con el buscador), Clientes y Ajustes. El historial de actividad está en Ajustes.
+- Sin emojis y con colores de estados que se leen mejor.
