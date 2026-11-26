@@ -1,5 +1,5 @@
 import { Repair } from "@/types/repair";
-import { Phone, Eye, Trash2 } from "lucide-react";
+import { Phone, Eye, Trash2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export type FinTrackState = "synced" | "pending" | "none";
@@ -142,7 +142,8 @@ const MobileRepairCard = ({
             onClick={() => onReopen(repair)}
             className="basis-full bg-status-pending text-primary-foreground text-xs font-bold py-3 rounded-lg active:scale-95 transition-transform min-h-[44px]"
           >
-            🔄 REABRIR CASO
+            <RotateCcw className="inline w-4 h-4 mr-1 -mt-0.5" aria-hidden="true" />
+            REABRIR CASO
           </button>
         )}
       </div>
