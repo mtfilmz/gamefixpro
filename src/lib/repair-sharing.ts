@@ -1,4 +1,5 @@
 import { Repair } from "@/types/repair";
+import { getNegocio } from "@/lib/config";
 
 // A share action must never download as a fallback.
 export async function shareReceipt(api: Partial<Pick<Navigator, "share" | "canShare">>, file: File, title: string, text: string, url: string): Promise<"shared" | "options" | "cancelled"> {
@@ -17,7 +18,7 @@ export function repairTotal(repair: Repair): number {
 }
 
 export function repairMessage(repair: Repair, url: string): string {
-  return `Super Mobile Game Fix — ${repair.id}\nCliente: ${repair.cliente}\nEquipo: ${repair.marca} — ${repair.consola}\nEstado: ${repair.estado}\nTotal presupuestado: $${repairTotal(repair).toFixed(2)}\nSeguimiento: ${url}`;
+  return `${getNegocio().nombre} — ${repair.id}\nCliente: ${repair.cliente}\nEquipo: ${repair.marca} — ${repair.consola}\nEstado: ${repair.estado}\nTotal presupuestado: $${repairTotal(repair).toFixed(2)}\nSeguimiento: ${url}`;
 }
 
 export function smsLink(phone: string, message: string, userAgent: string): string | null {
