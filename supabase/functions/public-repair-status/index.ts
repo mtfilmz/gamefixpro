@@ -27,10 +27,19 @@ Deno.serve(async (req) => {
     const { data, error } = await (code ? consulta.eq("tracking_code", code) : consulta.eq("id", viejo)).maybeSingle();
     if (error || !data) return json({ error: "Reparación no encontrada" }, 404);
 
+    // Datos del negocio que se configuran en la app (Ajustes › Datos del negocio).
+    const { data: ajustes } = await db.from("app_settings").select("config").eq("singleton_key", true).maybeSingle();
+    const n = ((ajustes?.config as any)?.negocio ?? {}) as Record<string, string>;
+    const negocio = {
+      nombre: n.nombre || "Super Mobile Tech Repair",
+      telefono: n.telefono || "787-500-1324",
+      web: n.web || "reparaciondecelularespr.com",
+    };
+
     if (!code) {
       return json({
         legacy: true, id: data.id, cliente: "", marca: data.marca, consola: data.consola,
-        estado: data.estado, fecha: data.fecha, problemas: [], historial: data.historial ?? [], imagenes: [],
+        estado: data.estado, fecha: data.fecha, problemas: [], historial: data.historial ?? [], imagenes: [], negocio,
       });
     }
 
@@ -59,6 +68,7 @@ Deno.serve(async (req) => {
       id: data.id, cliente, marca: data.marca, consola: data.consola, estado: data.estado, fecha: data.fecha,
       problemas: data.problemas, historial: data.historial, imagenes: fotos,
       costoDiagnostico: data.costo_diagnostico, costoReparacion: data.costo_reparacion, costoComponente: data.costo_componente,
+      negocio,
     });
   } catch {
     return json({ error: "No se pudo cargar la reparación" }, 500);
