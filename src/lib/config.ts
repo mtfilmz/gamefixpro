@@ -1,5 +1,24 @@
 const CONFIG_KEY = "gamefixpro_config";
 
+/** Datos del negocio que salen en las facturas, los mensajes y la página del cliente. */
+export interface Negocio {
+  nombre: string;
+  direccion: string;
+  telefono: string;
+  web: string;
+  correo: string;
+  notaFactura: string;
+}
+
+export const negocioPorDefecto: Negocio = {
+  nombre: "Super Mobile Tech Repair",
+  direccion: "PR-185 Km 5.0, Campo Rico, Canóvanas",
+  telefono: "787-500-1324",
+  web: "reparaciondecelularespr.com",
+  correo: "",
+  notaFactura: "Presupuesto de servicio; no acredita pago ni sustituye una factura fiscal.",
+};
+
 export interface AppConfig {
   marcas: string[];
   modelosPorMarca: Record<string, string[]>;
@@ -7,6 +26,7 @@ export interface AppConfig {
   estados: string[];
   coloresPreset: string[];
   accesoriosPreset: string[];
+  negocio: Negocio;
 }
 
 const defaultConfig: AppConfig = {
@@ -33,16 +53,26 @@ const defaultConfig: AppConfig = {
   estados: ["PENDIENTE", "DIAGNÓSTICO", "EN REPARACIÓN", "REPARADO", "ENTREGADO"],
   coloresPreset: ["Negro", "Blanco", "Gris", "Azul", "Rojo", "Neón"],
   accesoriosPreset: ["1 Control", "2 Controles", "Dock", "Joy-Cons", "Cable HDMI", "Fuente de poder", "Ninguno"],
+  negocio: negocioPorDefecto,
 };
+
+// Une lo guardado con los valores por defecto (también dentro de los datos del negocio).
+function completar(guardado: Partial<AppConfig> | null | undefined): AppConfig {
+  const g = guardado || {};
+  return { ...defaultConfig, ...g, negocio: { ...negocioPorDefecto, ...(g.negocio || {}) } };
+}
+
+export function getNegocio(): Negocio {
+  return getConfig().negocio;
+}
 
 export function getConfig(): AppConfig {
   const data = localStorage.getItem(CONFIG_KEY);
-  if (!data) return { ...defaultConfig };
+  if (!data) return completar(null);
   try {
-    const parsed = JSON.parse(data);
-    return { ...defaultConfig, ...parsed };
+    return completar(JSON.parse(data));
   } catch {
-    return { ...defaultConfig };
+    return completar(null);
   }
 }
 
@@ -52,7 +82,7 @@ export function saveConfig(config: AppConfig) {
 
 export function resetConfig(): AppConfig {
   localStorage.removeItem(CONFIG_KEY);
-  return { ...defaultConfig };
+  return completar(null);
 }
 
 // Cloud sync: settings live in the shared app_settings row so they persist across devices/sessions.
@@ -61,7 +91,7 @@ import { supabase } from "@/integrations/supabase/client";
 export async function fetchRemoteConfig(): Promise<AppConfig | null> {
   const { data, error } = await supabase.from("app_settings").select("config").eq("singleton_key", true).maybeSingle();
   if (error || !data?.config) return null;
-  const merged = { ...defaultConfig, ...(data.config as Partial<AppConfig>) };
+  const merged = completar(data.config as Partial<AppConfig>);
   try { localStorage.setItem(CONFIG_KEY, JSON.stringify(merged)); } catch { /* ignore */ }
   return merged;
 }
