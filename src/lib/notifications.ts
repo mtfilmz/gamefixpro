@@ -32,14 +32,14 @@ export function sendLocalNotification(title: string, options?: NotificationOptio
 }
 
 export function notifyStatusChange(repairId: string, cliente: string, newStatus: string) {
-  sendLocalNotification(`🎮 ${repairId} - Estado Actualizado`, {
+  sendLocalNotification(`${repairId} · Estado actualizado`, {
     body: `La reparación de ${cliente} cambió a: ${newStatus}`,
     tag: `status-${repairId}`,
   });
 }
 
 export function notifyNewRepair(repairId: string, cliente: string) {
-  sendLocalNotification(`🆕 Nueva Reparación ${repairId}`, {
+  sendLocalNotification(`Nueva orden ${repairId}`, {
     body: `Equipo de ${cliente} registrado correctamente`,
     tag: `new-${repairId}`,
   });
