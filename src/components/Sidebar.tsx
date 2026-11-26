@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import { EstadoReparacion } from "@/types/repair";
-import { Camera } from "lucide-react";
-import { Users, History } from "lucide-react";
+import { Camera, Home, ClipboardList, Users, History, Settings, Plus } from "lucide-react";
 import { useRole } from "@/hooks/use-role";
 import { Button } from "@/components/ui/button";
 
@@ -32,11 +31,11 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
   };
 
   const menuItems = [
-    { key: "dashboard", label: "Dashboard", icon: ">>" },
-    { key: "historial", label: "Historial", icon: "||" },
-    { key: "clientes", label: "Clientes", icon: "" },
-    ...(isAdmin ? [{ key: "actividad", label: "Historial", icon: "" }] : []),
-    { key: "config", label: "Configuración", icon: "*" },
+    { key: "dashboard", label: "Inicio", icon: Home, tambien: [] as string[] },
+    { key: "historial", label: "Órdenes", icon: ClipboardList, tambien: ["buscar"] },
+    { key: "clientes", label: "Clientes", icon: Users, tambien: [] as string[] },
+    ...(isAdmin ? [{ key: "actividad", label: "Actividad", icon: History, tambien: [] as string[] }] : []),
+    { key: "config", label: "Ajustes", icon: Settings, tambien: [] as string[] },
   ];
 
   return (
@@ -59,9 +58,10 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
 
       <button
         onClick={onNewRecord}
-        className="text-foreground font-bold text-sm hover:text-primary transition-colors"
+        className="text-foreground font-bold text-sm hover:text-primary transition-colors inline-flex items-center gap-1.5"
       >
-        + Nuevo Registro
+        <Plus className="h-4 w-4" />
+        Nueva orden
       </button>
 
       <nav className="flex flex-col gap-2 w-full px-4 mt-4">
@@ -70,13 +70,14 @@ const Sidebar = ({ activeView, onViewChange, onNewRecord }: SidebarProps) => {
             variant="ghost"
             key={item.key}
             onClick={() => onViewChange(item.key)}
-            className={`w-full py-2.5 px-4 rounded-lg text-sm font-bold text-left transition-colors ${
-              activeView === item.key
+            className={`w-full justify-start gap-2 py-2.5 px-4 rounded-lg text-sm font-bold text-left transition-colors ${
+              activeView === item.key || item.tambien.includes(activeView)
                 ? "bg-primary text-primary-foreground"
                 : "text-foreground hover:bg-muted"
             }`}
           >
-            {item.key === "clientes" ? <Users className="h-4 w-4" /> : item.key === "actividad" ? <History className="h-4 w-4" /> : item.icon} {item.label}
+            <item.icon className="h-4 w-4" />
+            {item.label}
           </Button>
         ))}
       </nav>
