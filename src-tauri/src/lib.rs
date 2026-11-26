@@ -146,14 +146,14 @@ async fn buscar_actualizacion(app: tauri::AppHandle) {
     let Ok(updater) = app.updater() else { return };
     let Ok(Some(update)) = updater.check().await else { return };
     let texto = format!(
-        "Hay una versión nueva de Game Fix: {}.\n\n{}\n\nEl programa se cierra un momento, se actualiza y se abre solo.",
+        "Hay una versión nueva de Gaming Fix: {}.\n\n{}\n\nEl programa se cierra un momento, se actualiza y se abre solo.",
         update.version,
         update.body.clone().unwrap_or_default().trim()
     );
     let app2 = app.clone();
     app.dialog()
         .message(texto)
-        .title("Actualización de Game Fix")
+        .title("Actualización de Gaming Fix")
         .buttons(MessageDialogButtons::OkCancelCustom(
             "Instalar ahora".into(),
             "Más tarde".into(),
@@ -168,7 +168,7 @@ async fn buscar_actualizacion(app: tauri::AppHandle) {
                     Err(e) => {
                         app2.dialog()
                             .message(format!("No se pudo instalar la actualización: {e}"))
-                            .title("Actualización de Game Fix")
+                            .title("Actualización de Gaming Fix")
                             .show(|_| {});
                     }
                 }
@@ -205,10 +205,10 @@ async fn buscar_actualizacion(app: tauri::AppHandle) {
     let app2 = app.clone();
     app.dialog()
         .message(format!(
-            "Hay una versión nueva de Game Fix: {version} (tienes la {actual}).\n\n{}\n\nToca Descargar, abre el archivo y toca Instalar. Tus datos no se pierden.",
+            "Hay una versión nueva de Gaming Fix: {version} (tienes la {actual}).\n\n{}\n\nToca Descargar, abre el archivo y toca Instalar. Tus datos no se pierden.",
             notas.trim()
         ))
-        .title("Actualización de Game Fix")
+        .title("Actualización de Gaming Fix")
         .buttons(MessageDialogButtons::OkCancelCustom(
             "Descargar".into(),
             "Más tarde".into(),
@@ -240,7 +240,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![guardar_binario, archivo_temporal])
         .run(tauri::generate_context!())
-        .expect("No se pudo abrir Game Fix");
+        .expect("No se pudo abrir Gaming Fix");
 }
 
 #[cfg(test)]
