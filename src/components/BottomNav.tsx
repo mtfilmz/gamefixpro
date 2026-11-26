@@ -1,5 +1,4 @@
-import { Home, PlusCircle, Clock, Settings, Search, Users, History } from "lucide-react";
-import { useRole } from "@/hooks/use-role";
+import { Home, Plus, ClipboardList, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -9,21 +8,19 @@ interface BottomNavProps {
   onNewRecord: () => void;
 }
 
-type NavItem = { key: string; label: string; icon: typeof Home };
+// "también" = otras vistas que viven dentro de esa sección (para marcarla como activa).
+type NavItem = { key: string; label: string; icon: typeof Home; tambien?: string[] };
 
+// 4 secciones, como piden las guías de Google para la barra de abajo. El + va en el centro.
 const navItems: NavItem[] = [
   { key: "dashboard", label: "Inicio", icon: Home },
-  { key: "historial", label: "Historial", icon: Clock },
+  { key: "historial", label: "Órdenes", icon: ClipboardList, tambien: ["buscar"] },
   { key: "clientes", label: "Clientes", icon: Users },
-  { key: "buscar", label: "Buscar", icon: Search },
-  { key: "config", label: "Config", icon: Settings },
+  { key: "config", label: "Ajustes", icon: Settings, tambien: ["actividad"] },
 ];
 
 const BottomNav = ({ activeView, onViewChange, onNewRecord }: BottomNavProps) => {
-  const { isAdmin } = useRole();
-  const items = navItems.flatMap((item) =>
-    item.key === "clientes" && isAdmin ? [item, { key: "actividad", label: "Actividad", icon: History }] : [item],
-  );
+  const items = navItems;
   // El botón + va siempre en el centro exacto: la mitad de las secciones a cada lado.
   const mitad = Math.ceil(items.length / 2);
   const izquierda = items.slice(0, mitad);
@@ -31,7 +28,7 @@ const BottomNav = ({ activeView, onViewChange, onNewRecord }: BottomNavProps) =>
 
   const renderItem = (item: NavItem) => {
     const Icon = item.icon;
-    const isActive = activeView === item.key;
+    const isActive = activeView === item.key || (item.tambien?.includes(activeView) ?? false);
     return (
       <Button
         variant="ghost"
@@ -44,7 +41,7 @@ const BottomNav = ({ activeView, onViewChange, onNewRecord }: BottomNavProps) =>
         )}
       >
         <Icon className="w-5 h-5" />
-        <span className="text-[10px] font-bold truncate max-w-full">{item.label}</span>
+        <span className="text-[11px] font-bold truncate max-w-full">{item.label}</span>
       </Button>
     );
   };
@@ -56,12 +53,12 @@ const BottomNav = ({ activeView, onViewChange, onNewRecord }: BottomNavProps) =>
         <button
           type="button"
           onClick={onNewRecord}
-          aria-label="Nuevo registro"
-          title="Nuevo registro"
+          aria-label="Nueva orden"
+          title="Nueva orden"
           className="flex items-center justify-center px-2 -mt-6"
         >
           <span className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg ring-4 ring-background active:scale-95 transition-transform">
-            <PlusCircle className="w-7 h-7 text-primary-foreground" />
+            <Plus className="w-7 h-7 text-primary-foreground" />
           </span>
         </button>
         <div className="flex items-center min-w-0">{derecha.map(renderItem)}</div>
